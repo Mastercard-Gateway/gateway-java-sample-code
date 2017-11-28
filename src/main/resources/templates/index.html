@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'index')}">
+
+<body>
+
+<div class="col-12">
+    <div class="row">
+        <div class="col-6">
+            <h4><a href="/authorize">Authorize</a></h4>
+            <p>Simple authorization transaction</p>
+            <h4><a href="/pay">Pay</a></h4>
+            <p>Simple pay (aka purchase) transaction</p>
+            <h4><a href="/capture">Capture</a></h4>
+            <p>Captures against an existing Order</p>
+            <h4><a href="/refund">Refund</a></h4>
+            <p>Refunds against an existing Order</p>
+            <h4><a href="/void">Void</a></h4>
+            <p>Voids a previous transaction</p>
+        </div>
+        <div class="col-6">
+            <h4><a href="/verify">Verify</a></h4>
+            <p>Performs a card verification transaction</p>
+            <h4><a href="/initiate">Initiate Browser Payment</a></h4>
+            <p>Initiates a browser payment, for example, PayPal</p>
+            <h4><a href="/confirm">Confirm Browser Payment</a></h4>
+            <p>Confirms a successfully initiated browser payment</p>
+            <h4><a href="/update">Update Authorization</a></h4>
+            <p>Updates an existing authorization</p>
+            <h4><a href="/retrieve">Retrieve Transaction</a></h4>
+            <p>Retrieves the details of a transaction</p>
+        </div>
+    </div>
+</div>
+
+<!--<div class="container">-->
+    <!--<div class="row">-->
+        <!--<div class="col-md-6">-->
+            <!--&lt;!&ndash;<h3><span class="glyphicon glyphicon-info-sign"></span> How this sample app works</h3>&ndash;&gt;-->
+            <!--<h3><a href="/authorize">Authorize</a></h3>-->
+            <!--<p>Simple authorization transaction. Includes only basic fields like Card Number, Expiry, Card Security Code, Amount, Currency, IP Address and Order & Transaction References. Requires merchant to specify Order & Transaction IDs.</p>-->
+            <!--<h3><a href="/pay">Pay</a></h3>-->
+            <!--<p>Simple pay (aka purchase) transaction. Includes only basic fields like Card Number, Expiry, Card Security Code, Amount, Currency, IP Address and Order & Transaction References. Requires merchant to specify Order & Transaction IDs.</p>-->
+            <!--<h3><a href="/capture">Capture</a></h3>-->
+            <!--<p>Captures against an existing Order. Includes the Amount and Currency as well as requiring the merchant to specify the Transaction ID for the capture and the Order ID created from the initial authorisation operation.</p>-->
+            <!--<h3><a href="/refund">Refund</a></h3>-->
+            <!--<p>Refunds against an existing Order. Includes the Amount and Currency as well as requiring the merchant to specify the Transaction ID for the refund and the Order ID created from the initial authorisation or pay operation.</p>-->
+            <!--<h3><a href="/void">Void</a></h3>-->
+            <!--<p>Voids a previous transaction. Requires the merchant to specify the Transaction ID and Order ID of the transaction to void. Includes basic fields like Transaction Reference.</p>-->
+        <!--</div>-->
+        <!--<div class="col-md-6">-->
+            <!--<h3><a href="/verify">Verify</a></h3>-->
+            <!--<p>Performs a card verification transaction. Includes only basic fields like Card Number, Expiry, Card Security Code, Currency and Order & Transaction References. Requires merchant to specify Order & Transaction IDs.</p>-->
+            <!--<h3><a href="/initiate">Initiate Browser Payment</a></h3>-->
+            <!--<p>Initiates a browser payment, for example, PayPal. Requires you to specify the amount, currency, and the return URL (the URL to which the payer's browser is redirected on completing the payment at the payment provider's website).-->
+                <!--With PayPal, you must also specify the operation and the payment confirmation flow.</p>-->
+            <!--<h3><a href="/confirm">Confirm Browser Payment</a></h3>-->
+            <!--<p>Confirms a successfully initiated browser payment. Requires you to specify the amount and currency.</p>-->
+            <!--<h3><a href="/update">Update Authorization</a></h3>-->
+            <!--<p>Updates an existing authorization. If successful, the authorization period of the existing authorization is extended and/or the authorization amount is updated.</p>-->
+            <!--<h3><a href="/retrieve">Retrieve Transaction</a></h3>-->
+            <!--<p>Retrieves the details of a transaction. The order ID and transaction ID must identify the transaction you wish to retrieve the details for.</p>-->
+        <!--</div>-->
+    <!--</div> &lt;!&ndash; row &ndash;&gt;-->
+<!--</div>-->
+
+</body>
+</html>

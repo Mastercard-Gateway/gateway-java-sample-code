@@ -1,0 +1,113 @@
+@font-face {
+    font-family: 'MarkForMC';
+    src: url('../fonts/MarkWebW01Regular.eot');
+    src: url('../fonts/MarkWebW01Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MarkWebW01Regular.woff') format('woff'),
+    url('../fonts/MarkWebW01Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'MarkForMC';
+    src: url('../fonts/MarkWebPro-LightW01Regular.eot');
+    src: url('../fonts/MarkWebPro-LightW01Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MarkWebPro-LightW01Regular.woff') format('woff'),
+    url('../fonts/MarkWebPro-LightW01Regular.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'MarkForMC';
+    src: url('../fonts/MarkWebPro-ExtraLightW01Rg.eot');
+    src: url('../fonts/MarkWebPro-ExtraLightW01Rg.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MarkWebPro-ExtraLightW01Rg.woff') format('woff'),
+    url('../fonts/MarkWebPro-ExtraLightW01Rg.ttf') format('truetype');
+    font-weight: 200;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'MarkForMC';
+    src: url('../fonts/MarkWebPro-HairlineW011466024.eot');
+    src: url('../fonts/MarkWebPro-HairlineW011466024.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MarkWebPro-HairlineW011466024.woff') format('woff'),
+    url('../fonts/MarkWebPro-HairlineW011466024.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+body {
+    margin-bottom: 50px;
+    font-family: "MarkForMC", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+a {
+    color: black;
+}
+a:hover {
+    color: #FF6600;
+    text-decoration: none;
+}
+pre {
+    white-space: pre-wrap;
+    background-color: #6A6A6A;
+    color: #FFF;
+    padding: 15px;
+    border-radius: 10px;
+}
+h3 {
+    margin: 0 0 32px 15px;
+    font-weight: 300;
+}
+h6 {
+    line-height: 22px;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+form {
+    padding: 15px;
+}
+form label {
+    font-weight: 400;
+}
+form label + span {
+    font-weight: 300;
+    color: #6A6A6A;
+}
+form input[type="text"] {
+    font-weight: 300;
+    border: 1px solid #6A6A6A;
+}
+.active {
+    color: #FF6600;
+}
+.error {
+    color: red;
+}
+.alert-warning {
+    margin-left: 15px;
+    margin-bottom: 40px;
+}
+.logo {
+    margin-bottom: 50px;
+}
+.row .sidebar {
+    padding: 30px;    
+}
+.sidebar {
+    border-right: 1px solid #CCC;
+}
+.btn-primary {
+    color: #fff;
+    background-color: #FF6600;
+    border-color: #FF6600;
+    cursor: pointer;
+}
+.btn-primary:hover, .btn-primary:focus {
+    color: #fff;
+    background-color: #E55C00;
+    border-color: #E55C00;
+    cursor: pointer;
+}
+.endpoint {
+    word-wrap: break-word;
+}

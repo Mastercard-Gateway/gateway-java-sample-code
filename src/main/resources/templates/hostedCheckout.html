@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'hostedCheckout')}">
+<body>
+<div class="col-9">
+    <div class="row">
+        <h3>Hosted Checkout</h3>
+        <div class="p-3">
+            <p>The Hosted Checkout model allows you to collect payment details from your payer through an interaction hosted and displayed by the MasterCard Payment Gateway.
+                With this model of integration, you never see or handle payment details directly because these are collected by the hosted payment interface and submitted directly from the payer's browser to the MasterCard Payment Gateway.</p>
+            <p>Hosted Checkout can be implemented as:</p>
+            <ol>
+                <li>A Lightbox in a modal dialog over the top of your existing merchant website.</li>
+                <li>A Hosted Payment Page is a web page hosted and displayed by the MasterCard Payment Gateway.</li>
+            </ol>
+            <!--<div class="my-5">-->
+                <!--<p>The below options do not redirect back to the merchant page after payment completion (and thus don't require a session ID)</p>-->
+                <!--<input id="lightbox-no-session" type="button" class="btn btn-primary mr-2" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />-->
+                <!--<input id="page-no-session" type="button" class="btn btn-primary" value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />-->
+            <!--</div>-->
+            <div class="my-5">
+                <p>The below options redirect back to the merchant site after payment completion and thus require a session ID to be passed in</p>
+                <input id="lightbox-with-session" type="button" class="btn btn-primary mr-2" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />
+                <input id="page-with-session" type="button" class="btn btn-primary" value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://test-gateway.mastercard.com/checkout/version/45/checkout.js"
+        data-error="errorCallback"
+        data-cancel="cancelCallback"
+        data-complete="/hostedCheckoutReceipt">
+</script>
+<script th:inline="javascript">
+
+    /*<![CDATA[*/
+        var merchantId = /*[[${merchantId}]]*/ null;
+        var sessionId = /*[[${session.id}]]*/ null;
+        var sessionVersion = /*[[${session.version}]]*/ null;
+    /*]]>*/
+
+    function errorCallback(error) {
+        console.log(JSON.stringify(error));
+    }
+    function cancelCallback() {
+        console.log('Payment cancelled');
+    }
+//    function completeCallback(data) {
+//        console.log("############### DATA: ", data);
+//        console.log("Payment complete");
+//        window.location.href = "/hostedCheckoutReceipt";
+//    }
+
+    function randomId() {
+        var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", length = 10;
+        var result = '';
+        for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+        return result;
+    }
+
+    Checkout.configure({
+        merchant: merchantId,
+        order: {
+            amount: function() {
+                //Dynamic calculation of amount
+                return 80 + 20;
+            },
+            currency: 'USD',
+            description: 'Ordered goods',
+            id: randomId()
+        },
+        session: {
+            id: sessionId,
+            version: sessionVersion
+        },
+        interaction: {
+            merchant: {
+                name: 'Merchant Name',
+                address: {
+                    line1: '200 Sample St',
+                    line2: '1234 Example Town'
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
