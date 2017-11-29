@@ -28,27 +28,38 @@
 <script src="https://test-gateway.mastercard.com/checkout/version/45/checkout.js"
         data-error="errorCallback"
         data-cancel="cancelCallback"
-        data-complete="/hostedCheckoutReceipt">
+        data-complete="completeCallback">
 </script>
 <script th:inline="javascript">
 
     /*<![CDATA[*/
         var merchantId = /*[[${merchantId}]]*/ null;
-        var sessionId = /*[[${session.id}]]*/ null;
-        var sessionVersion = /*[[${session.version}]]*/ null;
+        var sessionId = /*[[${sessionId}]]*/ null;
+        var sessionVersion = /*[[${sessionVersion}]]*/ null;
+        var successIndicator = /*[[${successIndicator}]]*/ null;
+        var orderId = /*[[${orderId}]]*/ null;
     /*]]>*/
+
+    sessionStorage.setItem('successIndicator', successIndicator);
+    sessionStorage.setItem('orderId', orderId);
 
     function errorCallback(error) {
         console.log(JSON.stringify(error));
     }
     function cancelCallback() {
         console.log('Payment cancelled');
+        // Reload the page to generate a new session ID - the old one is out of date as soon as the lightbox is invoked
+        window.location.reload(true);
     }
-//    function completeCallback(data) {
-//        console.log("############### DATA: ", data);
-//        console.log("Payment complete");
-//        window.location.href = "/hostedCheckoutReceipt";
-//    }
+
+    function completeCallback(response) {
+        console.log("resultIndicator: ", response);
+        console.log("successIndicator: ", sessionStorage.getItem("successIndicator"));
+        console.log("Payment complete");
+
+        var result = (response === sessionStorage.getItem("successIndicator")) ? "success" : "error";
+        window.location.href = "http://localhost:5000/hostedCheckoutReceipt/" + sessionStorage.getItem("orderId") + "/" + result;
+    }
 
     function randomId() {
         var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", length = 10;
