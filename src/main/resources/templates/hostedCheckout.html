@@ -58,7 +58,7 @@
         console.log("Payment complete");
 
         var result = (response === sessionStorage.getItem("successIndicator")) ? "success" : "error";
-        window.location.href = "http://localhost:5000/hostedCheckoutReceipt/" + sessionStorage.getItem("orderId") + "/" + result;
+        window.location.href = "/hostedCheckoutReceipt/" + sessionStorage.getItem("orderId") + "/" + result;
     }
 
     function randomId() {
