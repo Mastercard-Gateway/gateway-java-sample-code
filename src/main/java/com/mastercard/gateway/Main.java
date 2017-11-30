@@ -26,14 +26,14 @@ import org.springframework.web.servlet.ModelAndView;
 @SpringBootApplication
 public class Main {
 
-  public static void main(String[] args) throws Exception {
-    SpringApplication.run(Main.class, args);
-  }
+    public static void main(String[] args) throws Exception {
 
-  @RequestMapping("/")
-  ModelAndView index() {
-    return new ModelAndView("redirect:/authorize");
-    //return "index";
-  }
+        SpringApplication.run(Main.class, args);
+    }
+
+    @RequestMapping("/")
+    ModelAndView index() {
+        return new ModelAndView("redirect:/authorize");
+    }
 
 }

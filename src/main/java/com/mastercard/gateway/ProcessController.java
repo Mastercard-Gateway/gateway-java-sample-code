@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,13 +17,9 @@ import java.io.IOException;
 @Controller
 public class ProcessController {
 
-    private static final String DEFAULT_MERCHANT_ID = "TESTSIMPLIFYDEV1";
-    private static final String DEFAULT_API_PASSWORD = "0af6b287057c4705f4f1d4da8581c646";
-    private static final String DEFAULT_GATEWAY_URL = "https://test-gateway.mastercard.com";
 
-    private static final String MERCHANT_ID = (System.getenv("GATEWAY_MERCHANT_ID") != null && !System.getenv("GATEWAY_MERCHANT_ID").equals("")) ? System.getenv("GATEWAY_MERCHANT_ID") : DEFAULT_MERCHANT_ID;
-    private static final String API_PASSWORD = (System.getenv("GATEWAY_API_PASSWORD") != null && !System.getenv("GATEWAY_API_PASSWORD").equals("")) ? System.getenv("GATEWAY_API_PASSWORD") : DEFAULT_API_PASSWORD;
-    private static final String GATEWAY_URL = (System.getenv("GATEWAY_BASE_URL") != null && !System.getenv("GATEWAY_BASE_URL").equals("")) ? System.getenv("GATEWAY_BASE_URL") : DEFAULT_GATEWAY_URL;
+    @Autowired
+    private Config config;
 
     @GetMapping("/authorize")
     public ModelAndView showAuthorize() {
@@ -148,8 +146,7 @@ public class ProcessController {
             mav.addObject("session", session);
             mav.addObject("merchantId", merchant.getMerchantId());
             mav.addObject("apiPassword", merchant.getPassword());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -170,8 +167,7 @@ public class ProcessController {
             }
             data = buffer.toString();
             mav.addObject("request", data);
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -200,10 +196,9 @@ public class ProcessController {
 
         try {
             Connection connection = new Connection(merchant);
-            if(request.getMethod().equals("PUT")) {
+            if (request.getMethod().equals("PUT")) {
                 resp = connection.sendTransaction(data);
-            }
-            else if(request.getMethod().equals("GET")) {
+            } else if (request.getMethod().equals("GET")) {
                 resp = connection.getTransaction();
             }
             ObjectMapper mapper = new ObjectMapper();
@@ -214,8 +209,7 @@ public class ProcessController {
             mav.addObject("method", request.getMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -225,10 +219,10 @@ public class ProcessController {
 
     private Merchant createMerchant() {
         Merchant merchant = new Merchant();
-        merchant.setMerchantId(MERCHANT_ID);
-        merchant.setPassword(API_PASSWORD);
-        merchant.setGatewayHost(GATEWAY_URL);
-        merchant.setGatewayUrl(GATEWAY_URL + "/api/rest");
+        merchant.setMerchantId(config.getMerchantId());
+        merchant.setPassword(config.getApiPassword());
+        merchant.setGatewayHost(config.getApiBaseURL());
+        merchant.setGatewayUrl(config.getApiBaseURL() + "/api/rest");
         merchant.setApiUsername("merchant." + merchant.getMerchantId());
         return merchant;
     }
