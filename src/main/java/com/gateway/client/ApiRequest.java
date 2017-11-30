@@ -1,4 +1,4 @@
-package com.mastercard.gateway;
+package com.gateway.client;
 
 public class ApiRequest {
 
@@ -20,7 +20,8 @@ public class ApiRequest {
     private String browserPaymentConfirmation;
     private String method;
 
-    public ApiRequest(){}
+    //Update this to use a different API Version
+    private int apiVersion = 45;
 
     public String getOrderId() {
         return orderId;
@@ -158,22 +159,11 @@ public class ApiRequest {
         this.method = method;
     }
 
-    public static ApiRequest createTestRequest(String apiOperation) {
-        ApiRequest req = new ApiRequest();
+    public int getApiVersion() {
+        return apiVersion;
+    }
 
-        req.apiOperation = apiOperation;
-        req.method = "PUT";
-        req.sourceType = "CARD";
-        req.cardNumber = "5123450000000008";
-        req.expiryMonth = "5";
-        req.expiryYear = "21";
-        req.securityCode = "100";
-        req.orderAmount = "5000";
-        req.transactionAmount = "5000";
-        req.orderCurrency = "USD";
-        req.transactionCurrency = "USD";
-        req.returnUrl = "http://localhost:5000/browserPaymentReceipt";
-
-        return req;
+    public void setApiVersion(int apiVersion) {
+        this.apiVersion = apiVersion;
     }
 }

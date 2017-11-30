@@ -1,19 +1,26 @@
-package com.mastercard.gateway;
+package com.gateway.client;
 
-import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NTCredentials;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+
 import java.io.IOException;
 
-public final class Connection {
+public final class ApiClient {
 
     private Merchant merchant;
 
-    Connection(Merchant merchant) {
+    public ApiClient(Merchant merchant) {
         this.merchant = merchant;
     }
 
-    String sendTransaction(String data) throws Exception {
+    public String sendTransaction(String data) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
@@ -47,7 +54,7 @@ public final class Connection {
         return body;
     }
 
-    String postTransaction(String data) throws Exception {
+    public String postTransaction(String data) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
@@ -57,6 +64,8 @@ public final class Connection {
         PostMethod postMethod = new PostMethod(merchant.getGatewayUrl());
 
         postMethod.setDoAuthentication(true);
+
+        //TODO: This URL should come from the client dynamically
         postMethod.addParameter("interaction.returnUrl", "http://localhost:5000/hostedCheckoutReceipt");
 
         // Set the charset to UTF-8
@@ -82,7 +91,7 @@ public final class Connection {
         return body;
     }
 
-    String getTransaction() throws Exception {
+    public String getTransaction() throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
@@ -114,7 +123,7 @@ public final class Connection {
 
     /**
      * configureProxy
-     *
+     * <p/>
      * Check if proxy config is defined; if so configure the host and http client to tunnel through
      *
      * @param httpClient

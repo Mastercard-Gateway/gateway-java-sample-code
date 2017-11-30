@@ -1,4 +1,4 @@
-package com.mastercard.gateway;
+package com.mastercard.client;
 
 import static org.junit.Assert.*;
 import com.google.gson.*;

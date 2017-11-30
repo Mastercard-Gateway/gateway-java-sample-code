@@ -1,4 +1,4 @@
-package com.mastercard.gateway;
+package com.gateway.app;
 
 public class Config {
 

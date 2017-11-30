@@ -1,4 +1,5 @@
-package com.mastercard.gateway;
+package com.gateway.client;
+
 
 public final class Merchant {
     private String gatewayHost;
