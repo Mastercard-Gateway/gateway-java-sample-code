@@ -3,7 +3,7 @@ package com.gateway.client;
 public class CheckoutSession {
     private String id;
     private String version;
-
+    private String successIndicator;
 
     public CheckoutSession() {
     }
@@ -24,4 +24,11 @@ public class CheckoutSession {
         this.version = version;
     }
 
+    public String getSuccessIndicator() {
+        return successIndicator;
+    }
+
+    public void setSuccessIndicator(String successIndicator) {
+        this.successIndicator = successIndicator;
+    }
 }

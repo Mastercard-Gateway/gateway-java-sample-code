@@ -64,12 +64,6 @@ public final class ApiClient {
         PostMethod postMethod = new PostMethod(merchant.getGatewayUrl());
 
         postMethod.setDoAuthentication(true);
-<<<<<<< HEAD:src/main/java/com/mastercard/gateway/Connection.java
-=======
-
-        //TODO: This URL should come from the client dynamically
-        postMethod.addParameter("interaction.returnUrl", "http://localhost:5000/hostedCheckoutReceipt");
->>>>>>> refactoring:src/main/java/com/gateway/client/ApiClient.java
 
         // Set the charset to UTF-8
         StringRequestEntity entity = new StringRequestEntity(data, "application/json", "UTF-8");

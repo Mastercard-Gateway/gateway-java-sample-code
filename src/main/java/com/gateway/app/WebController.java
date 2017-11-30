@@ -139,23 +139,15 @@ public class WebController {
             JsonObject json = new Gson().fromJson(resp, JsonObject.class);
             JsonObject jsonSession = json.get("session").getAsJsonObject();
 
-<<<<<<< HEAD:src/main/java/com/mastercard/gateway/ProcessController.java
-            Session session = new Session();
-            session.setId(jsonSession.get("id").getAsString());
-            session.setVersion(jsonSession.get("version").getAsString());
-            session.setSuccessIndicator(json.get("successIndicator").getAsString());
-
-            mav.addObject("orderId", req.getOrderId());
-            mav.addObject("sessionId", session.getId());
-            mav.addObject("sessionVersion", session.getVersion());
-            mav.addObject("successIndicator", session.getSuccessIndicator());
-=======
             CheckoutSession checkoutSession = new CheckoutSession();
             checkoutSession.setId(jsonSession.get("id").getAsString());
             checkoutSession.setVersion(jsonSession.get("version").getAsString());
+            checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
 
-            mav.addObject("session", checkoutSession);
->>>>>>> refactoring:src/main/java/com/gateway/app/WebController.java
+            mav.addObject("orderId", req.getOrderId());
+            mav.addObject("sessionId", checkoutSession.getId());
+            mav.addObject("sessionVersion", checkoutSession.getVersion());
+            mav.addObject("successIndicator", checkoutSession.getSuccessIndicator());
             mav.addObject("merchantId", merchant.getMerchantId());
             mav.addObject("apiPassword", merchant.getPassword());
         } catch (Exception e) {
@@ -199,11 +191,11 @@ public class WebController {
             req.setOrderId(orderId);
 
             Merchant merchant = createMerchant();
-            Parser parser = new Parser(merchant);
-            String requestUrl = parser.formRequestUrl(req);
+            ClientUtil clientUtil = new ClientUtil();
+            String requestUrl = clientUtil.getRequestUrl(merchant, req);
 
             try {
-                Connection connection = new Connection(merchant);
+                ApiClient connection = new ApiClient(merchant);
                 String resp = connection.getTransaction();
                 mav.addObject("orderDetails", resp);
             }
