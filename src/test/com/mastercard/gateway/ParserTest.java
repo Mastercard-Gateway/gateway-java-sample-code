@@ -1,4 +1,4 @@
-package com.mastercard.gateway;
+package com.mastercard.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

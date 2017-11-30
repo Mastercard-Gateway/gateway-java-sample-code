@@ -1,4 +1,4 @@
-package com.mastercard.gateway;
+package com.mastercard.client;
 
 public class ProcessControllerTest {
 

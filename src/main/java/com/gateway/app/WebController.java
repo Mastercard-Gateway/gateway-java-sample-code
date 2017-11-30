@@ -1,9 +1,11 @@
-package com.mastercard.gateway;
+package com.gateway.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gateway.client.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,20 +17,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 @Controller
-public class ProcessController {
+public class WebController {
 
-    private static final String DEFAULT_MERCHANT_ID = "TESTSIMPLIFYDEV1";
-    private static final String DEFAULT_API_PASSWORD = "0af6b287057c4705f4f1d4da8581c646";
-    private static final String DEFAULT_GATEWAY_URL = "https://test-gateway.mastercard.com";
 
-    private static final String MERCHANT_ID = (System.getenv("GATEWAY_MERCHANT_ID") != null && !System.getenv("GATEWAY_MERCHANT_ID").equals("")) ? System.getenv("GATEWAY_MERCHANT_ID") : DEFAULT_MERCHANT_ID;
-    private static final String API_PASSWORD = (System.getenv("GATEWAY_API_PASSWORD") != null && !System.getenv("GATEWAY_API_PASSWORD").equals("")) ? System.getenv("GATEWAY_API_PASSWORD") : DEFAULT_API_PASSWORD;
-    private static final String GATEWAY_URL = (System.getenv("GATEWAY_BASE_URL") != null && !System.getenv("GATEWAY_BASE_URL").equals("")) ? System.getenv("GATEWAY_BASE_URL") : DEFAULT_GATEWAY_URL;
+    @Autowired
+    private Config config;
 
     @GetMapping("/authorize")
     public ModelAndView showAuthorize() {
         ModelAndView mav = new ModelAndView("authorize");
-        ApiRequest req = ApiRequest.createTestRequest("AUTHORIZE");
+        ApiRequest req = createTestRequest("AUTHORIZE");
         req.setTransactionId(randomNumber());
         req.setOrderId(randomNumber());
         mav.addObject("apiRequest", req);
@@ -38,7 +36,7 @@ public class ProcessController {
     @GetMapping("/capture")
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
-        ApiRequest req = ApiRequest.createTestRequest("CAPTURE");
+        ApiRequest req = createTestRequest("CAPTURE");
         req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -47,7 +45,7 @@ public class ProcessController {
     @GetMapping("/confirm")
     public ModelAndView showConfirm() {
         ModelAndView mav = new ModelAndView("confirm");
-        ApiRequest req = ApiRequest.createTestRequest("CONFIRM_BROWSER_PAYMENT");
+        ApiRequest req = createTestRequest("CONFIRM_BROWSER_PAYMENT");
         req.setTransactionId(randomNumber());
         req.setOrderId(randomNumber());
         mav.addObject("apiRequest", req);
@@ -57,7 +55,7 @@ public class ProcessController {
     @GetMapping("/initiate")
     public ModelAndView showInitiate() {
         ModelAndView mav = new ModelAndView("initiate");
-        ApiRequest req = ApiRequest.createTestRequest("INITIATE_BROWSER_PAYMENT");
+        ApiRequest req = createTestRequest("INITIATE_BROWSER_PAYMENT");
         req.setTransactionId(randomNumber());
         req.setOrderId(randomNumber());
         req.setSourceType(null);
@@ -68,7 +66,7 @@ public class ProcessController {
     @GetMapping("/pay")
     public ModelAndView showPay() {
         ModelAndView mav = new ModelAndView("pay");
-        ApiRequest req = ApiRequest.createTestRequest("PAY");
+        ApiRequest req = createTestRequest("PAY");
         req.setOrderId(randomNumber());
         req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
@@ -78,7 +76,7 @@ public class ProcessController {
     @GetMapping("/refund")
     public ModelAndView showRefund() {
         ModelAndView mav = new ModelAndView("refund");
-        ApiRequest req = ApiRequest.createTestRequest("REFUND");
+        ApiRequest req = createTestRequest("REFUND");
         req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -87,7 +85,7 @@ public class ProcessController {
     @GetMapping("/retrieve")
     public ModelAndView showRetrieve() {
         ModelAndView mav = new ModelAndView("retrieve");
-        ApiRequest req = ApiRequest.createTestRequest("RETRIEVE_TRANSACTION");
+        ApiRequest req = createTestRequest("RETRIEVE_TRANSACTION");
         req.setMethod("GET");
         mav.addObject("apiRequest", req);
         return mav;
@@ -96,7 +94,7 @@ public class ProcessController {
     @GetMapping("/update")
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
-        ApiRequest req = ApiRequest.createTestRequest("UPDATE_AUTHORIZATION");
+        ApiRequest req = createTestRequest("UPDATE_AUTHORIZATION");
         req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -105,7 +103,7 @@ public class ProcessController {
     @GetMapping("/verify")
     public ModelAndView showVerify() {
         ModelAndView mav = new ModelAndView("verify");
-        ApiRequest req = ApiRequest.createTestRequest("VERIFY");
+        ApiRequest req = createTestRequest("VERIFY");
         req.setOrderId(randomNumber());
         req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
@@ -115,7 +113,7 @@ public class ProcessController {
     @GetMapping("/void")
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
-        ApiRequest req = ApiRequest.createTestRequest("VOID");
+        ApiRequest req = createTestRequest("VOID");
         req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -130,18 +128,18 @@ public class ProcessController {
         req.setOrderCurrency("USD");
 
         Merchant merchant = createMerchant();
-        Parser parser = new Parser(merchant);
-        String requestUrl = parser.sessionRequestUrl();
+        String requestUrl = ClientUtil.getSessionRequestUrl(merchant, req);
 
-        String data = parser.parse(req);
+        String data = ClientUtil.buildJSONPayload(req);
 
         try {
-            Connection connection = new Connection(merchant);
+            ApiClient connection = new ApiClient(merchant);
             String resp = connection.postTransaction(data);
 
             JsonObject json = new Gson().fromJson(resp, JsonObject.class);
             JsonObject jsonSession = json.get("session").getAsJsonObject();
 
+<<<<<<< HEAD:src/main/java/com/mastercard/gateway/ProcessController.java
             Session session = new Session();
             session.setId(jsonSession.get("id").getAsString());
             session.setVersion(jsonSession.get("version").getAsString());
@@ -151,10 +149,16 @@ public class ProcessController {
             mav.addObject("sessionId", session.getId());
             mav.addObject("sessionVersion", session.getVersion());
             mav.addObject("successIndicator", session.getSuccessIndicator());
+=======
+            CheckoutSession checkoutSession = new CheckoutSession();
+            checkoutSession.setId(jsonSession.get("id").getAsString());
+            checkoutSession.setVersion(jsonSession.get("version").getAsString());
+
+            mav.addObject("session", checkoutSession);
+>>>>>>> refactoring:src/main/java/com/gateway/app/WebController.java
             mav.addObject("merchantId", merchant.getMerchantId());
             mav.addObject("apiPassword", merchant.getPassword());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -175,8 +179,7 @@ public class ProcessController {
             }
             data = buffer.toString();
             mav.addObject("request", data);
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -218,33 +221,29 @@ public class ProcessController {
     public ModelAndView process(ApiRequest request) {
 
         Merchant merchant = createMerchant();
-        Parser parser = new Parser(merchant);
-
-        String requestUrl = parser.formRequestUrl(request);
-        String data = parser.parse(request);
+        String requestUrl = ClientUtil.getRequestUrl(merchant, request);
+        String jsonPayload = ClientUtil.buildJSONPayload(request);
 
         String resp = "";
 
         ModelAndView mav = new ModelAndView("receipt");
 
         try {
-            Connection connection = new Connection(merchant);
-            if(request.getMethod().equals("PUT")) {
-                resp = connection.sendTransaction(data);
-            }
-            else if(request.getMethod().equals("GET")) {
+            ApiClient connection = new ApiClient(merchant);
+            if (request.getMethod().equals("PUT")) {
+                resp = connection.sendTransaction(jsonPayload);
+            } else if (request.getMethod().equals("GET")) {
                 resp = connection.getTransaction();
             }
             ObjectMapper mapper = new ObjectMapper();
             Object prettyResp = mapper.readValue(resp, Object.class);
-            Object prettyPayload = mapper.readValue(data, Object.class);
+            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
             mav.addObject("operation", request.getApiOperation());
             mav.addObject("method", request.getMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -254,16 +253,34 @@ public class ProcessController {
 
     private Merchant createMerchant() {
         Merchant merchant = new Merchant();
-        merchant.setMerchantId(MERCHANT_ID);
-        merchant.setPassword(API_PASSWORD);
-        merchant.setGatewayHost(GATEWAY_URL);
-        merchant.setGatewayUrl(GATEWAY_URL + "/api/rest");
+        merchant.setMerchantId(config.getMerchantId());
+        merchant.setPassword(config.getApiPassword());
+        merchant.setGatewayHost(config.getApiBaseURL());
+        merchant.setGatewayUrl(config.getApiBaseURL() + "/api/rest");
         merchant.setApiUsername("merchant." + merchant.getMerchantId());
         return merchant;
     }
 
     private String randomNumber() {
         return RandomStringUtils.random(10, true, true);
+    }
+
+    public static ApiRequest createTestRequest(String apiOperation) {
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation(apiOperation);
+        req.setMethod("PUT");
+        req.setSourceType("CARD");
+        req.setCardNumber("5123450000000008");
+        req.setExpiryMonth("5");
+        req.setExpiryYear("21");
+        req.setSecurityCode("100");
+        req.setOrderAmount("5000");
+        req.setTransactionAmount("5000");
+        req.setOrderCurrency("USD");
+        req.setTransactionCurrency("USD");
+        //TODO: This URL should come from the client dynamically
+        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
+        return req;
     }
 
 }

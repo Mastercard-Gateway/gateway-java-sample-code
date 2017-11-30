@@ -15,8 +15,8 @@
   <name>gateway-java-sample-code</name>
 
   <properties>
-    <start-class>com.mastercard.gateway.Main</start-class>
-    <java.version>1.8</java.version>
+    <start-class>com.gateway.app.Main</start-class>
+    <java.version>1.7</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <webjars-bootstrap.version>3.3.6</webjars-bootstrap.version>
