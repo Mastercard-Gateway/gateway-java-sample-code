@@ -138,7 +138,6 @@ public class ProcessController {
         try {
             Connection connection = new Connection(merchant);
             String resp = connection.postTransaction(data);
-            System.out.println("################ response: " + resp);
 
             JsonObject json = new Gson().fromJson(resp, JsonObject.class);
             JsonObject jsonSession = json.get("session").getAsJsonObject();

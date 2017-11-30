@@ -57,7 +57,6 @@ public final class Connection {
         PostMethod postMethod = new PostMethod(merchant.getGatewayUrl());
 
         postMethod.setDoAuthentication(true);
-        postMethod.addParameter("interaction.returnUrl", "http://localhost:5000/hostedCheckoutReceipt");
 
         // Set the charset to UTF-8
         StringRequestEntity entity = new StringRequestEntity(data, "application/json", "UTF-8");

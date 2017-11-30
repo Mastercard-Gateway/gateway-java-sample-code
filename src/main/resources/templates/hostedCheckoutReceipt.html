@@ -7,7 +7,8 @@
     <th:block th:switch="${result}">
         <div th:case="'success'">
             <h3>Success!</h3>
-            <div>You have successfully completed your hosted checkout! Here are the details of your order:</div><br/>
+            <div>You have successfully completed your hosted checkout!</div>
+            <h2>Order Details</h2>
             <div th:text="${orderDetails}"></div>
         </div>
         <div th:case="'error'">
