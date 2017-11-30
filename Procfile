@@ -1,1 +1,1 @@
-web: java -jar target/gateway-java-sample-1.0.jar
+web: java -jar target/gateway-java-sample-code-1.0.jar

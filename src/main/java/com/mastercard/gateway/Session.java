@@ -9,7 +9,7 @@ public class Session implements Serializable {
     private String urlComplete;
     private String urlCallback;
     private String updateStatus;
-
+    private String successIndicator;
 
     public Session() {}
 
@@ -59,5 +59,13 @@ public class Session implements Serializable {
 
     public void setUpdateStatus(String updateStatus) {
         this.updateStatus = updateStatus;
+    }
+
+    public String getSuccessIndicator() {
+        return successIndicator;
+    }
+
+    public void setSuccessIndicator(String successIndicator) {
+        this.successIndicator = successIndicator;
     }
 }

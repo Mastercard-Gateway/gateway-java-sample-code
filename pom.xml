@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
-  <artifactId>gateway-java-sample</artifactId>
+  <artifactId>gateway-java-sample-code</artifactId>
   <version>1.0</version>
 
   <parent>
@@ -12,7 +12,7 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>1.5.2.RELEASE</version>
   </parent>
-  <name>gateway-java-sample</name>
+  <name>gateway-java-sample-code</name>
 
   <properties>
     <start-class>com.mastercard.gateway.Main</start-class>

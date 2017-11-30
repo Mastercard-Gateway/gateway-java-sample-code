@@ -31,10 +31,14 @@ public final class Parser {
         url.append(version);
         url.append("/merchant/");
         url.append(merchant.getMerchantId());
-        url.append("/order/");
-        url.append(request.getOrderId());
-        url.append("/transaction/");
-        url.append(request.getTransactionId());
+        if(notNullOrEmpty(request.getOrderId())) {
+            url.append("/order/");
+            url.append(request.getOrderId());
+        }
+        if(notNullOrEmpty(request.getTransactionId())) {
+            url.append("/transaction/");
+            url.append(request.getTransactionId());
+        }
         merchant.setGatewayUrl(url.toString());
         return merchant.getGatewayUrl();
     }

@@ -4,15 +4,18 @@
 <body>
 
 <div class="col-9 pl-4">
-    <!--<h3 th:text="|${operation} Operation|">Operation</h3>-->
-    <!--<p class="endpoint" th:text="|${method} ${requestUrl}|"></p>-->
-
-    <!--<h5>Payload</h5>-->
-    <!--<pre th:text="${request}">Request</pre>-->
-    <h3>Success!</h3>
-    <div>
-        You have successfully completed your hosted checkout!
-    </div>
+    <th:block th:switch="${result}">
+        <div th:case="'success'">
+            <h3>Success!</h3>
+            <div>You have successfully completed your hosted checkout!</div>
+            <h2>Order Details</h2>
+            <div th:text="${orderDetails}"></div>
+        </div>
+        <div th:case="'error'">
+            <h3>Error</h3>
+            <div>There was an error completing your payment.</div>
+        </div>
+    </th:block>
 </div>
 
 </body>
