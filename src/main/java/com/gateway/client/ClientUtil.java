@@ -12,9 +12,10 @@ public final class ClientUtil {
                 "/merchant/" +
                 merchant.getMerchantId() +
                 "/order/" +
-                request.getOrderId() +
-                "/transaction/" +
-                request.getTransactionId();
+                request.getOrderId();
+        if(notNullOrEmpty(request.getTransactionId())) {
+            url += "/transaction/" + request.getTransactionId();
+        }
         merchant.setGatewayUrl(url);
         return merchant.getGatewayUrl();
     }

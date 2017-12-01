@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 public class ClientUtilTest {
 
-    private ClientUtil clientUtil;
     private Merchant merchant;
 
     @Before
@@ -25,8 +24,6 @@ public class ClientUtilTest {
         merchant.setGatewayHost("https://test-gateway.mastercard.com");
         merchant.setGatewayUrl(merchant.getGatewayHost() + "/api/rest");
         merchant.setApiUsername("merchant." + merchant.getMerchantId());
-
-        clientUtil = new ClientUtil();
     }
 
     @Test
@@ -35,7 +32,7 @@ public class ClientUtilTest {
         request.setOrderId("DS9SJ3J39A");
         request.setTransactionId("H9JK29SM0J");
         request.setApiVersion(45);
-        String result = clientUtil.getRequestUrl(merchant, request);
+        String result = ClientUtil.getRequestUrl(merchant, request);
         assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
     }
 
@@ -43,7 +40,7 @@ public class ClientUtilTest {
     public void getSessionRequestUrl() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiVersion(45);
-        String result = clientUtil.getSessionRequestUrl(merchant, request);
+        String result = ClientUtil.getSessionRequestUrl(merchant, request);
         assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
     }
 
@@ -54,7 +51,7 @@ public class ClientUtilTest {
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setSourceType("CARD");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"AUTHORIZE\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"CARD\"}}";
 
@@ -67,7 +64,7 @@ public class ClientUtilTest {
         request.setApiOperation("CAPTURE");
         request.setTransactionAmount("10.00");
         request.setTransactionCurrency("USD");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CAPTURE\",\"transaction\":{\"amount\":\"10.00\",\"currency\":\"USD\"}}";
 
@@ -81,7 +78,7 @@ public class ClientUtilTest {
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setSourceType("CARD");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"PAY\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"CARD\"}}";
 
@@ -94,7 +91,7 @@ public class ClientUtilTest {
         request.setApiOperation("REFUND");
         request.setTransactionAmount("10.00");
         request.setTransactionCurrency("USD");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"REFUND\",\"transaction\":{\"amount\":\"10.00\",\"currency\":\"USD\"}}";
 
@@ -107,7 +104,7 @@ public class ClientUtilTest {
         request.setApiOperation("VERIFY");
         request.setOrderCurrency("USD");
         request.setSourceType("CARD");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"VERIFY\",\"order\":{\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"CARD\"}}";
 
@@ -119,7 +116,7 @@ public class ClientUtilTest {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("VOID");
         request.setTargetTransactionId("D9DK0KMWBS");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"VOID\",\"transaction\":{\"targetTransactionId\":\"D9DK0KMWBS\"}}";
 
@@ -130,7 +127,7 @@ public class ClientUtilTest {
     public void parseRetrieveTransactionRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("RETRIEVE_TRANSACTION");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"RETRIEVE_TRANSACTION\"}";
 
@@ -141,7 +138,7 @@ public class ClientUtilTest {
     public void parseUpdateAuthRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("UPDATE_AUTHORIZATION");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"UPDATE_AUTHORIZATION\"}";
 
@@ -154,7 +151,7 @@ public class ClientUtilTest {
         request.setApiOperation("CONFIRM_BROWSER_PAYMENT");
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CONFIRM_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"}}";
 
@@ -171,7 +168,7 @@ public class ClientUtilTest {
         request.setBrowserPaymentConfirmation("CONFIRM_AT_PROVIDER");
         request.setReturnUrl("http://www.mysite.com/receipt");
         request.setSourceType("PAYPAL");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"INITIATE_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"PAYPAL\"},\"browserPayment\":{\"operation\":\"PAY\",\"paypal\":{\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
 
@@ -185,7 +182,7 @@ public class ClientUtilTest {
         request.setOrderId("DS9SJ3J39A");
         request.setOrderCurrency("USD");
         request.setReturnUrl("http://www.mysite.com/receipt");
-        String result = clientUtil.buildJSONPayload(request);
+        String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CREATE_CHECKOUT_SESSION\",\"order\":{\"id\":\"DS9SJ3J39A\",\"currency\":\"USD\"},\"interaction\":{\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
 
