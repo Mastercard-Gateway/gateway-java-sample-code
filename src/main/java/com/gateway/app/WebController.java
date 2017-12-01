@@ -134,7 +134,8 @@ public class WebController {
 
         try {
             ApiClient connection = new ApiClient(merchant);
-            String resp = connection.postTransaction(data);
+            String resp = connection.postTransaction(data, requestUrl);
+            System.out.println("CREATED SESSION: " + resp);
 
             JsonObject json = new Gson().fromJson(resp, JsonObject.class);
             JsonObject jsonSession = json.get("session").getAsJsonObject();
@@ -191,12 +192,13 @@ public class WebController {
             req.setOrderId(orderId);
 
             Merchant merchant = createMerchant();
-            ClientUtil clientUtil = new ClientUtil();
-            String requestUrl = clientUtil.getRequestUrl(merchant, req);
+            String requestUrl = ClientUtil.getRequestUrl(merchant, req);
+            System.out.println("REQUEST URL: " + requestUrl);
 
             try {
                 ApiClient connection = new ApiClient(merchant);
-                String resp = connection.getTransaction();
+                String resp = connection.getTransaction(requestUrl);
+                System.out.println("RETRIEVE ORDER: " + resp);
                 mav.addObject("orderDetails", resp);
             }
             catch(Exception e) {
@@ -223,9 +225,9 @@ public class WebController {
         try {
             ApiClient connection = new ApiClient(merchant);
             if (request.getMethod().equals("PUT")) {
-                resp = connection.sendTransaction(jsonPayload);
+                resp = connection.sendTransaction(jsonPayload, requestUrl);
             } else if (request.getMethod().equals("GET")) {
-                resp = connection.getTransaction();
+                resp = connection.getTransaction(requestUrl);
             }
             ObjectMapper mapper = new ObjectMapper();
             Object prettyResp = mapper.readValue(resp, Object.class);

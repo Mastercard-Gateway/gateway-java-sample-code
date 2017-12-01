@@ -20,14 +20,14 @@ public final class ApiClient {
         this.merchant = merchant;
     }
 
-    public String sendTransaction(String data) throws Exception {
+    public String sendTransaction(String data, String requestUrl) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
         httpClient.getState().setCredentials(AuthScope.ANY,
                 new UsernamePasswordCredentials(merchant.getApiUsername(), merchant.getPassword()));
 
-        PutMethod putMethod = new PutMethod(merchant.getGatewayUrl());
+        PutMethod putMethod = new PutMethod(requestUrl);
 
         putMethod.setDoAuthentication(true);
 
@@ -54,14 +54,14 @@ public final class ApiClient {
         return body;
     }
 
-    public String postTransaction(String data) throws Exception {
+    public String postTransaction(String data, String requestUrl) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
         httpClient.getState().setCredentials(AuthScope.ANY,
                 new UsernamePasswordCredentials(merchant.getApiUsername(), merchant.getPassword()));
 
-        PostMethod postMethod = new PostMethod(merchant.getGatewayUrl());
+        PostMethod postMethod = new PostMethod(requestUrl);
 
         postMethod.setDoAuthentication(true);
 
@@ -88,14 +88,14 @@ public final class ApiClient {
         return body;
     }
 
-    public String getTransaction() throws Exception {
+    public String getTransaction(String requestUrl) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
         httpClient.getState().setCredentials(AuthScope.ANY,
                 new UsernamePasswordCredentials(merchant.getApiUsername(), merchant.getPassword()));
 
-        GetMethod getMethod = new GetMethod(merchant.getGatewayUrl());
+        GetMethod getMethod = new GetMethod(requestUrl);
 
         getMethod.setDoAuthentication(true);
 
