@@ -30,6 +30,7 @@ public class WebController {
         req.setTransactionId(randomNumber());
         req.setOrderId(randomNumber());
         mav.addObject("apiRequest", req);
+        mav.addObject("merchantId", createMerchant().getMerchantId());
         return mav;
     }
 
