@@ -1,9 +1,13 @@
 <!doctype html>
-<html th:fragment="layout (template, viewName)" xmlns:th="http://www.w3.org/1999/xhtml">
+<html th:fragment="layout (template, viewName, baseUrl, merchantId)" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>Gateway Java Sample</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+    <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
+    <style id="antiClickjack">body{display:none !important;}</style>
+    <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
+    <script th:src="@{${baseUrl} + '/form/version/45/merchant/' + ${merchantId} + '/session.js'}"></script>
 </head>
 
 <body>
@@ -27,6 +31,7 @@
             <h6><a th:class="${viewName == 'update'}? 'active'" href="/update">Update Authorization</a></h6>
             <h6><a th:class="${viewName == 'retrieve'}? 'active'" href="/retrieve">Retrieve Transaction</a></h6>
             <h6><a th:class="${viewName == 'hostedCheckout'}? 'active'" href="/hostedCheckout">Hosted Checkout</a></h6>
+            <h6><a th:class="${viewName == 'hostedSession'}? 'active'" href="/hostedSession">Hosted Session</a></h6>
         </div>
         <div th:replace="${template}"/>
     </div>
@@ -36,4 +41,5 @@
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script src="/scripts/hostedSession.js"></script>
 </body>

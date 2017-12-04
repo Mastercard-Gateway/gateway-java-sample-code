@@ -1,158 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'authorize')}">
-<head>
-    <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-    <script th:src="@{'https://test-gateway.mastercard.com/form/version/45/merchant/' + ${merchantId} + '/session.js'}"></script>
-    <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
-    <style id="antiClickjack">body{display:none !important;}</style>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'authorize',${baseUrl},${merchantId})}">
 <body>
+<script type="text/javascript">
+    var JavaSample = {
+        operation: function() {
+            return "AUTHORIZE";
+        }
+    };
+</script>
 <div class="col-9">
     <div class="row">
         <h3>Authorize</h3>
-        <p>Please enter your payment details:</p>
-        <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
-        <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
-        <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
-        <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
-        <div><button id="payButton" onclick="pay();">Pay Now</button></div>
-        <!--<form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">-->
-            <!--<h3>Authorize</h3>-->
-            <!--<fieldset>-->
-                <!--<input type="hidden" th:field="*{orderId}" th:value="${orderId}" name="orderId" />-->
-                <!--<input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />-->
-                <!--<input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />-->
-                <!--<input type="hidden" th:field="*{method}" th:value="${method}" name="method" />-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="funds-type">Source of Funds</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="funds-type" th:field="*{sourceType}" type="text" placeholder="CARD" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="card-number">Card Number</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="card-number" th:field="*{cardNumber}" type="text" placeholder="" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="expiry-month">Expiry Month</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="expiry-month" th:field="*{expiryMonth}" type="text" placeholder="" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="expiry-year">Expiry Year</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="expiry-year" th:field="*{expiryYear}" type="text" placeholder="" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="security-code">Security Code</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="security-code" th:field="*{securityCode}" type="text" placeholder="" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="order-amount">Amount</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="order-currency">Currency</label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>-->
-
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="form-group">-->
-                    <!--<label class="col-md-7 control-label" for="process"></label>-->
-                    <!--<div class="col-md-7">-->
-                        <!--<button id="process" name="process" class="btn btn-primary">Process Authorization</button>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</fieldset>-->
-        <!--</form>-->
+        <div class="col-md-7">
+            <p>Please enter your payment details:</p>
+            <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
+            <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
+            <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
+            <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
+            <button class="btn btn-primary" id="payButton" onclick="pay();">Authorize Now</button>
+        </div>
     </div>
 </div>
-<!-- JAVASCRIPT FRAME-BREAKER CODE TO PROVIDE PROTECTION AGAINST IFRAME CLICK-JACKING -->
-<script type="text/javascript">
-    if (self === top) {
-        var antiClickjack = document.getElementById("antiClickjack");
-        antiClickjack.parentNode.removeChild(antiClickjack);
-    } else {
-        top.location = self.location;
-    }
-
-    PaymentSession.configure({
-        fields: {
-            // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
-            card: {
-                number: "#card-number",
-                securityCode: "#security-code",
-                expiryMonth: "#expiry-month",
-                expiryYear: "#expiry-year"
-            }
-        },
-        //SPECIFY YOUR MITIGATION OPTION HERE
-        frameEmbeddingMitigation: ["javascript"],
-        callbacks: {
-            initialized: function(response) {
-                // HANDLE INITIALIZATION RESPONSE
-            },
-            formSessionUpdate: function(response) {
-                // HANDLE RESPONSE FOR UPDATE SESSION
-                if (response.status) {
-                    if ("ok" == response.status) {
-                        console.log("Session updated with data: " + response.session.id);
-
-                        //check if the security code was provided by the user
-                        if (response.sourceOfFunds.provided.card.securityCode) {
-                            console.log("Security code was provided.");
-                        }
-
-                        //check if the user entered a MasterCard credit card
-                        if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
-                            console.log("The user entered a MasterCard credit card.")
-                        }
-                    } else if ("fields_in_error" == response.status)  {
-
-                        console.log("Session update failed with field errors.");
-                        if (response.errors.cardNumber) {
-                            console.log("Card number invalid or missing.");
-                        }
-                        if (response.errors.expiryYear) {
-                            console.log("Expiry year invalid or missing.");
-                        }
-                        if (response.errors.expiryMonth) {
-                            console.log("Expiry month invalid or missing.");
-                        }
-                        if (response.errors.securityCode) {
-                            console.log("Security code invalid.");
-                        }
-                    } else if ("request_timeout" == response.status)  {
-                        console.log("Session update failed with request timeout: " + response.errors.message);
-                    } else if ("system_error" == response.status)  {
-                        console.log("Session update failed with system error: " + response.errors.message);
-                    }
-                } else {
-                    console.log("Session update failed: " + response);
-                }
-            }
-        }
-    });
-
-    function pay() {
-        // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-        PaymentSession.updateSessionFromForm('card');
-    }
-</script>
 </body>
 </html>

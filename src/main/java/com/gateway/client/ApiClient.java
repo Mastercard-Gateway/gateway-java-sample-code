@@ -1,5 +1,6 @@
 package com.gateway.client;
 
+import com.gateway.app.Config;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NTCredentials;
@@ -14,18 +15,12 @@ import java.io.IOException;
 
 public final class ApiClient {
 
-    private Merchant merchant;
-
-    public ApiClient(Merchant merchant) {
-        this.merchant = merchant;
-    }
-
-    public String sendTransaction(String data, String requestUrl) throws Exception {
+    public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
         httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(merchant.getApiUsername(), merchant.getPassword()));
+                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
 
         PutMethod putMethod = new PutMethod(requestUrl);
 
@@ -36,8 +31,8 @@ public final class ApiClient {
         putMethod.setRequestEntity(entity);
 
         HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(merchant.getGatewayHost());
-        configureProxy(httpClient);
+        hostConfig.setHost(config.getGatewayHost());
+        configureProxy(httpClient, config);
         String body = null;
 
         try {
@@ -54,12 +49,12 @@ public final class ApiClient {
         return body;
     }
 
-    public String postTransaction(String data, String requestUrl) throws Exception {
+    public String postTransaction(String data, String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
         httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(merchant.getApiUsername(), merchant.getPassword()));
+                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
 
         PostMethod postMethod = new PostMethod(requestUrl);
 
@@ -70,8 +65,8 @@ public final class ApiClient {
         postMethod.setRequestEntity(entity);
 
         HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(merchant.getGatewayHost());
-        configureProxy(httpClient);
+        hostConfig.setHost(config.getGatewayHost());
+        configureProxy(httpClient, config);
         String body = null;
 
         try {
@@ -88,20 +83,20 @@ public final class ApiClient {
         return body;
     }
 
-    public String getTransaction(String requestUrl) throws Exception {
+    public String getTransaction(String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
         // Set the API Username and Password in the header authentication field.
         httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(merchant.getApiUsername(), merchant.getPassword()));
+                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
 
         GetMethod getMethod = new GetMethod(requestUrl);
 
         getMethod.setDoAuthentication(true);
 
         HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(merchant.getGatewayHost());
-        configureProxy(httpClient);
+        hostConfig.setHost(config.getGatewayHost());
+        configureProxy(httpClient, config);
         String body = null;
 
         try {
@@ -126,22 +121,22 @@ public final class ApiClient {
      * @param httpClient
      * @return void
      */
-    private void configureProxy(HttpClient httpClient) {
+    private void configureProxy(HttpClient httpClient, Config config) {
         // If proxy server is defined, set the host configuration.
-        if (merchant.getProxyServer() != null) {
+        if (config.getProxyServer() != null) {
             HostConfiguration hostConfig = httpClient.getHostConfiguration();
-            hostConfig.setHost(merchant.getGatewayHost());
-            hostConfig.setProxy(merchant.getProxyServer(), merchant.getProxyPort());
+            hostConfig.setHost(config.getGatewayHost());
+            hostConfig.setProxy(config.getProxyServer(), config.getProxyPort());
 
         }
         // If proxy authentication is defined, set proxy credentials
-        if (merchant.getProxyUsername() != null) {
+        if (config.getProxyUsername() != null) {
             NTCredentials proxyCredentials =
-                    new NTCredentials(merchant.getProxyUsername(),
-                            merchant.getProxyPassword(), merchant.getGatewayHost(),
-                            merchant.getNtDomain());
-            httpClient.getState().setProxyCredentials(merchant.getProxyAuthType(),
-                    merchant.getProxyServer(), proxyCredentials);
+                    new NTCredentials(config.getProxyUsername(),
+                            config.getProxyPassword(), config.getGatewayHost(),
+                            config.getNtDomain());
+            httpClient.getState().setProxyCredentials(config.getProxyAuthType(),
+                    config.getProxyServer(), proxyCredentials);
         }
     }
 }

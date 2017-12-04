@@ -1,33 +1,26 @@
 package com.gateway.client;
 
+import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 public final class ClientUtil {
 
-    public static String getRequestUrl(Merchant merchant, ApiRequest request) {
-        String url = merchant.getGatewayUrl() + "/version/" +
-                request.getApiVersion() +
-                "/merchant/" +
-                merchant.getMerchantId() +
-                "/order/" +
-                request.getOrderId();
+    public static String getRequestUrl(Config config, ApiRequest request) {
+        String url = config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
         if(notNullOrEmpty(request.getTransactionId())) {
             url += "/transaction/" + request.getTransactionId();
         }
-        merchant.setGatewayUrl(url);
-        return merchant.getGatewayUrl();
+        return url;
     }
 
-    public static String getSessionRequestUrl(Merchant merchant, ApiRequest request) {
-        String url = merchant.getGatewayUrl() + "/version/" +
-                request.getApiVersion() +
-                "/merchant/" +
-                merchant.getMerchantId() +
-                "/session";
-        merchant.setGatewayUrl(url);
-        return merchant.getGatewayUrl();
+    public static String getSessionRequestUrl(Config config) {
+        return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session";
+    }
+
+    public static String getSessionRequestUrl(Config config, String sessionId) {
+        return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
     }
 
     public static String buildJSONPayload(ApiRequest request) {
@@ -78,6 +71,9 @@ public final class ClientUtil {
             }
         }
 
+        JsonObject session = new JsonObject();
+        if (notNullOrEmpty(request.getSessionId())) session.addProperty("id", request.getSessionId());
+
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
         if (notNullOrEmpty(request.getApiOperation())) data.addProperty("apiOperation", request.getApiOperation());
@@ -86,9 +82,11 @@ public final class ClientUtil {
         if (!sourceOfFunds.entrySet().isEmpty()) data.add("sourceOfFunds", sourceOfFunds);
         if (!browserPayment.entrySet().isEmpty()) data.add("browserPayment", browserPayment);
         if (!interaction.entrySet().isEmpty()) data.add("interaction", interaction);
+        if (!session.entrySet().isEmpty()) data.add("session", session);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+        System.out.println("$$$$$$$$$$$$$$$ DATA: " + data);
         return gson.toJson(data);
     }
 

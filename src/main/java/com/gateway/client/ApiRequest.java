@@ -19,9 +19,7 @@ public class ApiRequest {
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
     private String method;
-
-    //Update this to use a different API Version
-    private int apiVersion = 45;
+    private String sessionId;
 
     public String getOrderId() {
         return orderId;
@@ -159,11 +157,11 @@ public class ApiRequest {
         this.method = method;
     }
 
-    public int getApiVersion() {
-        return apiVersion;
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setApiVersion(int apiVersion) {
-        this.apiVersion = apiVersion;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }
