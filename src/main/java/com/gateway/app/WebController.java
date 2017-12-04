@@ -27,12 +27,18 @@ public class WebController {
     @GetMapping("/authorize")
     public ModelAndView showAuthorize() {
         ModelAndView mav = new ModelAndView("authorize");
-        ApiRequest req = createTestRequest("AUTHORIZE");
-        req.setTransactionId(randomNumber());
-        req.setOrderId(randomNumber());
-        mav.addObject("apiRequest", req);
         mav.addObject("merchantId", config.getMerchantId());
         mav.addObject("baseUrl", config.getApiBaseURL());
+        return mav;
+    }
+
+    @GetMapping("/pay")
+    public ModelAndView showPay() {
+        ModelAndView mav = new ModelAndView("pay");
+        ApiRequest req = createTestRequest("PAY");
+        req.setOrderId(randomNumber());
+        req.setTransactionId(randomNumber());
+        mav.addObject("apiRequest", req);
         return mav;
     }
 
@@ -62,16 +68,6 @@ public class WebController {
         req.setTransactionId(randomNumber());
         req.setOrderId(randomNumber());
         req.setSourceType(null);
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/pay")
-    public ModelAndView showPay() {
-        ModelAndView mav = new ModelAndView("pay");
-        ApiRequest req = createTestRequest("PAY");
-        req.setOrderId(randomNumber());
-        req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
