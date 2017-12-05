@@ -209,38 +209,38 @@ public class WebController {
     }
 
     // Endpoint for form POST
-//    @PostMapping("/process")
-//    public ModelAndView process(ApiRequest request) {
-//
-//        String requestUrl = ClientUtil.getRequestUrl(config, request);
-//        String jsonPayload = ClientUtil.buildJSONPayload(request);
-//
-//        String resp = "";
-//
-//        ModelAndView mav = new ModelAndView("receipt");
-//
-//        try {
-//            ApiClient connection = new ApiClient();
-//            if (request.getMethod().equals("PUT")) {
-//                resp = connection.sendTransaction(jsonPayload, requestUrl, config);
-//            } else if (request.getMethod().equals("GET")) {
-//                resp = connection.getTransaction(requestUrl, config);
-//            }
-//            ObjectMapper mapper = new ObjectMapper();
-//            Object prettyResp = mapper.readValue(resp, Object.class);
-//            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
-//            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-//            mav.addObject("operation", request.getApiOperation());
-//            mav.addObject("method", request.getMethod());
-//            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-//            mav.addObject("requestUrl", requestUrl);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            mav.addObject("error", e.getMessage());
-//        }
-//
-//        return mav;
-//    }
+    @PostMapping("/process")
+    public ModelAndView process(ApiRequest request) {
+
+        String requestUrl = ClientUtil.getRequestUrl(config, request);
+        String jsonPayload = ClientUtil.buildJSONPayload(request);
+
+        String resp = "";
+
+        ModelAndView mav = new ModelAndView("receipt");
+
+        try {
+            ApiClient connection = new ApiClient();
+            if (request.getMethod().equals("PUT")) {
+                resp = connection.sendTransaction(jsonPayload, requestUrl, config);
+            } else if (request.getMethod().equals("GET")) {
+                resp = connection.getTransaction(requestUrl, config);
+            }
+            ObjectMapper mapper = new ObjectMapper();
+            Object prettyResp = mapper.readValue(resp, Object.class);
+            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
+            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+            mav.addObject("operation", request.getApiOperation());
+            mav.addObject("method", request.getMethod());
+            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+            mav.addObject("requestUrl", requestUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mav.addObject("error", e.getMessage());
+        }
+
+        return mav;
+    }
 
     private static String randomNumber() {
         return RandomStringUtils.random(10, true, true);

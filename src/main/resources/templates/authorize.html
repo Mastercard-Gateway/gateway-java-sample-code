@@ -8,6 +8,10 @@
         }
     };
 </script>
+<!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
+<style id="antiClickjack">body{display:none !important;}</style>
+<!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
+<script th:src="@{${baseUrl} + '/form/version/45/merchant/' + ${merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
         <h3>Authorize</h3>
@@ -21,5 +25,6 @@
         </div>
     </div>
 </div>
+<script src="/scripts/hostedSession.js"></script>
 </body>
 </html>
