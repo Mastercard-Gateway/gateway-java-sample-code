@@ -1,62 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'initiate')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'initiate',${baseUrl},${merchantId})}">
 
 <body>
 <div class="col-9">
     <div class="row">
-        <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
-            <h3>Initiate Browser Payment</h3>
-            <div class="alert alert-warning" role="alert">
-                To access the browser payment simulator, copy and paste the redirectUrl from the response into a new browser window. Then complete the payment.
-            </div>
-            <fieldset>
-                <input type="hidden" th:field="*{orderId}" th:value="${orderId}" name="orderId" />
-                <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />
-                <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
-                <input type="hidden" th:field="*{method}" th:value="${method}" name="method" />
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="browser-payment-operation">Payment Operation</label>
-                    <div class="col-md-7">
-                        <input id="browser-payment-operation" th:field="*{browserPaymentOperation}" type="text" placeholder="PAY" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="funds-type">Source of Funds</label>
-                    <div class="col-md-7">
-                        <input id="funds-type" th:field="*{sourceType}" type="text" placeholder="PAYPAL" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="return-url">Return URL</label>
-                    <div class="col-md-7">
-                        <input id="return-url" th:field="*{returnUrl}" type="text" placeholder="" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="order-amount">Amount</label>
-                    <div class="col-md-7">
-                        <input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="order-currency">Currency</label>
-                    <div class="col-md-7">
-                        <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="process"></label>
-                    <div class="col-md-7">
-                        <button id="process" name="process" class="btn btn-primary">Initiate Browser Payment</button>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
+        <h3>Initiate Browser Payment</h3>
+        <div class="col-md-7">
+            <p>Please enter your payment details:</p>
+            <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
+            <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
+            <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
+            <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
+            <button class="btn btn-primary" id="payButton" onclick="pay();">Initiate Browser Payment</button>
+        </div>
     </div> <!-- row -->
 </div>
 

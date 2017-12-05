@@ -1,6 +1,20 @@
 package com.gateway.client;
 
+import org.apache.commons.lang.ArrayUtils;
+
 public class ApiRequest {
+
+    private static final String[] PUT_OPERATIONS = {
+        "AUTHORIZE", "CAPTURE", "PAY", "REFUND", "UPDATE_AUTHORIZATION", "VERIFY", "VOID",
+        "CONFIRM_BROWSER_PAYMENT", "INITIATE_BROWSER_PAYMENT"
+    };
+
+    private static final String[] GET_OPERATIONS = {
+        "RETRIEVE_ORDER", "RETRIEVE_TRANSACTION"
+    };
+    private static final String[] POST_OPERATIONS = {
+        "CREATE_CHECKOUT_SESSION"
+    };
 
     private String orderId;
     private String transactionId;
@@ -153,8 +167,16 @@ public class ApiRequest {
         return method;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setMethod(String operation) {
+        if (ArrayUtils.contains(PUT_OPERATIONS, operation)) {
+            this.method = "PUT";
+        }
+        else if(ArrayUtils.contains(GET_OPERATIONS, operation)) {
+            this.method = "GET";
+        }
+        else if(ArrayUtils.contains(POST_OPERATIONS, operation)) {
+            this.method = "POST";
+        }
     }
 
     public String getSessionId() {
