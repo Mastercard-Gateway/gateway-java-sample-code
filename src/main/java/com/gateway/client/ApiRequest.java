@@ -1,20 +1,6 @@
 package com.gateway.client;
 
-import org.apache.commons.lang.ArrayUtils;
-
 public class ApiRequest {
-
-    private static final String[] PUT_OPERATIONS = {
-        "AUTHORIZE", "CAPTURE", "PAY", "REFUND", "UPDATE_AUTHORIZATION", "VERIFY", "VOID",
-        "CONFIRM_BROWSER_PAYMENT", "INITIATE_BROWSER_PAYMENT"
-    };
-
-    private static final String[] GET_OPERATIONS = {
-        "RETRIEVE_ORDER", "RETRIEVE_TRANSACTION"
-    };
-    private static final String[] POST_OPERATIONS = {
-        "CREATE_CHECKOUT_SESSION"
-    };
 
     private String orderId;
     private String transactionId;
@@ -32,7 +18,7 @@ public class ApiRequest {
     private String returnUrl;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
-    private String apiMethod;
+    private String apiMethod = "PUT";
     private String sessionId;
 
     public String getOrderId() {
@@ -159,24 +145,16 @@ public class ApiRequest {
         return browserPaymentConfirmation;
     }
 
-    public void setBrowserPaymentConfirmation(String browerPaymentConfirmation) {
-        this.browserPaymentConfirmation = browerPaymentConfirmation;
+    public void setBrowserPaymentConfirmation(String browserPaymentConfirmation) {
+        this.browserPaymentConfirmation = browserPaymentConfirmation;
     }
 
     public String getApiMethod() {
         return apiMethod;
     }
 
-    public void setApiMethod(String operation) {
-        if (ArrayUtils.contains(PUT_OPERATIONS, operation)) {
-            this.apiMethod = "PUT";
-        }
-        else if(ArrayUtils.contains(GET_OPERATIONS, operation)) {
-            this.apiMethod = "GET";
-        }
-        else if(ArrayUtils.contains(POST_OPERATIONS, operation)) {
-            this.apiMethod = "POST";
-        }
+    public void setApiMethod(String apiMethod) {
+         this.apiMethod = apiMethod;
     }
 
     public String getSessionId() {

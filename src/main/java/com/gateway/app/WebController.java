@@ -38,7 +38,6 @@ public class WebController {
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
         ApiRequest req = createTestRequest("CAPTURE");
-        req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -68,7 +67,6 @@ public class WebController {
     public ModelAndView showRefund() {
         ModelAndView mav = new ModelAndView("refund");
         ApiRequest req = createTestRequest("REFUND");
-        req.setTransactionId(randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -297,7 +295,6 @@ public class WebController {
     public static ApiRequest createTestRequest(String apiOperation) {
         ApiRequest req = new ApiRequest();
         req.setApiOperation(apiOperation);
-        req.setApiMethod(apiOperation);
         req.setOrderAmount("5000");
         req.setOrderCurrency("USD");
         req.setOrderId(randomNumber());
@@ -307,8 +304,16 @@ public class WebController {
             req.setTransactionAmount("5000");
             req.setOrderId(null);
         }
-        if(apiOperation.equals("VOID")) {
+        if(apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
             req.setOrderId(null);
+        }
+        if(apiOperation.equals("RETRIEVE_ORDER") || apiOperation.equals("RETRIEVE_TRANSACTION")) {
+            req.setApiMethod("GET");
+            req.setOrderId(null);
+            req.setTransactionId(null);
+        }
+        if(apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
+            req.setApiMethod("POST");
         }
         //TODO: This URL should come from the client dynamically
         req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
