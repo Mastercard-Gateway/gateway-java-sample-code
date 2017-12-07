@@ -36,32 +36,58 @@ public class WebController {
 
     @GetMapping("/capture")
     public ModelAndView showCapture() {
-        return createModel("capture");
+        ModelAndView mav = new ModelAndView("capture");
+        ApiRequest req = createTestRequest("CAPTURE");
+        req.setTransactionId(randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/confirm")
     public ModelAndView showConfirm() {
-        return createModel("confirm");
+        ModelAndView mav = new ModelAndView("confirm");
+        ApiRequest req = createTestRequest("CONFIRM_BROWSER_PAYMENT");
+        req.setTransactionId(randomNumber());
+        req.setOrderId(randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/initiate")
     public ModelAndView showInitiate() {
-        return createModel("initiate");
+        ModelAndView mav = new ModelAndView("initiate");
+        ApiRequest req = createTestRequest("INITIATE_BROWSER_PAYMENT");
+        req.setTransactionId(randomNumber());
+        req.setOrderId(randomNumber());
+        req.setSourceType(null);
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/refund")
     public ModelAndView showRefund() {
-        return createModel("refund");
+        ModelAndView mav = new ModelAndView("refund");
+        ApiRequest req = createTestRequest("REFUND");
+        req.setTransactionId(randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/retrieve")
     public ModelAndView showRetrieve() {
-        return createModel("retrieve");
+        ModelAndView mav = new ModelAndView("retrieve");
+        ApiRequest req = createTestRequest("RETRIEVE_TRANSACTION");
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/update")
     public ModelAndView showUpdate() {
-        return createModel("update");
+        ModelAndView mav = new ModelAndView("update");
+        ApiRequest req = createTestRequest("UPDATE_AUTHORIZATION");
+        req.setTransactionId(randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/verify")
@@ -71,7 +97,11 @@ public class WebController {
 
     @GetMapping("/void")
     public ModelAndView showVoid() {
-        return createModel("void");
+        ModelAndView mav = new ModelAndView("void");
+        ApiRequest req = createTestRequest("VOID");
+        req.setTransactionId(randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
     }
 
     @GetMapping("/hostedCheckout")
@@ -197,7 +227,7 @@ public class WebController {
             mav.addObject("baseUrl", config.getApiBaseURL());
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
             mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getMethod());
+            mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         }
@@ -221,9 +251,9 @@ public class WebController {
 
         try {
             ApiClient connection = new ApiClient();
-            if (request.getMethod().equals("PUT")) {
+            if (request.getApiMethod().equals("PUT")) {
                 resp = connection.sendTransaction(jsonPayload, requestUrl, config);
-            } else if (request.getMethod().equals("GET")) {
+            } else if (request.getApiMethod().equals("GET")) {
                 resp = connection.getTransaction(requestUrl, config);
             }
             ObjectMapper mapper = new ObjectMapper();
@@ -231,7 +261,7 @@ public class WebController {
             Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
             mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getMethod());
+            mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
@@ -267,11 +297,19 @@ public class WebController {
     public static ApiRequest createTestRequest(String apiOperation) {
         ApiRequest req = new ApiRequest();
         req.setApiOperation(apiOperation);
-        req.setMethod(apiOperation);
+        req.setApiMethod(apiOperation);
         req.setOrderAmount("5000");
         req.setOrderCurrency("USD");
         req.setOrderId(randomNumber());
         req.setTransactionId(randomNumber());
+        if(apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
+            req.setTransactionCurrency("USD");
+            req.setTransactionAmount("5000");
+            req.setOrderId(null);
+        }
+        if(apiOperation.equals("VOID")) {
+            req.setOrderId(null);
+        }
         //TODO: This URL should come from the client dynamically
         req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
         return req;

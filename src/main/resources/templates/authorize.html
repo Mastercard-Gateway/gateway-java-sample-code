@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'authorize',${baseUrl},${merchantId})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'authorize')}">
 <body>
 <script type="text/javascript">
     var JavaSample = {
@@ -23,7 +23,7 @@
             <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
             <button class="btn btn-primary" id="payButton" onclick="pay();">Authorize</button>
         </div>
-    </div>
+    </div> <!-- row -->
 </div>
 <script src="/scripts/hostedSession.js"></script>
 </body>

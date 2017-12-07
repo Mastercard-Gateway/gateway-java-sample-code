@@ -32,7 +32,7 @@ public class ApiRequest {
     private String returnUrl;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
-    private String method;
+    private String apiMethod;
     private String sessionId;
 
     public String getOrderId() {
@@ -163,19 +163,19 @@ public class ApiRequest {
         this.browserPaymentConfirmation = browerPaymentConfirmation;
     }
 
-    public String getMethod() {
-        return method;
+    public String getApiMethod() {
+        return apiMethod;
     }
 
-    public void setMethod(String operation) {
+    public void setApiMethod(String operation) {
         if (ArrayUtils.contains(PUT_OPERATIONS, operation)) {
-            this.method = "PUT";
+            this.apiMethod = "PUT";
         }
         else if(ArrayUtils.contains(GET_OPERATIONS, operation)) {
-            this.method = "GET";
+            this.apiMethod = "GET";
         }
         else if(ArrayUtils.contains(POST_OPERATIONS, operation)) {
-            this.method = "POST";
+            this.apiMethod = "POST";
         }
     }
 

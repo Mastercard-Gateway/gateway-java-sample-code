@@ -1,18 +1,38 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'confirm',${baseUrl},${merchantId})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'confirm')}">
 
 <body>
 <div class="col-9">
     <div class="row">
-        <h3>Confirm Browser Payment</h3>
-        <div class="col-md-7">
-            <p>Please enter your payment details:</p>
-            <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
-            <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
-            <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
-            <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
-            <button class="btn btn-primary" id="payButton" onclick="pay();">Confirm Browser Payment</button>
-        </div>
+        <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
+            <h3>Confirm Browser Payment</h3>
+            <fieldset>
+                <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
+                <input type="hidden" th:field="*{method}" th:value="${method}" name="method" />
+                <input type="hidden" th:field="*{orderId}" th:value="${orderId}" name="orderId" />
+                <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-amount">Amount</label>
+                    <div class="col-md-7">
+                        <input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-currency">Currency</label>
+                    <div class="col-md-7">
+                        <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="process"></label>
+                    <div class="col-md-7">
+                        <button id="process" name="process" class="btn btn-primary">Confirm Browser Payment</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
     </div> <!-- row -->
 </div>
 
