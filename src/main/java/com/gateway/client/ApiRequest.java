@@ -20,6 +20,8 @@ public class ApiRequest {
     private String browserPaymentConfirmation;
     private String apiMethod = "PUT";
     private String sessionId;
+    private String secureId;
+    private String secureIdResponseUrl;
 
     public String getOrderId() {
         return orderId;
@@ -163,5 +165,21 @@ public class ApiRequest {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public String getSecureId() {
+        return secureId;
+    }
+
+    public void setSecureId(String secureId) {
+        this.secureId = secureId;
+    }
+
+    public String getSecureIdResponseUrl() {
+        return secureIdResponseUrl;
+    }
+
+    public void setSecureIdResponseUrl(String secureIdResponseUrl) {
+        this.secureIdResponseUrl = secureIdResponseUrl;
     }
 }

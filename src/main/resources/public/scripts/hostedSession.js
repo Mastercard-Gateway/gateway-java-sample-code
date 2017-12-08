@@ -38,7 +38,9 @@ PaymentSession.configure({
                     }
 
                     //process operation
-                    window.location.href = "/process/" + JavaSample.operation() + "/" + response.session.id;
+                    var redirectLocation = "/process/" + JavaSample.operation() + "/" + response.session.id;
+                    if(JavaSample.operation() === "CHECK_3DS_ENROLLMENT") redirectLocation += "?secureIdRedirect=" + window.location.protocol + window.location.host + "/secureIdReceipt";
+                    window.location.href = redirectLocation;
                 } else if ("fields_in_error" == response.status)  {
 
                     console.log("Session update failed with field errors.");

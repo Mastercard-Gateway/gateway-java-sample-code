@@ -63,7 +63,7 @@ h6 {
     font-size: 18px;
     margin-bottom: 20px;
 }
-form {
+form, .contents {
     padding: 15px;
 }
 form label {
@@ -73,10 +73,10 @@ form label + span {
     font-weight: 300;
     color: #6A6A6A;
 }
-/*form input[type="text"] {*/
-    /*font-weight: 300;*/
-    /*border: 1px solid #6A6A6A;*/
-/*}*/
+form input[type="text"] {
+    font-weight: 300;
+    border: 1px solid #6A6A6A;
+}
 input {
     border: 1px solid #CCCCCC !important;
     border-radius: 4px !important;

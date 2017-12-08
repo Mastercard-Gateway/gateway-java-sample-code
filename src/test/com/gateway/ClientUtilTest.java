@@ -195,6 +195,21 @@ public class ClientUtilTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    @Test
+    public void parse3dsRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("CHECK_3DS_ENROLLMENT");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setSessionId("SESSION0002647025380I5651515F86");
+        request.setSecureIdResponseUrl("http://www.mysite.com/receipt");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\"}}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
     private String prettifyJson(String data) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(data).getAsJsonObject();

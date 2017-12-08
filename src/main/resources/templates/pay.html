@@ -14,6 +14,7 @@
 <script th:src="@{${baseUrl} + '/form/version/45/merchant/' + ${merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
+        <div class="contents col-12">
             <h3>Pay</h3>
             <div class="col-md-7">
                 <p>Please enter your payment details:</p>
@@ -23,6 +24,7 @@
                 <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
                 <button class="btn btn-primary" id="payButton" onclick="pay();">Pay</button>
             </div>
+        </div>
     </div> <!-- row -->
 </div>
 <script src="/scripts/hostedSession.js"></script>

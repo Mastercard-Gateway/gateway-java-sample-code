@@ -4,8 +4,13 @@ import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.RandomStringUtils;
 
-public final class ClientUtil {
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class ClientUtil {
 
     public static String getRequestUrl(Config config, ApiRequest request) {
         String url = config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
@@ -23,8 +28,22 @@ public final class ClientUtil {
         return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
     }
 
+    public static String getSecureIdRequest(Config config) {
+        // Pass unique ID as secure ID
+        String secureId = randomNumber();
+        return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/3DSecureId/" + secureId;
+    }
+
     public static String buildJSONPayload(ApiRequest request) {
         JsonObject order = new JsonObject();
+
+        JsonObject secureId = new JsonObject();
+        if(request.getApiOperation().equals("CHECK_3DS_ENROLLMENT")) {
+            JsonObject authenticationRedirect = new JsonObject();
+            authenticationRedirect.addProperty("responseUrl", request.getSecureIdResponseUrl());
+            secureId.add("authenticationRedirect", authenticationRedirect);
+        }
+
         if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
             // Need to add order ID in the request body for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
@@ -83,11 +102,41 @@ public final class ClientUtil {
         if (!browserPayment.entrySet().isEmpty()) data.add("browserPayment", browserPayment);
         if (!interaction.entrySet().isEmpty()) data.add("interaction", interaction);
         if (!session.entrySet().isEmpty()) data.add("session", session);
+        if (!secureId.entrySet().isEmpty()) data.add("3DSecure", secureId);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         System.out.println("$$$$$$$$$$$$$$$ DATA: " + data);
         return gson.toJson(data);
+    }
+
+    public static CheckoutSession parseSessionResponse(String sessionResponse) {
+        JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
+        JsonObject jsonSession = json.get("session").getAsJsonObject();
+
+        CheckoutSession checkoutSession = new CheckoutSession();
+        checkoutSession.setId(jsonSession.get("id").getAsString());
+        checkoutSession.setVersion(jsonSession.get("version").getAsString());
+        if(json.get("successIndicator") != null) checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+
+        return checkoutSession;
+    }
+
+    public static String encodeUrl(String url) {
+        String encodedUrl = "";
+
+        try {
+            encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString());
+        }
+        catch(UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        return encodedUrl;
+    }
+
+    public static String randomNumber() {
+        return RandomStringUtils.random(10, true, true);
     }
 
     private static boolean notNullOrEmpty(String value) {

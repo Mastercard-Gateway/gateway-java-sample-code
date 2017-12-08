@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.sun.deploy.util.SessionState;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.measure.unit.Dimension;
@@ -34,6 +36,11 @@ public class WebController {
         return createModel("pay");
     }
 
+    @GetMapping("/secureId")
+    public ModelAndView showSecureId() {
+        return createModel("secureId");
+    }
+
     @GetMapping("/capture")
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
@@ -46,8 +53,8 @@ public class WebController {
     public ModelAndView showConfirm() {
         ModelAndView mav = new ModelAndView("confirm");
         ApiRequest req = createTestRequest("CONFIRM_BROWSER_PAYMENT");
-        req.setTransactionId(randomNumber());
-        req.setOrderId(randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -56,8 +63,8 @@ public class WebController {
     public ModelAndView showInitiate() {
         ModelAndView mav = new ModelAndView("initiate");
         ApiRequest req = createTestRequest("INITIATE_BROWSER_PAYMENT");
-        req.setTransactionId(randomNumber());
-        req.setOrderId(randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
         req.setSourceType(null);
         mav.addObject("apiRequest", req);
         return mav;
@@ -83,7 +90,7 @@ public class WebController {
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
         ApiRequest req = createTestRequest("UPDATE_AUTHORIZATION");
-        req.setTransactionId(randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -97,7 +104,7 @@ public class WebController {
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
         ApiRequest req = createTestRequest("VOID");
-        req.setTransactionId(randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -107,7 +114,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView("hostedCheckout");
         ApiRequest req = new ApiRequest();
         req.setApiOperation("CREATE_CHECKOUT_SESSION");
-        req.setOrderId(randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
         req.setOrderCurrency("USD");
 
         String requestUrl = ClientUtil.getSessionRequestUrl(config);
@@ -117,20 +124,13 @@ public class WebController {
         try {
             ApiClient connection = new ApiClient();
             String resp = connection.postTransaction(data, requestUrl, config);
-            System.out.println("CREATED SESSION: " + resp);
 
-            JsonObject json = new Gson().fromJson(resp, JsonObject.class);
-            JsonObject jsonSession = json.get("session").getAsJsonObject();
-
-            CheckoutSession checkoutSession = new CheckoutSession();
-            checkoutSession.setId(jsonSession.get("id").getAsString());
-            checkoutSession.setVersion(jsonSession.get("version").getAsString());
-            checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+            CheckoutSession session = ClientUtil.parseSessionResponse(resp);
 
             mav.addObject("orderId", req.getOrderId());
-            mav.addObject("sessionId", checkoutSession.getId());
-            mav.addObject("sessionVersion", checkoutSession.getVersion());
-            mav.addObject("successIndicator", checkoutSession.getSuccessIndicator());
+            mav.addObject("sessionId", session.getId());
+            mav.addObject("sessionVersion", session.getVersion());
+            mav.addObject("successIndicator", session.getSuccessIndicator());
             mav.addObject("merchantId", config.getMerchantId());
             mav.addObject("apiPassword", config.getApiPassword());
         } catch (Exception e) {
@@ -159,6 +159,12 @@ public class WebController {
             mav.addObject("error", e.getMessage());
         }
 
+        return mav;
+    }
+
+    @GetMapping("/secureIdReceipt")
+    public ModelAndView secureIdReceipt(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("secureIdReceipt");
         return mav;
     }
 
@@ -194,7 +200,7 @@ public class WebController {
 
     // Endpoint for Hosted Session
     @GetMapping("/process/{operation}/{sessionId}")
-    public ModelAndView process(@PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId) {
+    public ModelAndView process(@PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId, @RequestParam(value="secureIdRedirect") String secureIdRedirect) {
 
         ModelAndView mav = new ModelAndView("receipt");
 
@@ -205,13 +211,21 @@ public class WebController {
             String sessionResponse = sessionConnection.getTransaction(url, config);
 
             // Parse session response into CheckoutSession object
-            CheckoutSession session = parseSessionResponse(sessionResponse);
+            CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
 
             // Construct API request
             ApiRequest request = createTestRequest(operation);
             request.setSessionId(session.getId());
             String jsonPayload = ClientUtil.buildJSONPayload(request);
-            String requestUrl = ClientUtil.getRequestUrl(config, request);
+            // If it's a 3DS enrollment check, we need to construct a different URL than for the other operations
+            String requestUrl;
+            if(operation.equals("CHECK_3DS_ENROLLMENT")) {
+                request.setSecureIdResponseUrl(secureIdRedirect);
+                requestUrl = ClientUtil.getSecureIdRequest(config);
+            }
+            else {
+                requestUrl = ClientUtil.getRequestUrl(config, request);
+            }
 
             // Perform API operation
             ApiClient apiConnection = new ApiClient();
@@ -270,23 +284,8 @@ public class WebController {
         return mav;
     }
 
-    private static String randomNumber() {
-        return RandomStringUtils.random(10, true, true);
-    }
-
-    private CheckoutSession parseSessionResponse(String sessionResponse) {
-        JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
-        JsonObject jsonSession = json.get("session").getAsJsonObject();
-
-        CheckoutSession checkoutSession = new CheckoutSession();
-        checkoutSession.setId(jsonSession.get("id").getAsString());
-        checkoutSession.setVersion(jsonSession.get("version").getAsString());
-
-        return checkoutSession;
-    }
-
-    private ModelAndView createModel(String operation) {
-        ModelAndView mav = new ModelAndView(operation);
+    private ModelAndView createModel(String viewName) {
+        ModelAndView mav = new ModelAndView(viewName);
         mav.addObject("merchantId", config.getMerchantId());
         mav.addObject("baseUrl", config.getApiBaseURL());
         return mav;
@@ -297,8 +296,8 @@ public class WebController {
         req.setApiOperation(apiOperation);
         req.setOrderAmount("5000");
         req.setOrderCurrency("USD");
-        req.setOrderId(randomNumber());
-        req.setTransactionId(randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
         if(apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
             req.setTransactionCurrency("USD");
             req.setTransactionAmount("5000");

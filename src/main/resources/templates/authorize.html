@@ -14,14 +14,16 @@
 <script th:src="@{${baseUrl} + '/form/version/45/merchant/' + ${merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
-        <h3>Authorize</h3>
-        <div class="col-md-7">
-            <p>Please enter your payment details:</p>
-            <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
-            <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
-            <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
-            <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
-            <button class="btn btn-primary" id="payButton" onclick="pay();">Authorize</button>
+        <div class="contents col-12">
+            <h3>Authorize</h3>
+            <div class="col-md-7">
+                <p>Please enter your payment details:</p>
+                <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
+                <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
+                <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
+                <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
+                <button class="btn btn-primary" id="payButton" onclick="pay();">Authorize</button>
+            </div>
         </div>
     </div> <!-- row -->
 </div>
