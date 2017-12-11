@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'secureId')}">
 <body>
-<script type="text/javascript">
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var redirectUrlEndpoint = /*[[${redirectUrlEndpoint}]]*/ null;
+    /*]]>*/
+
     var JavaSample = {
         operation: function() {
             return "CHECK_3DS_ENROLLMENT";
+        },
+        endpoint: function() {
+            return "/authenticatePayer/";
+        },
+        params: function() {
+            return encodeURI("?redirectUrl=" + window.location.protocol + "//" + window.location.host + "/" + redirectUrlEndpoint);
         }
     };
 </script>

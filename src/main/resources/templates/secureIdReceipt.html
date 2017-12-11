@@ -4,7 +4,10 @@
 <body>
 
 <div class="col-9 pl-4">
-    <h1>Secure ID Receipt</h1>
+    <h3>Secure ID</h3>
+    <div th:if="${notEnrolledStatus != null}">
+        <p>3DS status: <span th:text="${notEnrolledStatus}"></span></p>
+    </div>
 </div>
 
 </body>
