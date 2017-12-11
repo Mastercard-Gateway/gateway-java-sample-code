@@ -22,6 +22,7 @@ public class ApiRequest {
     private String sessionId;
     private String secureId;
     private String secureIdResponseUrl;
+    private String paymentAuthResponse;
 
     public String getOrderId() {
         return orderId;
@@ -181,5 +182,13 @@ public class ApiRequest {
 
     public void setSecureIdResponseUrl(String secureIdResponseUrl) {
         this.secureIdResponseUrl = secureIdResponseUrl;
+    }
+
+    public String getPaymentAuthResponse() {
+        return paymentAuthResponse;
+    }
+
+    public void setPaymentAuthResponse(String paymentAuthResponse) {
+        this.paymentAuthResponse = paymentAuthResponse;
     }
 }

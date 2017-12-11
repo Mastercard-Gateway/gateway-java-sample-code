@@ -11,7 +11,7 @@
             return "CHECK_3DS_ENROLLMENT";
         },
         endpoint: function() {
-            return "/authenticatePayer/";
+            return "/check3dsEnrollment/";
         },
         params: function() {
             return encodeURI("?redirectUrl=" + window.location.protocol + "//" + window.location.host + "/" + redirectUrlEndpoint);

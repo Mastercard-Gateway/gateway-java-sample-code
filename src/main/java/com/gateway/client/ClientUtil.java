@@ -28,9 +28,7 @@ public class ClientUtil {
         return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
     }
 
-    public static String getSecureIdRequest(Config config) {
-        // Pass unique ID as secure ID
-        String secureId = randomNumber();
+    public static String getSecureIdRequest(Config config, String secureId) {
         return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/3DSecureId/" + secureId;
     }
 
@@ -38,8 +36,12 @@ public class ClientUtil {
         JsonObject order = new JsonObject();
 
         JsonObject secureId = new JsonObject();
-        if(request.getApiOperation().equals("CHECK_3DS_ENROLLMENT")) {
-            JsonObject authenticationRedirect = new JsonObject();
+        if(notNullOrEmpty(request.getPaymentAuthResponse())) {
+            secureId.addProperty("paRes", request.getPaymentAuthResponse());
+        }
+
+        JsonObject authenticationRedirect = new JsonObject();
+        if (notNullOrEmpty(request.getSecureIdResponseUrl())) {
             authenticationRedirect.addProperty("responseUrl", request.getSecureIdResponseUrl());
             secureId.add("authenticationRedirect", authenticationRedirect);
         }

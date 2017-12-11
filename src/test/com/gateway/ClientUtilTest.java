@@ -210,6 +210,18 @@ public class ClientUtilTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    @Test
+    public void parseACSRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("PROCESS_ACS_RESULT");
+        request.setPaymentAuthResponse("LONG_PARES_VALUE");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"PROCESS_ACS_RESULT\",\"3DSecure\":{\"paRes\":\"LONG_PARES_VALUE\"}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
     private String prettifyJson(String data) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(data).getAsJsonObject();
