@@ -345,7 +345,7 @@ public class WebController {
             JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
             String authenticationHtml = jsonSimple.get("htmlBodyContent").getAsString();
 
-            if(secureIdStatus.equals("CARD_ENROLLED")) {
+            if(secureIdStatus.equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("secureIdPayerAuthenticationForm");
                 mav.addObject("authenticationHtml", authenticationHtml);
             }

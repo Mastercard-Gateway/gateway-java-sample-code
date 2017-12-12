@@ -25,16 +25,18 @@
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
-            <h3>Pay with 3DS</h3>
-            <ol>
-                <li>Check for 3DS enrollment.</li>
-                <ol type="i">
-                    <li>Create a hosted session using the CREATE_CHECKOUT_SESSION operation.</li>
-                    <li>Collect card details using hosted session.</li>
-                    <li>Check if the card is enrolled in 3DS.</li>
-                </ol>
-            </ol>
             <div class="col-md-7">
+                <h3>Pay with 3DS</h3>
+                <div class="alert alert-warning" role="alert">
+                    <ol>
+                        <li>Check for 3DS enrollment.</li>
+                        <ol type="i">
+                            <li>Create a hosted session using the CREATE_CHECKOUT_SESSION operation.</li>
+                            <li>Collect card details using hosted session.</li>
+                            <li>Check if the card is enrolled in 3DS.</li>
+                        </ol>
+                    </ol>
+                </div>
                 <p>Please enter your payment details:</p>
                 <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
                 <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>

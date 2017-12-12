@@ -55,7 +55,7 @@ pre {
     border-radius: 10px;
 }
 h3 {
-    margin: 0 0 32px 15px;
+    margin-bottom: 32px;
     font-weight: 300;
 }
 h6 {
@@ -76,6 +76,9 @@ form label + span {
 form input[type="text"] {
     font-weight: 300;
     border: 1px solid #6A6A6A;
+}
+form h3 {
+    margin-left: 15px;
 }
 input {
     border: 1px solid #CCCCCC !important;
