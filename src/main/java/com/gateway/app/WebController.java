@@ -45,26 +45,36 @@ public class WebController {
         return createModel("verify");
     }
 
-    @GetMapping("/confirm")
-    public ModelAndView showConfirm() {
-        ModelAndView mav = new ModelAndView("confirm");
-        ApiRequest req = ClientUtil.createApiRequest("CONFIRM_BROWSER_PAYMENT");
+    @GetMapping("/paypal")
+    public ModelAndView showPaypal() {
+        ModelAndView mav = new ModelAndView("paypal");
+        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
         req.setTransactionId(ClientUtil.randomNumber());
         req.setOrderId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
 
-    @GetMapping("/initiate")
-    public ModelAndView showInitiate() {
-        ModelAndView mav = new ModelAndView("initiate");
-        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
-        req.setTransactionId(ClientUtil.randomNumber());
-        req.setOrderId(ClientUtil.randomNumber());
-        req.setSourceType(null);
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
+//    @GetMapping("/confirm")
+//    public ModelAndView showConfirm() {
+//        ModelAndView mav = new ModelAndView("confirm");
+//        ApiRequest req = ClientUtil.createApiRequest("CONFIRM_BROWSER_PAYMENT");
+//        req.setTransactionId(ClientUtil.randomNumber());
+//        req.setOrderId(ClientUtil.randomNumber());
+//        mav.addObject("apiRequest", req);
+//        return mav;
+//    }
+//
+//    @GetMapping("/initiate")
+//    public ModelAndView showInitiate() {
+//        ModelAndView mav = new ModelAndView("initiate");
+//        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
+//        req.setTransactionId(ClientUtil.randomNumber());
+//        req.setOrderId(ClientUtil.randomNumber());
+//        req.setSourceType(null);
+//        mav.addObject("apiRequest", req);
+//        return mav;
+//    }
 
     @GetMapping("/browserPaymentReceipt")
     public ModelAndView browserPaymentReceipt(HttpServletRequest request) {
