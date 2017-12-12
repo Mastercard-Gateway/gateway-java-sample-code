@@ -222,6 +222,21 @@ public class ClientUtilTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    @Test
+    public void parseUsingSecureIdWithTransaction() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("PAY");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setSessionId("SESSION0002647025380I5651515F86");
+        request.setSecureId("1234567890");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"PAY\",\"3DSecureId\":\"1234567890\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
     private String prettifyJson(String data) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(data).getAsJsonObject();

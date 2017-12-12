@@ -12,6 +12,34 @@ import java.nio.charset.StandardCharsets;
 
 public class ClientUtil {
 
+    public static ApiRequest createApiRequest(String apiOperation) {
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation(apiOperation);
+        req.setOrderAmount("5000");
+        req.setOrderCurrency("USD");
+        req.setOrderId(ClientUtil.randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
+        if(apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
+            req.setTransactionCurrency("USD");
+            req.setTransactionAmount("5000");
+            req.setOrderId(null);
+        }
+        if(apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
+            req.setOrderId(null);
+        }
+        if(apiOperation.equals("RETRIEVE_ORDER") || apiOperation.equals("RETRIEVE_TRANSACTION")) {
+            req.setApiMethod("GET");
+            req.setOrderId(null);
+            req.setTransactionId(null);
+        }
+        if(apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
+            req.setApiMethod("POST");
+        }
+        //TODO: This URL should come from the client dynamically
+        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
+        return req;
+    }
+
     public static String getRequestUrl(Config config, ApiRequest request) {
         String url = config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
         if(notNullOrEmpty(request.getTransactionId())) {
@@ -98,6 +126,7 @@ public class ClientUtil {
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
         if (notNullOrEmpty(request.getApiOperation())) data.addProperty("apiOperation", request.getApiOperation());
+        if (notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
         if (!transaction.entrySet().isEmpty()) data.add("transaction", transaction);
         if (!sourceOfFunds.entrySet().isEmpty()) data.add("sourceOfFunds", sourceOfFunds);

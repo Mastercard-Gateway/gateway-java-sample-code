@@ -48,7 +48,7 @@ public class WebController {
     @GetMapping("/confirm")
     public ModelAndView showConfirm() {
         ModelAndView mav = new ModelAndView("confirm");
-        ApiRequest req = createTestRequest("CONFIRM_BROWSER_PAYMENT");
+        ApiRequest req = ClientUtil.createApiRequest("CONFIRM_BROWSER_PAYMENT");
         req.setTransactionId(ClientUtil.randomNumber());
         req.setOrderId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
@@ -58,7 +58,7 @@ public class WebController {
     @GetMapping("/initiate")
     public ModelAndView showInitiate() {
         ModelAndView mav = new ModelAndView("initiate");
-        ApiRequest req = createTestRequest("INITIATE_BROWSER_PAYMENT");
+        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
         req.setTransactionId(ClientUtil.randomNumber());
         req.setOrderId(ClientUtil.randomNumber());
         req.setSourceType(null);
@@ -97,7 +97,7 @@ public class WebController {
     @GetMapping("/capture")
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
-        ApiRequest req = createTestRequest("CAPTURE");
+        ApiRequest req = ClientUtil.createApiRequest("CAPTURE");
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -105,7 +105,7 @@ public class WebController {
     @GetMapping("/refund")
     public ModelAndView showRefund() {
         ModelAndView mav = new ModelAndView("refund");
-        ApiRequest req = createTestRequest("REFUND");
+        ApiRequest req = ClientUtil.createApiRequest("REFUND");
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -113,7 +113,7 @@ public class WebController {
     @GetMapping("/retrieve")
     public ModelAndView showRetrieve() {
         ModelAndView mav = new ModelAndView("retrieve");
-        ApiRequest req = createTestRequest("RETRIEVE_TRANSACTION");
+        ApiRequest req = ClientUtil.createApiRequest("RETRIEVE_TRANSACTION");
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -121,7 +121,7 @@ public class WebController {
     @GetMapping("/update")
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
-        ApiRequest req = createTestRequest("UPDATE_AUTHORIZATION");
+        ApiRequest req = ClientUtil.createApiRequest("UPDATE_AUTHORIZATION");
         req.setTransactionId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -130,7 +130,7 @@ public class WebController {
     @GetMapping("/void")
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
-        ApiRequest req = createTestRequest("VOID");
+        ApiRequest req = ClientUtil.createApiRequest("VOID");
         req.setTransactionId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -224,7 +224,7 @@ public class WebController {
             CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
 
             // Construct API request
-            ApiRequest request = createTestRequest(operation);
+            ApiRequest request = ClientUtil.createApiRequest(operation);
             request.setSessionId(session.getId());
             String jsonPayload = ClientUtil.buildJSONPayload(request);
             String requestUrl = ClientUtil.getRequestUrl(config, request);
@@ -323,7 +323,7 @@ public class WebController {
             CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
 
             // Construct API request
-            ApiRequest req = createTestRequest(operation);
+            ApiRequest req = ClientUtil.createApiRequest(operation);
             req.setSessionId(session.getId());
             req.setSecureIdResponseUrl(redirectUrl);
             String jsonPayload = ClientUtil.buildJSONPayload(req);
@@ -331,6 +331,7 @@ public class WebController {
             String secureId = ClientUtil.randomNumber();
             HttpSession httpSession = request.getSession();
             httpSession.setAttribute("secureId", secureId);
+            httpSession.setAttribute("sessionId", session.getId());
             String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
 
             // Perform API operation
@@ -349,8 +350,9 @@ public class WebController {
                 mav.addObject("authenticationHtml", authenticationHtml);
             }
             else {
-                mav.setViewName("secureIdReceipt");
-                mav.addObject("notEnrolledStatus", secureIdStatus);
+                mav.setViewName("error");
+                mav.addObject("error", secureIdStatus);
+                mav.addObject("message", "Card not enrolled in 3DS.");
             }
         }
         catch(Exception e) {
@@ -378,6 +380,7 @@ public class WebController {
         try {
             HttpSession session = request.getSession();
             String secureId = (String) session.getAttribute("secureId");
+            String sessionId = (String) session.getAttribute("sessionId");
 
             // Process Access Control Server (ACS) result
             String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
@@ -391,12 +394,33 @@ public class WebController {
             String secureIdStatus = json3ds.get("summaryStatus").getAsString();
 
             if(!secureIdStatus.equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
-                // TODO: perform pay or auth operation
+                // Construct API request
+                ApiRequest apiReq = ClientUtil.createApiRequest("AUTHORIZE");
+                apiReq.setSessionId(sessionId);
+                apiReq.setSecureId(secureId);
+                String payload = ClientUtil.buildJSONPayload(apiReq);
+                String reqUrl = ClientUtil.getRequestUrl(config, apiReq);
+
+                // Perform API operation
+                ApiClient apiConnection = new ApiClient();
+                String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+
+                ObjectMapper mapper = new ObjectMapper();
+                Object prettyResp = mapper.readValue(apiResponse, Object.class);
+                Object prettyPayload = mapper.readValue(payload, Object.class);
+
+                mav.setViewName("receipt");
+                mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+                mav.addObject("operation", apiReq.getApiOperation());
+                mav.addObject("method", apiReq.getApiMethod());
+                mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+                mav.addObject("requestUrl", reqUrl);
             }
             else {
-                // TODO: show error message
+                mav.setViewName("error");
+                mav.addObject("error", ApiResponses.AUTHENTICATION_FAILED.toString());
+                mav.addObject("message", "3DS authentication failed. Please try again with another card.");
             }
-            mav.setViewName("secureIdReceipt");
         }
         catch(Exception e) {
             mav.setViewName("error");
@@ -406,40 +430,11 @@ public class WebController {
         return mav;
     }
 
-
     private ModelAndView createModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);
         mav.addObject("merchantId", config.getMerchantId());
         mav.addObject("baseUrl", config.getApiBaseURL());
         return mav;
-    }
-
-    public static ApiRequest createTestRequest(String apiOperation) {
-        ApiRequest req = new ApiRequest();
-        req.setApiOperation(apiOperation);
-        req.setOrderAmount("5000");
-        req.setOrderCurrency("USD");
-        req.setOrderId(ClientUtil.randomNumber());
-        req.setTransactionId(ClientUtil.randomNumber());
-        if(apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
-            req.setTransactionCurrency("USD");
-            req.setTransactionAmount("5000");
-            req.setOrderId(null);
-        }
-        if(apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
-            req.setOrderId(null);
-        }
-        if(apiOperation.equals("RETRIEVE_ORDER") || apiOperation.equals("RETRIEVE_TRANSACTION")) {
-            req.setApiMethod("GET");
-            req.setOrderId(null);
-            req.setTransactionId(null);
-        }
-        if(apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
-            req.setApiMethod("POST");
-        }
-        //TODO: This URL should come from the client dynamically
-        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
-        return req;
     }
 
 }
