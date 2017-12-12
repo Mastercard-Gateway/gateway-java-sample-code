@@ -2,6 +2,10 @@ package com.gateway.app;
 
 public enum ApiResponses {
 
+    // General API result
+    SUCCESS,
+    ERROR,
+
     // 3DS enrollment check
     CARD_ENROLLED,
     CARD_NOT_ENROLLED,

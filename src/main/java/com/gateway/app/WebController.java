@@ -328,7 +328,10 @@ public class WebController {
             req.setSecureIdResponseUrl(redirectUrl);
             String jsonPayload = ClientUtil.buildJSONPayload(req);
 
+            // Create a unique identifier to use for 3DSecure
             String secureId = ClientUtil.randomNumber();
+
+            // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = request.getSession();
             httpSession.setAttribute("secureId", secureId);
             httpSession.setAttribute("sessionId", session.getId());
@@ -338,20 +341,15 @@ public class WebController {
             ApiClient apiConnection = new ApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
-            JsonObject json = new Gson().fromJson(apiResponse, JsonObject.class);
-            JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
-            String secureIdStatus = json3ds.get("summaryStatus").getAsString();
-            JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
-            JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
-            String authenticationHtml = jsonSimple.get("htmlBodyContent").getAsString();
+            SecureId secureIdObject = ClientUtil.parse3DSecureResponse(apiResponse);
 
-            if(secureIdStatus.equals(ApiResponses.CARD_ENROLLED.toString())) {
+            if(secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("secureIdPayerAuthenticationForm");
-                mav.addObject("authenticationHtml", authenticationHtml);
+                mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
             }
             else {
                 mav.setViewName("error");
-                mav.addObject("error", secureIdStatus);
+                mav.addObject("error", secureIdObject.getStatus());
                 mav.addObject("message", "Card not enrolled in 3DS.");
             }
         }
@@ -388,12 +386,9 @@ public class WebController {
 
             String data = ClientUtil.buildJSONPayload(req);
             String resp = connection.postTransaction(data, requestUrl, config);
+            SecureId secureIdObject = ClientUtil.parse3DSecureResponse(resp);
 
-            JsonObject json = new Gson().fromJson(resp, JsonObject.class);
-            JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
-            String secureIdStatus = json3ds.get("summaryStatus").getAsString();
-
-            if(!secureIdStatus.equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
+            if(!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
                 ApiRequest apiReq = ClientUtil.createApiRequest("AUTHORIZE");
                 apiReq.setSessionId(sessionId);
@@ -418,8 +413,8 @@ public class WebController {
             }
             else {
                 mav.setViewName("error");
-                mav.addObject("error", ApiResponses.AUTHENTICATION_FAILED.toString());
-                mav.addObject("message", "3DS authentication failed. Please try again with another card.");
+                mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
+                mav.addObject("explanation", "3DS authentication failed. Please try again with another card.");
             }
         }
         catch(Exception e) {

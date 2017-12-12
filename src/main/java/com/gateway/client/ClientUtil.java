@@ -153,17 +153,22 @@ public class ClientUtil {
         return checkoutSession;
     }
 
-    public static String encodeUrl(String url) {
-        String encodedUrl = "";
+    public static SecureId parse3DSecureResponse(String response) {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
+        JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
+        JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
 
-        try {
-            encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString());
-        }
-        catch(UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        SecureId secureId = new SecureId();
+        secureId.setStatus(json3ds.get("summaryStatus").getAsString());
+        secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
 
-        return encodedUrl;
+        return secureId;
+    }
+
+    public static String getApiResult(String response) {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        return json.get("result").getAsString();
     }
 
     public static String randomNumber() {
