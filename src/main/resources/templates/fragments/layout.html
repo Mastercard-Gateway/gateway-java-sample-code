@@ -27,7 +27,7 @@
             <!--<h6><a th:class="${viewName == 'initiate'}? 'active'" href="/initiate">Initiate Browser Payment</a></h6>-->
             <!--<h6><a th:class="${viewName == 'confirm'}? 'active'" href="/confirm">Confirm Browser Payment</a></h6>-->
             <h6><a th:class="${viewName == 'hostedCheckout'}? 'active'" href="/hostedCheckout">Hosted Checkout</a></h6>
-            <h6><a th:class="${viewName == 'secureId'}? 'active'" href="/secureId">Pay with 3DS</a></h6>
+            <h6><a th:class="${viewName == 'secureId'}? 'active'" href="/secureId">Authorize with 3DS</a></h6>
             <h6><a th:class="${viewName == 'paypal'}? 'active'" href="/paypal">Pay with PayPal</a></h6>
         </div>
         <div th:replace="${template}"/>
