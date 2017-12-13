@@ -2,10 +2,6 @@ package com.gateway.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.sun.deploy.util.SessionState;
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.measure.unit.Dimension;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
@@ -52,6 +47,12 @@ public class WebController {
         req.setTransactionId(ClientUtil.randomNumber());
         req.setOrderId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
+        return mav;
+    }
+
+    @GetMapping("/webhooks")
+    public ModelAndView showWebhooks() {
+        ModelAndView mav = new ModelAndView("webhooks");
         return mav;
     }
 
@@ -201,8 +202,10 @@ public class WebController {
                 ApiClient connection = new ApiClient();
                 String resp = connection.getTransaction(requestUrl, config);
 
+                Order order = ClientUtil.parseOrderDetails(resp);
+
                 mav.setViewName("hostedCheckoutReceipt");
-                mav.addObject("orderDetails", resp);
+                mav.addObject("order", order);
                 mav.addObject("result", result);
             }
             catch(Exception e) {
@@ -212,7 +215,9 @@ public class WebController {
             }
         }
         else {
-            // TODO: Handle non-success result
+            mav.setViewName("error");
+            mav.addObject("cause", "UNKNOWN ERROR");
+            mav.addObject("explanation", "Could not complete transaction");
         }
 
         return mav;
@@ -248,7 +253,7 @@ public class WebController {
             Object prettyResp = mapper.readValue(apiResponse, Object.class);
             Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
 
-            mav.setViewName("hostedCheckoutReceipt");
+            mav.setViewName("receipt");
             mav.addObject("merchantId", config.getMerchantId());
             mav.addObject("baseUrl", config.getApiBaseURL());
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
@@ -434,6 +439,11 @@ public class WebController {
         }
         return mav;
     }
+
+//    @@GetMapping(value="**")
+//    public String get404(){
+//        return "redirect:/index.html";
+//    }
 
     private ModelAndView createModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);

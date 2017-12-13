@@ -4,18 +4,34 @@
 <body>
 
 <div class="col-9 pl-4">
-    <th:block th:switch="${result}">
-        <div th:case="'success'">
-            <h3>Payment complete!</h3>
-            <div>Your payment was successful.</div>
-            <h2>Order Details</h2>
-            <div th:text="${orderDetails}"></div>
+    <h3>Payment complete!</h3>
+    <div>Your payment was successful.</div>
+    <div class="container mt-4 ml-0">
+        <div class="row">
+            <div class="col">
+                Order ID
+            </div>
+            <div class="col">
+                <p th:text="${order.id}"></p>
+            </div>
         </div>
-        <div th:case="'error'">
-            <h3>Error</h3>
-            <div>There was an error completing your payment.</div>
+        <div class="row">
+            <div class="col">
+                Description
+            </div>
+            <div class="col">
+                <p th:text="${order.description}"></p>
+            </div>
         </div>
-    </th:block>
+        <div class="row">
+            <div class="col">
+                Amount
+            </div>
+            <div class="col">
+                <p th:text="${order.amount} + ' ' + ${order.currency}"></p>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>

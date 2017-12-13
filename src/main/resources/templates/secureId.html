@@ -25,16 +25,14 @@
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
-            <div class="col-md-7">
+            <div class="col-md-12">
                 <h3>Authorize with 3DS</h3>
                 <div class="alert alert-warning" role="alert">
                     <ol>
-                        <li>Check for 3DS enrollment.</li>
-                        <ol type="i">
-                            <li>Create a hosted session using the CREATE_CHECKOUT_SESSION operation.</li>
-                            <li>Collect card details using hosted session.</li>
-                            <li>Check if the card is enrolled in 3DS.</li>
-                        </ol>
+                        <li>Create Hosted Session for the card details</li>
+                        <li>Check for 3DS enrollment using Hosted Session</li>
+                        <li>Redirect the user to the ACS simulator (in a real-life scenario this would be the issuer's authentication form)</li>
+                        <li>Complete the payment or authorization using the session ID and the 3D Secure ID</li>
                     </ol>
                 </div>
                 <p>Please enter your payment details:</p>
