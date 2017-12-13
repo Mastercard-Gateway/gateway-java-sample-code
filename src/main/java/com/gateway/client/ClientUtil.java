@@ -169,9 +169,9 @@ public class ClientUtil {
 
     public static Order parseOrderDetails(String response)  {
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonArray transactionJson = json.get("transaction").getAsJsonArray();
-        JsonObject transactionJson2 = transactionJson.get(0).getAsJsonObject();
-        JsonObject orderJson = transactionJson2.get("order").getAsJsonObject();
+        JsonArray arr = json.get("transaction").getAsJsonArray();
+        JsonObject transactionJson = arr.get(0).getAsJsonObject();
+        JsonObject orderJson = transactionJson.get("order").getAsJsonObject();
 
         Order order = new Order();
         order.setAmount(orderJson.get("amount").getAsString());

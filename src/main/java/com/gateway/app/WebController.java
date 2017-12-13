@@ -215,7 +215,9 @@ public class WebController {
             }
         }
         else {
-            // TODO: Handle non-success result
+            mav.setViewName("error");
+            mav.addObject("cause", "UNKNOWN ERROR");
+            mav.addObject("explanation", "Could not complete transaction");
         }
 
         return mav;
