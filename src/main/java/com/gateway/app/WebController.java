@@ -202,8 +202,10 @@ public class WebController {
                 ApiClient connection = new ApiClient();
                 String resp = connection.getTransaction(requestUrl, config);
 
+                Order order = ClientUtil.parseOrderDetails(resp);
+
                 mav.setViewName("hostedCheckoutReceipt");
-                mav.addObject("orderDetails", resp);
+                mav.addObject("order", order);
                 mav.addObject("result", result);
             }
             catch(Exception e) {
@@ -435,6 +437,11 @@ public class WebController {
         }
         return mav;
     }
+
+//    @@GetMapping(value="**")
+//    public String get404(){
+//        return "redirect:/index.html";
+//    }
 
     private ModelAndView createModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);

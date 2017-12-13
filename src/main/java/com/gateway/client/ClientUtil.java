@@ -3,6 +3,7 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -164,6 +165,21 @@ public class ClientUtil {
         secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
 
         return secureId;
+    }
+
+    public static Order parseOrderDetails(String response)  {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        JsonArray transactionJson = json.get("transaction").getAsJsonArray();
+        JsonObject transactionJson2 = transactionJson.get(0).getAsJsonObject();
+        JsonObject orderJson = transactionJson2.get("order").getAsJsonObject();
+
+        Order order = new Order();
+        order.setAmount(orderJson.get("amount").getAsString());
+        order.setCurrency(orderJson.get("currency").getAsString());
+        order.setId(orderJson.get("id").getAsString());
+        order.setDescription(orderJson.get("description").getAsString());
+
+        return order;
     }
 
     public static String getApiResult(String response) {
