@@ -1,37 +1,79 @@
 package com.gateway.client;
 
+import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.RandomStringUtils;
 
-public final class ClientUtil {
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-    public static String getRequestUrl(Merchant merchant, ApiRequest request) {
-        String url = merchant.getGatewayUrl() + "/version/" +
-                request.getApiVersion() +
-                "/merchant/" +
-                merchant.getMerchantId() +
-                "/order/" +
-                request.getOrderId();
+public class ClientUtil {
+
+    public static ApiRequest createApiRequest(String apiOperation) {
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation(apiOperation);
+        req.setOrderAmount("5000");
+        req.setOrderCurrency("USD");
+        req.setOrderId(ClientUtil.randomNumber());
+        req.setTransactionId(ClientUtil.randomNumber());
+        if(apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
+            req.setTransactionCurrency("USD");
+            req.setTransactionAmount("5000");
+            req.setOrderId(null);
+        }
+        if(apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
+            req.setOrderId(null);
+        }
+        if(apiOperation.equals("RETRIEVE_ORDER") || apiOperation.equals("RETRIEVE_TRANSACTION")) {
+            req.setApiMethod("GET");
+            req.setOrderId(null);
+            req.setTransactionId(null);
+        }
+        if(apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
+            req.setApiMethod("POST");
+        }
+        //TODO: This URL should come from the client dynamically
+        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
+        return req;
+    }
+
+    public static String getRequestUrl(Config config, ApiRequest request) {
+        String url = config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
         if(notNullOrEmpty(request.getTransactionId())) {
             url += "/transaction/" + request.getTransactionId();
         }
-        merchant.setGatewayUrl(url);
-        return merchant.getGatewayUrl();
+        return url;
     }
 
-    public static String getSessionRequestUrl(Merchant merchant, ApiRequest request) {
-        String url = merchant.getGatewayUrl() + "/version/" +
-                request.getApiVersion() +
-                "/merchant/" +
-                merchant.getMerchantId() +
-                "/session";
-        merchant.setGatewayUrl(url);
-        return merchant.getGatewayUrl();
+    public static String getSessionRequestUrl(Config config) {
+        return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session";
+    }
+
+    public static String getSessionRequestUrl(Config config, String sessionId) {
+        return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
+    }
+
+    public static String getSecureIdRequest(Config config, String secureId) {
+        return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/3DSecureId/" + secureId;
     }
 
     public static String buildJSONPayload(ApiRequest request) {
         JsonObject order = new JsonObject();
+
+        JsonObject secureId = new JsonObject();
+        if(notNullOrEmpty(request.getPaymentAuthResponse())) {
+            secureId.addProperty("paRes", request.getPaymentAuthResponse());
+        }
+
+        JsonObject authenticationRedirect = new JsonObject();
+        if (notNullOrEmpty(request.getSecureIdResponseUrl())) {
+            authenticationRedirect.addProperty("responseUrl", request.getSecureIdResponseUrl());
+            secureId.add("authenticationRedirect", authenticationRedirect);
+        }
+
         if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
             // Need to add order ID in the request body for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
@@ -78,18 +120,59 @@ public final class ClientUtil {
             }
         }
 
+        JsonObject session = new JsonObject();
+        if (notNullOrEmpty(request.getSessionId())) session.addProperty("id", request.getSessionId());
+
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
         if (notNullOrEmpty(request.getApiOperation())) data.addProperty("apiOperation", request.getApiOperation());
+        if (notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
         if (!transaction.entrySet().isEmpty()) data.add("transaction", transaction);
         if (!sourceOfFunds.entrySet().isEmpty()) data.add("sourceOfFunds", sourceOfFunds);
         if (!browserPayment.entrySet().isEmpty()) data.add("browserPayment", browserPayment);
         if (!interaction.entrySet().isEmpty()) data.add("interaction", interaction);
+        if (!session.entrySet().isEmpty()) data.add("session", session);
+        if (!secureId.entrySet().isEmpty()) data.add("3DSecure", secureId);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+        System.out.println("$$$$$$$$$$$$$$$ DATA: " + data);
         return gson.toJson(data);
+    }
+
+    public static CheckoutSession parseSessionResponse(String sessionResponse) {
+        JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
+        JsonObject jsonSession = json.get("session").getAsJsonObject();
+
+        CheckoutSession checkoutSession = new CheckoutSession();
+        checkoutSession.setId(jsonSession.get("id").getAsString());
+        checkoutSession.setVersion(jsonSession.get("version").getAsString());
+        if(json.get("successIndicator") != null) checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+
+        return checkoutSession;
+    }
+
+    public static SecureId parse3DSecureResponse(String response) {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
+        JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
+        JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
+
+        SecureId secureId = new SecureId();
+        secureId.setStatus(json3ds.get("summaryStatus").getAsString());
+        secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
+
+        return secureId;
+    }
+
+    public static String getApiResult(String response) {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        return json.get("result").getAsString();
+    }
+
+    public static String randomNumber() {
+        return RandomStringUtils.random(10, true, true);
     }
 
     private static boolean notNullOrEmpty(String value) {

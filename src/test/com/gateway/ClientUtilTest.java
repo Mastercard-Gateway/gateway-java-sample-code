@@ -1,8 +1,8 @@
 package com.gateway;
 
+import com.gateway.app.Config;
 import com.gateway.client.ApiRequest;
 import com.gateway.client.ClientUtil;
-import com.gateway.client.Merchant;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -14,16 +14,11 @@ import static org.junit.Assert.assertEquals;
 
 public class ClientUtilTest {
 
-    private Merchant merchant;
+    private Config config;
 
     @Before
     public void setUp() {
-        merchant = new Merchant();
-        merchant.setMerchantId("TESTMERCHANTID");
-        merchant.setPassword("APIPASSWORD1234");
-        merchant.setGatewayHost("https://test-gateway.mastercard.com");
-        merchant.setGatewayUrl(merchant.getGatewayHost() + "/api/rest");
-        merchant.setApiUsername("merchant." + merchant.getMerchantId());
+        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com", 45);
     }
 
     @Test
@@ -31,16 +26,13 @@ public class ClientUtilTest {
         ApiRequest request = new ApiRequest();
         request.setOrderId("DS9SJ3J39A");
         request.setTransactionId("H9JK29SM0J");
-        request.setApiVersion(45);
-        String result = ClientUtil.getRequestUrl(merchant, request);
+        String result = ClientUtil.getRequestUrl(config, request);
         assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
     }
 
     @Test
     public void getSessionRequestUrl() throws Exception {
-        ApiRequest request = new ApiRequest();
-        request.setApiVersion(45);
-        String result = ClientUtil.getSessionRequestUrl(merchant, request);
+        String result = ClientUtil.getSessionRequestUrl(config);
         assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
     }
 
@@ -185,6 +177,62 @@ public class ClientUtilTest {
         String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CREATE_CHECKOUT_SESSION\",\"order\":{\"id\":\"DS9SJ3J39A\",\"currency\":\"USD\"},\"interaction\":{\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseRequestWithSessionId() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("PAY");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setSessionId("SESSION0002647025380I5651515F86");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"PAY\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parse3dsRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("CHECK_3DS_ENROLLMENT");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setSessionId("SESSION0002647025380I5651515F86");
+        request.setSecureIdResponseUrl("http://www.mysite.com/receipt");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\"}}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseACSRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("PROCESS_ACS_RESULT");
+        request.setPaymentAuthResponse("LONG_PARES_VALUE");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"PROCESS_ACS_RESULT\",\"3DSecure\":{\"paRes\":\"LONG_PARES_VALUE\"}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseUsingSecureIdWithTransaction() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("PAY");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setSessionId("SESSION0002647025380I5651515F86");
+        request.setSecureId("1234567890");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"PAY\",\"3DSecureId\":\"1234567890\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"}}";
 
         assertEquals(prettifyJson(data), result);
     }

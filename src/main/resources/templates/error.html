@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'error')}">
+
+<body>
+<div class="col-9 pl-4">
+    <h3>Error</h3>
+    <div th:text="${cause}"></div>
+    <div th:text="${explanation}"></div>
+</div>
+
+</body>
+</html>

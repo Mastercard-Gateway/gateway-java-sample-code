@@ -4,15 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.sun.deploy.util.SessionState;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.measure.unit.Dimension;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -23,145 +27,60 @@ public class WebController {
     @Autowired
     private Config config;
 
+    /*
+     * Browser operations
+     */
     @GetMapping("/authorize")
     public ModelAndView showAuthorize() {
-        ModelAndView mav = new ModelAndView("authorize");
-        ApiRequest req = createTestRequest("AUTHORIZE");
-        req.setTransactionId(randomNumber());
-        req.setOrderId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/capture")
-    public ModelAndView showCapture() {
-        ModelAndView mav = new ModelAndView("capture");
-        ApiRequest req = createTestRequest("CAPTURE");
-        req.setTransactionId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/confirm")
-    public ModelAndView showConfirm() {
-        ModelAndView mav = new ModelAndView("confirm");
-        ApiRequest req = createTestRequest("CONFIRM_BROWSER_PAYMENT");
-        req.setTransactionId(randomNumber());
-        req.setOrderId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/initiate")
-    public ModelAndView showInitiate() {
-        ModelAndView mav = new ModelAndView("initiate");
-        ApiRequest req = createTestRequest("INITIATE_BROWSER_PAYMENT");
-        req.setTransactionId(randomNumber());
-        req.setOrderId(randomNumber());
-        req.setSourceType(null);
-        mav.addObject("apiRequest", req);
-        return mav;
+        return createModel("authorize");
     }
 
     @GetMapping("/pay")
     public ModelAndView showPay() {
-        ModelAndView mav = new ModelAndView("pay");
-        ApiRequest req = createTestRequest("PAY");
-        req.setOrderId(randomNumber());
-        req.setTransactionId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/refund")
-    public ModelAndView showRefund() {
-        ModelAndView mav = new ModelAndView("refund");
-        ApiRequest req = createTestRequest("REFUND");
-        req.setTransactionId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/retrieve")
-    public ModelAndView showRetrieve() {
-        ModelAndView mav = new ModelAndView("retrieve");
-        ApiRequest req = createTestRequest("RETRIEVE_TRANSACTION");
-        req.setMethod("GET");
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/update")
-    public ModelAndView showUpdate() {
-        ModelAndView mav = new ModelAndView("update");
-        ApiRequest req = createTestRequest("UPDATE_AUTHORIZATION");
-        req.setTransactionId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
+        return createModel("pay");
     }
 
     @GetMapping("/verify")
     public ModelAndView showVerify() {
-        ModelAndView mav = new ModelAndView("verify");
-        ApiRequest req = createTestRequest("VERIFY");
-        req.setOrderId(randomNumber());
-        req.setTransactionId(randomNumber());
+        return createModel("verify");
+    }
+
+    @GetMapping("/paypal")
+    public ModelAndView showPaypal() {
+        ModelAndView mav = new ModelAndView("paypal");
+        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
+        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
 
-    @GetMapping("/void")
-    public ModelAndView showVoid() {
-        ModelAndView mav = new ModelAndView("void");
-        ApiRequest req = createTestRequest("VOID");
-        req.setTransactionId(randomNumber());
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    @GetMapping("/hostedCheckout")
-    public ModelAndView showHostedCheckout() {
-        ModelAndView mav = new ModelAndView("hostedCheckout");
-        ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_CHECKOUT_SESSION");
-        req.setOrderId(randomNumber());
-        req.setOrderCurrency("USD");
-
-        Merchant merchant = createMerchant();
-        String requestUrl = ClientUtil.getSessionRequestUrl(merchant, req);
-
-        String data = ClientUtil.buildJSONPayload(req);
-
-        try {
-            ApiClient connection = new ApiClient(merchant);
-            String resp = connection.postTransaction(data, requestUrl);
-            System.out.println("CREATED SESSION: " + resp);
-
-            JsonObject json = new Gson().fromJson(resp, JsonObject.class);
-            JsonObject jsonSession = json.get("session").getAsJsonObject();
-
-            CheckoutSession checkoutSession = new CheckoutSession();
-            checkoutSession.setId(jsonSession.get("id").getAsString());
-            checkoutSession.setVersion(jsonSession.get("version").getAsString());
-            checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
-
-            mav.addObject("orderId", req.getOrderId());
-            mav.addObject("sessionId", checkoutSession.getId());
-            mav.addObject("sessionVersion", checkoutSession.getVersion());
-            mav.addObject("successIndicator", checkoutSession.getSuccessIndicator());
-            mav.addObject("merchantId", merchant.getMerchantId());
-            mav.addObject("apiPassword", merchant.getPassword());
-        } catch (Exception e) {
-            e.printStackTrace();
-            mav.addObject("error", e.getMessage());
-        }
-
-        return mav;
-    }
+//    @GetMapping("/confirm")
+//    public ModelAndView showConfirm() {
+//        ModelAndView mav = new ModelAndView("confirm");
+//        ApiRequest req = ClientUtil.createApiRequest("CONFIRM_BROWSER_PAYMENT");
+//        req.setTransactionId(ClientUtil.randomNumber());
+//        req.setOrderId(ClientUtil.randomNumber());
+//        mav.addObject("apiRequest", req);
+//        return mav;
+//    }
+//
+//    @GetMapping("/initiate")
+//    public ModelAndView showInitiate() {
+//        ModelAndView mav = new ModelAndView("initiate");
+//        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
+//        req.setTransactionId(ClientUtil.randomNumber());
+//        req.setOrderId(ClientUtil.randomNumber());
+//        req.setSourceType(null);
+//        mav.addObject("apiRequest", req);
+//        return mav;
+//    }
 
     @GetMapping("/browserPaymentReceipt")
     public ModelAndView browserPaymentReceipt(HttpServletRequest request) {
-        ModelAndView mav = new ModelAndView("browserPaymentReceipt");
+
+        ModelAndView mav = new ModelAndView();
+
         String data = "";
         try {
             StringBuilder buffer = new StringBuilder();
@@ -171,19 +90,104 @@ public class WebController {
                 buffer.append(line);
             }
             data = buffer.toString();
+
+            mav.setViewName("browserPaymentReceipt");
             mav.addObject("request", data);
         } catch (IOException e) {
+            mav.setViewName("error");
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
+        return mav;
+    }
 
+    /*
+     * Server-to-server operations
+     */
+    @GetMapping("/capture")
+    public ModelAndView showCapture() {
+        ModelAndView mav = new ModelAndView("capture");
+        ApiRequest req = ClientUtil.createApiRequest("CAPTURE");
+        mav.addObject("apiRequest", req);
+        return mav;
+    }
+
+    @GetMapping("/refund")
+    public ModelAndView showRefund() {
+        ModelAndView mav = new ModelAndView("refund");
+        ApiRequest req = ClientUtil.createApiRequest("REFUND");
+        mav.addObject("apiRequest", req);
+        return mav;
+    }
+
+    @GetMapping("/retrieve")
+    public ModelAndView showRetrieve() {
+        ModelAndView mav = new ModelAndView("retrieve");
+        ApiRequest req = ClientUtil.createApiRequest("RETRIEVE_TRANSACTION");
+        mav.addObject("apiRequest", req);
+        return mav;
+    }
+
+    @GetMapping("/update")
+    public ModelAndView showUpdate() {
+        ModelAndView mav = new ModelAndView("update");
+        ApiRequest req = ClientUtil.createApiRequest("UPDATE_AUTHORIZATION");
+        req.setTransactionId(ClientUtil.randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
+    }
+
+    @GetMapping("/void")
+    public ModelAndView showVoid() {
+        ModelAndView mav = new ModelAndView("void");
+        ApiRequest req = ClientUtil.createApiRequest("VOID");
+        req.setTransactionId(ClientUtil.randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
+    }
+
+    /*
+     * Hosted checkout
+     */
+    @GetMapping("/hostedCheckout")
+    public ModelAndView showHostedCheckout() {
+
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("CREATE_CHECKOUT_SESSION");
+        req.setOrderId(ClientUtil.randomNumber());
+        req.setOrderCurrency("USD");
+
+        String requestUrl = ClientUtil.getSessionRequestUrl(config);
+
+        String data = ClientUtil.buildJSONPayload(req);
+
+        try {
+            ApiClient connection = new ApiClient();
+            String resp = connection.postTransaction(data, requestUrl, config);
+
+            CheckoutSession session = ClientUtil.parseSessionResponse(resp);
+
+            mav.setViewName("hostedCheckout");
+            mav.addObject("orderId", req.getOrderId());
+            mav.addObject("sessionId", session.getId());
+            mav.addObject("sessionVersion", session.getVersion());
+            mav.addObject("successIndicator", session.getSuccessIndicator());
+            mav.addObject("merchantId", config.getMerchantId());
+            mav.addObject("apiPassword", config.getApiPassword());
+        } catch (Exception e) {
+            mav.setViewName("error");
+            e.printStackTrace();
+            mav.addObject("error", e.getMessage());
+        }
         return mav;
     }
 
     @GetMapping("/hostedCheckoutReceipt/{orderId}/{result}")
     public ModelAndView hostedCheckoutReceipt(@PathVariable(value="orderId") String orderId, @PathVariable(value="result") String result) {
 
-        ModelAndView mav = new ModelAndView("hostedCheckoutReceipt");
+        ModelAndView mav = new ModelAndView();
 
         if(result.equals("success")) {
             // Retrieve order details
@@ -191,53 +195,176 @@ public class WebController {
             req.setApiOperation("RETRIEVE_ORDER");
             req.setOrderId(orderId);
 
-            Merchant merchant = createMerchant();
-            String requestUrl = ClientUtil.getRequestUrl(merchant, req);
-            System.out.println("REQUEST URL: " + requestUrl);
+            String requestUrl = ClientUtil.getRequestUrl(config, req);
 
             try {
-                ApiClient connection = new ApiClient(merchant);
-                String resp = connection.getTransaction(requestUrl);
-                System.out.println("RETRIEVE ORDER: " + resp);
+                ApiClient connection = new ApiClient();
+                String resp = connection.getTransaction(requestUrl, config);
+
+                mav.setViewName("hostedCheckoutReceipt");
                 mav.addObject("orderDetails", resp);
+                mav.addObject("result", result);
             }
             catch(Exception e) {
-                e.printStackTrace();
+                mav.setViewName("error");
                 mav.addObject("error", e.getMessage());
+                e.printStackTrace();
             }
         }
+        else {
+            // TODO: Handle non-success result
+        }
 
-        mav.addObject("result", result);
         return mav;
     }
 
+    // Endpoint for Hosted Session
+    @GetMapping("/process/{operation}/{sessionId}")
+    public ModelAndView processHostedSession(@PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId) {
+
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            // Retrieve session
+            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
+            ApiClient sessionConnection = new ApiClient();
+            String sessionResponse = sessionConnection.getTransaction(url, config);
+
+            // Parse session response into CheckoutSession object
+            CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
+
+            // Construct API request
+            ApiRequest request = ClientUtil.createApiRequest(operation);
+            request.setSessionId(session.getId());
+            String jsonPayload = ClientUtil.buildJSONPayload(request);
+            String requestUrl = ClientUtil.getRequestUrl(config, request);
+
+            // Perform API operation
+            ApiClient apiConnection = new ApiClient();
+            String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
+
+            // Send info on transaction to view
+            ObjectMapper mapper = new ObjectMapper();
+            Object prettyResp = mapper.readValue(apiResponse, Object.class);
+            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
+
+            mav.setViewName("hostedCheckoutReceipt");
+            mav.addObject("merchantId", config.getMerchantId());
+            mav.addObject("baseUrl", config.getApiBaseURL());
+            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+            mav.addObject("operation", request.getApiOperation());
+            mav.addObject("method", request.getApiMethod());
+            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+            mav.addObject("requestUrl", requestUrl);
+        }
+        catch(Exception e) {
+            mav.setViewName("error");
+            e.printStackTrace();
+            mav.addObject("error", e.getMessage());
+        }
+        return mav;
+    }
+
+    /*
+     * Processing endpoint for server-to-server operations
+     */
     @PostMapping("/process")
     public ModelAndView process(ApiRequest request) {
 
-        Merchant merchant = createMerchant();
-        String requestUrl = ClientUtil.getRequestUrl(merchant, request);
+        ModelAndView mav = new ModelAndView();
+
+        String requestUrl = ClientUtil.getRequestUrl(config, request);
         String jsonPayload = ClientUtil.buildJSONPayload(request);
 
         String resp = "";
 
-        ModelAndView mav = new ModelAndView("receipt");
-
         try {
-            ApiClient connection = new ApiClient(merchant);
-            if (request.getMethod().equals("PUT")) {
-                resp = connection.sendTransaction(jsonPayload, requestUrl);
-            } else if (request.getMethod().equals("GET")) {
-                resp = connection.getTransaction(requestUrl);
+            ApiClient connection = new ApiClient();
+            if (request.getApiMethod().equals("PUT")) {
+                resp = connection.sendTransaction(jsonPayload, requestUrl, config);
+            } else if (request.getApiMethod().equals("GET")) {
+                resp = connection.getTransaction(requestUrl, config);
             }
             ObjectMapper mapper = new ObjectMapper();
             Object prettyResp = mapper.readValue(resp, Object.class);
             Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
+
+            mav.setViewName("receipt");
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
             mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getMethod());
+            mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
+            mav.setViewName("error");
+            e.printStackTrace();
+            mav.addObject("error", e.getMessage());
+        }
+        return mav;
+    }
+
+    /*
+     * Display 3DS page
+     */
+    @GetMapping("/secureId")
+    public ModelAndView showSecureId() {
+        ModelAndView mav = new ModelAndView("secureId");
+        mav.addObject("merchantId", config.getMerchantId());
+        mav.addObject("baseUrl", config.getApiBaseURL());
+        mav.addObject("redirectUrlEndpoint", "process3ds");
+        return mav;
+    }
+
+    /*
+     * Checks for 3DS enrollment and, if enrolled, redirects to issuer's authentication form
+     */
+    @GetMapping("/check3dsEnrollment/{operation}/{sessionId}")
+    public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
+
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            // Retrieve session
+            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
+            ApiClient sessionConnection = new ApiClient();
+            String sessionResponse = sessionConnection.getTransaction(url, config);
+
+            // Parse session response into CheckoutSession object
+            CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
+
+            // Construct API request
+            ApiRequest req = ClientUtil.createApiRequest(operation);
+            req.setSessionId(session.getId());
+            req.setSecureIdResponseUrl(redirectUrl);
+            String jsonPayload = ClientUtil.buildJSONPayload(req);
+
+            // Create a unique identifier to use for 3DSecure
+            String secureId = ClientUtil.randomNumber();
+
+            // Save this value in HttpSession to retrieve after returning from issuer authentication form
+            HttpSession httpSession = request.getSession();
+            httpSession.setAttribute("secureId", secureId);
+            httpSession.setAttribute("sessionId", session.getId());
+            String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
+
+            // Perform API operation
+            ApiClient apiConnection = new ApiClient();
+            String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
+
+            SecureId secureIdObject = ClientUtil.parse3DSecureResponse(apiResponse);
+
+            if(secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
+                mav.setViewName("secureIdPayerAuthenticationForm");
+                mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
+            }
+            else {
+                mav.setViewName("error");
+                mav.addObject("error", secureIdObject.getStatus());
+                mav.addObject("message", "Card not enrolled in 3DS.");
+            }
+        }
+        catch(Exception e) {
+            mav.setViewName("error");
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
         }
@@ -245,36 +372,74 @@ public class WebController {
         return mav;
     }
 
-    private Merchant createMerchant() {
-        Merchant merchant = new Merchant();
-        merchant.setMerchantId(config.getMerchantId());
-        merchant.setPassword(config.getApiPassword());
-        merchant.setGatewayHost(config.getApiBaseURL());
-        merchant.setGatewayUrl(config.getApiBaseURL() + "/api/rest");
-        merchant.setApiUsername("merchant." + merchant.getMerchantId());
-        return merchant;
-    }
+    /*
+     * Processing endpoint for server-to-server operations
+     */
+    @PostMapping("/process3ds")
+    public ModelAndView process3ds(HttpServletRequest request) {
 
-    private String randomNumber() {
-        return RandomStringUtils.random(10, true, true);
-    }
+        ModelAndView mav = new ModelAndView();
 
-    public static ApiRequest createTestRequest(String apiOperation) {
         ApiRequest req = new ApiRequest();
-        req.setApiOperation(apiOperation);
-        req.setMethod("PUT");
-        req.setSourceType("CARD");
-        req.setCardNumber("5123450000000008");
-        req.setExpiryMonth("5");
-        req.setExpiryYear("21");
-        req.setSecurityCode("100");
-        req.setOrderAmount("5000");
-        req.setTransactionAmount("5000");
-        req.setOrderCurrency("USD");
-        req.setTransactionCurrency("USD");
-        //TODO: This URL should come from the client dynamically
-        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
-        return req;
+        req.setApiOperation("PROCESS_ACS_RESULT");
+        // Retrieve Payment Authentication Response (PaRes) from request
+        req.setPaymentAuthResponse(request.getParameter("PaRes"));
+
+        try {
+            HttpSession session = request.getSession();
+            String secureId = (String) session.getAttribute("secureId");
+            String sessionId = (String) session.getAttribute("sessionId");
+
+            // Process Access Control Server (ACS) result
+            String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
+            ApiClient connection = new ApiClient();
+
+            String data = ClientUtil.buildJSONPayload(req);
+            String resp = connection.postTransaction(data, requestUrl, config);
+            SecureId secureIdObject = ClientUtil.parse3DSecureResponse(resp);
+
+            if(!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
+                // Construct API request
+                ApiRequest apiReq = ClientUtil.createApiRequest("AUTHORIZE");
+                apiReq.setSessionId(sessionId);
+                apiReq.setSecureId(secureId);
+                String payload = ClientUtil.buildJSONPayload(apiReq);
+                String reqUrl = ClientUtil.getRequestUrl(config, apiReq);
+
+                // Perform API operation
+                ApiClient apiConnection = new ApiClient();
+                String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+
+                ObjectMapper mapper = new ObjectMapper();
+                Object prettyResp = mapper.readValue(apiResponse, Object.class);
+                Object prettyPayload = mapper.readValue(payload, Object.class);
+
+                mav.setViewName("receipt");
+                mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+                mav.addObject("operation", apiReq.getApiOperation());
+                mav.addObject("method", apiReq.getApiMethod());
+                mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+                mav.addObject("requestUrl", reqUrl);
+            }
+            else {
+                mav.setViewName("error");
+                mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
+                mav.addObject("explanation", "3DS authentication failed. Please try again with another card.");
+            }
+        }
+        catch(Exception e) {
+            mav.setViewName("error");
+            e.printStackTrace();
+            mav.addObject("error", e.getMessage());
+        }
+        return mav;
+    }
+
+    private ModelAndView createModel(String viewName) {
+        ModelAndView mav = new ModelAndView(viewName);
+        mav.addObject("merchantId", config.getMerchantId());
+        mav.addObject("baseUrl", config.getApiBaseURL());
+        return mav;
     }
 
 }

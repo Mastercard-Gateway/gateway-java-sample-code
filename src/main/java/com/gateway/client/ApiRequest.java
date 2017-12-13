@@ -18,10 +18,11 @@ public class ApiRequest {
     private String returnUrl;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
-    private String method;
-
-    //Update this to use a different API Version
-    private int apiVersion = 45;
+    private String apiMethod = "PUT";
+    private String sessionId;
+    private String secureId;
+    private String secureIdResponseUrl;
+    private String paymentAuthResponse;
 
     public String getOrderId() {
         return orderId;
@@ -147,23 +148,47 @@ public class ApiRequest {
         return browserPaymentConfirmation;
     }
 
-    public void setBrowserPaymentConfirmation(String browerPaymentConfirmation) {
-        this.browserPaymentConfirmation = browerPaymentConfirmation;
+    public void setBrowserPaymentConfirmation(String browserPaymentConfirmation) {
+        this.browserPaymentConfirmation = browserPaymentConfirmation;
     }
 
-    public String getMethod() {
-        return method;
+    public String getApiMethod() {
+        return apiMethod;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setApiMethod(String apiMethod) {
+         this.apiMethod = apiMethod;
     }
 
-    public int getApiVersion() {
-        return apiVersion;
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setApiVersion(int apiVersion) {
-        this.apiVersion = apiVersion;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getSecureId() {
+        return secureId;
+    }
+
+    public void setSecureId(String secureId) {
+        this.secureId = secureId;
+    }
+
+    public String getSecureIdResponseUrl() {
+        return secureIdResponseUrl;
+    }
+
+    public void setSecureIdResponseUrl(String secureIdResponseUrl) {
+        this.secureIdResponseUrl = secureIdResponseUrl;
+    }
+
+    public String getPaymentAuthResponse() {
+        return paymentAuthResponse;
+    }
+
+    public void setPaymentAuthResponse(String paymentAuthResponse) {
+        this.paymentAuthResponse = paymentAuthResponse;
     }
 }

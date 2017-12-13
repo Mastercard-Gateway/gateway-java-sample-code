@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'initiate')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'paypal')}">
 
 <body>
 <div class="col-9">
     <div class="row">
         <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
-            <h3>Initiate Browser Payment</h3>
+            <h3>Pay with PayPal</h3>
             <div class="alert alert-warning" role="alert">
                 To access the browser payment simulator, copy and paste the redirectUrl from the response into a new browser window. Then complete the payment.
             </div>
@@ -14,17 +14,11 @@
                 <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />
                 <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
                 <input type="hidden" th:field="*{apiMethod}" th:value="${apiMethod}" name="apiMethod" />
+                <input type="hidden" th:field="*{sourceType}" th:value="${sourceType}" name="sourceType" />
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="browser-payment-operation">Payment Operation</label>
                     <div class="col-md-7">
                         <input id="browser-payment-operation" th:field="*{browserPaymentOperation}" type="text" placeholder="PAY" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="funds-type">Source of Funds</label>
-                    <div class="col-md-7">
-                        <input id="funds-type" th:field="*{sourceType}" type="text" placeholder="PAYPAL" class="form-control input-md" required=""/>
 
                     </div>
                 </div>
