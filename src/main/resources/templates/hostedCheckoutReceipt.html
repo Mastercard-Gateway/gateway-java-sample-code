@@ -6,8 +6,8 @@
 <div class="col-9 pl-4">
     <th:block th:switch="${result}">
         <div th:case="'success'">
-            <h3>Success!</h3>
-            <div>You have successfully completed your hosted checkout!</div>
+            <h3>Payment complete!</h3>
+            <div>Your payment was successful.</div>
             <h2>Order Details</h2>
             <div th:text="${orderDetails}"></div>
         </div>

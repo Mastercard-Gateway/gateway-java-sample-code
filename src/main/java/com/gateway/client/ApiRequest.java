@@ -1,4 +1,4 @@
-package com.mastercard.gateway;
+package com.gateway.client;
 
 public class ApiRequest {
 
@@ -18,9 +18,11 @@ public class ApiRequest {
     private String returnUrl;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
-    private String method;
-
-    public ApiRequest(){}
+    private String apiMethod = "PUT";
+    private String sessionId;
+    private String secureId;
+    private String secureIdResponseUrl;
+    private String paymentAuthResponse;
 
     public String getOrderId() {
         return orderId;
@@ -146,34 +148,47 @@ public class ApiRequest {
         return browserPaymentConfirmation;
     }
 
-    public void setBrowserPaymentConfirmation(String browerPaymentConfirmation) {
-        this.browserPaymentConfirmation = browerPaymentConfirmation;
+    public void setBrowserPaymentConfirmation(String browserPaymentConfirmation) {
+        this.browserPaymentConfirmation = browserPaymentConfirmation;
     }
 
-    public String getMethod() {
-        return method;
+    public String getApiMethod() {
+        return apiMethod;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setApiMethod(String apiMethod) {
+         this.apiMethod = apiMethod;
     }
 
-    public static ApiRequest createTestRequest(String apiOperation) {
-        ApiRequest req = new ApiRequest();
+    public String getSessionId() {
+        return sessionId;
+    }
 
-        req.apiOperation = apiOperation;
-        req.method = "PUT";
-        req.sourceType = "CARD";
-        req.cardNumber = "5123450000000008";
-        req.expiryMonth = "5";
-        req.expiryYear = "21";
-        req.securityCode = "100";
-        req.orderAmount = "5000";
-        req.transactionAmount = "5000";
-        req.orderCurrency = "USD";
-        req.transactionCurrency = "USD";
-        req.returnUrl = "http://localhost:5000/browserPaymentReceipt";
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 
-        return req;
+    public String getSecureId() {
+        return secureId;
+    }
+
+    public void setSecureId(String secureId) {
+        this.secureId = secureId;
+    }
+
+    public String getSecureIdResponseUrl() {
+        return secureIdResponseUrl;
+    }
+
+    public void setSecureIdResponseUrl(String secureIdResponseUrl) {
+        this.secureIdResponseUrl = secureIdResponseUrl;
+    }
+
+    public String getPaymentAuthResponse() {
+        return paymentAuthResponse;
+    }
+
+    public void setPaymentAuthResponse(String paymentAuthResponse) {
+        this.paymentAuthResponse = paymentAuthResponse;
     }
 }

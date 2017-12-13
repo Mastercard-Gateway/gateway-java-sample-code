@@ -9,9 +9,8 @@ This is a sample application to help developers start building Java applications
 ## Steps for testing with Heroku
 1. Obtain an account with your Gateway provider
 1. Register with [Heroku](https://www.heroku.com)
-1. Click this button [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-1. Configure the app with your TEST merchant ID, API password, and the regional API endpoint.
-1. Visit the landing page of the newly deployed app for more details
+1. Update the .env file at the root level of the project with your merchant ID, API password, and gateway URL.
+1. Deploy to Heroku using the following steps:
 
 ## Steps for running locally
 1. Download code
