@@ -243,7 +243,7 @@ public class WebController {
             Object prettyResp = mapper.readValue(apiResponse, Object.class);
             Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
 
-            mav.setViewName("hostedCheckoutReceipt");
+            mav.setViewName("receipt");
             mav.addObject("merchantId", config.getMerchantId());
             mav.addObject("baseUrl", config.getApiBaseURL());
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
