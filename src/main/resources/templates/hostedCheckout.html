@@ -3,27 +3,34 @@
 <body>
 <div class="col-9">
     <div class="row">
-        <h3>Hosted Checkout</h3>
-        <div class="p-3">
-            <p>The Hosted Checkout model allows you to collect payment details from your payer through an interaction hosted and displayed by the Payment Gateway.
-                With this model of integration, you never see or handle payment details directly because these are collected by the hosted payment interface and submitted directly from the payer's browser to the Payment Gateway.</p>
-            <p>Hosted Checkout can be implemented as:</p>
-            <ol>
-                <li>A Lightbox in a modal dialog over the top of your existing merchant website.</li>
-                <li>A Hosted Payment Page is a web page hosted and displayed by the Payment Gateway.</li>
-            </ol>
-            <!--<div class="my-5">-->
-                <!--<p>The below options do not redirect back to the merchant page after payment completion (and thus don't require a session ID)</p>-->
-                <!--<input id="lightbox-no-session" type="button" class="btn btn-primary mr-2" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />-->
-                <!--<input id="page-no-session" type="button" class="btn btn-primary" value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />-->
-            <!--</div>-->
-            <div class="my-5">
-                <p>The below options redirect back to the merchant site after payment completion and thus require a session ID to be passed in</p>
-                <input id="lightbox-with-session" type="button" class="btn btn-primary mr-2" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />
-                <input id="page-with-session" type="button" class="btn btn-primary" value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>Hosted Checkout</h3>
+                <p>The Hosted Checkout model allows you to collect payment details from your payer through an interaction hosted and displayed by the Payment Gateway. This means you aren't responsible for handling sensitive PCI data.</p>
+                <p>Hosted Checkout can be implemented as:</p>
+                <div class="container mt-5">
+                    <div class="row">
+                        <div class="col">
+                            <h5>Lightbox</h5>
+                            <ul class="my-4">
+                                <li>Opens modal; doesn't redirect away from merchant site</li>
+                                <li>Seamless checkout experience</li>
+                            </ul>
+                            <input id="lightbox-with-session" type="button" class="btn btn-primary mr-2" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />
+                        </div>
+                        <div class="col">
+                            <h5>Payment Page</h5>
+                            <ul class="my-4">
+                                <li>Redirects to Gateway-hosted payment page</li>
+                                <li>Ideal if your site isn't SSL-secured</li>
+                            </ul>
+                            <input id="page-with-session" type="button" class="btn btn-primary" value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </div> <!-- row -->
 </div>
 <script src="https://test-gateway.mastercard.com/checkout/version/45/checkout.js"
         data-error="errorCallback"
