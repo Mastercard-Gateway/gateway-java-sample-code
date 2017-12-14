@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,6 +61,14 @@ public class WebController {
     public ModelAndView showWebhooks() {
         ModelAndView mav = new ModelAndView("webhooks");
         return mav;
+    }
+
+    @RequestMapping(
+            value = "/process-webhooks",
+            method = RequestMethod.POST,
+            consumes = "text/plain")
+    public void processWebhooks(@RequestBody String payload) {
+        System.out.println("Webhook Payload = " + payload);
     }
 
     @GetMapping("/browserPaymentReceipt")
@@ -175,11 +180,11 @@ public class WebController {
     }
 
     @GetMapping("/hostedCheckoutReceipt/{orderId}/{result}")
-    public ModelAndView hostedCheckoutReceipt(@PathVariable(value="orderId") String orderId, @PathVariable(value="result") String result) {
+    public ModelAndView hostedCheckoutReceipt(@PathVariable(value = "orderId") String orderId, @PathVariable(value = "result") String result) {
 
         ModelAndView mav = new ModelAndView();
 
-        if(result.equals("success")) {
+        if (result.equals("success")) {
             // Retrieve order details
             ApiRequest req = new ApiRequest();
             req.setApiOperation("RETRIEVE_ORDER");
@@ -196,14 +201,12 @@ public class WebController {
                 mav.setViewName("hostedCheckoutReceipt");
                 mav.addObject("order", order);
                 mav.addObject("result", result);
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 mav.setViewName("error");
                 mav.addObject("error", e.getMessage());
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             mav.setViewName("error");
             mav.addObject("cause", "UNKNOWN ERROR");
             mav.addObject("explanation", "Could not complete transaction");
@@ -214,7 +217,7 @@ public class WebController {
 
     // Endpoint for Hosted Session
     @GetMapping("/process/{operation}/{sessionId}")
-    public ModelAndView processHostedSession(@PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId) {
+    public ModelAndView processHostedSession(@PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId) {
 
         ModelAndView mav = new ModelAndView();
 
@@ -250,8 +253,7 @@ public class WebController {
             mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
@@ -313,7 +315,7 @@ public class WebController {
      * Checks for 3DS enrollment and, if enrolled, redirects to issuer's authentication form
      */
     @GetMapping("/check3dsEnrollment/{operation}/{sessionId}")
-    public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
+    public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
 
         ModelAndView mav = new ModelAndView();
 
@@ -347,17 +349,15 @@ public class WebController {
 
             SecureId secureIdObject = ClientUtil.parse3DSecureResponse(apiResponse);
 
-            if(secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
+            if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("secureIdPayerAuthenticationForm");
                 mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
-            }
-            else {
+            } else {
                 mav.setViewName("error");
                 mav.addObject("error", secureIdObject.getStatus());
                 mav.addObject("message", "Card not enrolled in 3DS.");
             }
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
@@ -392,7 +392,7 @@ public class WebController {
             String resp = connection.postTransaction(data, requestUrl, config);
             SecureId secureIdObject = ClientUtil.parse3DSecureResponse(resp);
 
-            if(!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
+            if (!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
                 ApiRequest apiReq = ClientUtil.createApiRequest("AUTHORIZE");
                 apiReq.setSessionId(sessionId);
@@ -414,14 +414,12 @@ public class WebController {
                 mav.addObject("method", apiReq.getApiMethod());
                 mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
                 mav.addObject("requestUrl", reqUrl);
-            }
-            else {
+            } else {
                 mav.setViewName("error");
                 mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
                 mav.addObject("explanation", "3DS authentication failed. Please try again with another card.");
             }
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             e.printStackTrace();
             mav.addObject("error", e.getMessage());
