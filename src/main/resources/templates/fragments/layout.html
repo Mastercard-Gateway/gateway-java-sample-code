@@ -9,7 +9,7 @@
 <body>
 <div class="jumbotron text-center">
     <div class="container">
-        <h1 href="/">Gateway Sample Java Code</h1>
+        <h1 href="/">Gateway Java Sample Code</h1>
         <p>This set contains working example code to help you integrate your application into the payment gateway. Below are the transaction types covered in this example.</p>
     </div>
 </div>
@@ -29,6 +29,7 @@
             <h6><a th:class="${viewName == 'hostedCheckout'}? 'active'" href="/hostedCheckout">Hosted Checkout</a></h6>
             <h6><a th:class="${viewName == 'secureId'}? 'active'" href="/secureId">Authorize with 3DS</a></h6>
             <h6><a th:class="${viewName == 'paypal'}? 'active'" href="/paypal">Pay with PayPal</a></h6>
+            <h6><a th:class="${viewName == 'unionpay'}? 'active'" href="/unionpay">Pay with UnionPay SecurePay</a></h6>
             <h6><a th:class="${viewName == 'webhooks'}? 'active'" href="/webhooks">Webhooks</a></h6>
         </div>
         <div th:replace="${template}"/>

@@ -55,6 +55,7 @@
     }
     function cancelCallback() {
         console.log('Payment cancelled');
+        sessionStorage.clear();
         // Reload the page to generate a new session ID - the old one is out of date as soon as the lightbox is invoked
         window.location.reload(true);
     }
@@ -66,6 +67,7 @@
 
         var result = (response === sessionStorage.getItem("successIndicator")) ? "success" : "error";
         window.location.href = "/hostedCheckoutReceipt/" + sessionStorage.getItem("orderId") + "/" + result;
+        sessionStorage.clear();
     }
 
     function randomId() {

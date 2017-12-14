@@ -37,7 +37,7 @@ public class ClientUtil {
             req.setApiMethod("POST");
         }
         //TODO: This URL should come from the client dynamically
-        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
+        req.setReturnUrl("/browserPaymentReceipt");
         return req;
     }
 
@@ -138,7 +138,6 @@ public class ClientUtil {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        System.out.println("$$$$$$$$$$$$$$$ DATA: " + data);
         return gson.toJson(data);
     }
 

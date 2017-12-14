@@ -50,32 +50,21 @@ public class WebController {
         return mav;
     }
 
+    @GetMapping("/unionpay")
+    public ModelAndView showUnionPay() {
+        ModelAndView mav = new ModelAndView("unionpay");
+        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
+        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
+        mav.addObject("apiRequest", req);
+        return mav;
+    }
+
     @GetMapping("/webhooks")
     public ModelAndView showWebhooks() {
         ModelAndView mav = new ModelAndView("webhooks");
         return mav;
     }
-
-//    @GetMapping("/confirm")
-//    public ModelAndView showConfirm() {
-//        ModelAndView mav = new ModelAndView("confirm");
-//        ApiRequest req = ClientUtil.createApiRequest("CONFIRM_BROWSER_PAYMENT");
-//        req.setTransactionId(ClientUtil.randomNumber());
-//        req.setOrderId(ClientUtil.randomNumber());
-//        mav.addObject("apiRequest", req);
-//        return mav;
-//    }
-//
-//    @GetMapping("/initiate")
-//    public ModelAndView showInitiate() {
-//        ModelAndView mav = new ModelAndView("initiate");
-//        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
-//        req.setTransactionId(ClientUtil.randomNumber());
-//        req.setOrderId(ClientUtil.randomNumber());
-//        req.setSourceType(null);
-//        mav.addObject("apiRequest", req);
-//        return mav;
-//    }
 
     @GetMapping("/browserPaymentReceipt")
     public ModelAndView browserPaymentReceipt(HttpServletRequest request) {
@@ -439,11 +428,6 @@ public class WebController {
         }
         return mav;
     }
-
-//    @@GetMapping(value="**")
-//    public String get404(){
-//        return "redirect:/index.html";
-//    }
 
     private ModelAndView createModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'paypal')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'unionpay')}">
 
 <body>
 <div class="col-9">
     <div class="row">
         <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
-            <h3>Pay with PayPal</h3>
+            <h3>Pay with UnionPay SecurePay</h3>
             <div class="alert alert-warning" role="alert">
                 To access the browser payment simulator, copy and paste the redirectUrl from the response into a new browser window. Then complete the payment.
             </div>
@@ -46,7 +46,7 @@
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="process"></label>
                     <div class="col-md-7">
-                        <button id="process" name="process" class="btn btn-primary">Pay with PayPal</button>
+                        <button id="process" name="process" class="btn btn-primary">Pay with SecurePay</button>
                     </div>
                 </div>
             </fieldset>
