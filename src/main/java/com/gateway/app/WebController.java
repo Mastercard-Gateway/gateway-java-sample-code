@@ -63,9 +63,11 @@ public class WebController {
         return mav;
     }
 
-    @RequestMapping(value="/body", method=RequestMethod.POST)
-    public void getBody(@RequestBody String body) {
-            System.out.println("body:" + body);
+    @PostMapping("/webhooks")
+    public ModelAndView processWebhooks(@RequestBody String payload) {
+        System.out.println("Processing Webhooks - payload = " + payload);
+        ModelAndView mav = new ModelAndView("webhooks");
+        return mav;
     }
 
     @GetMapping("/browserPaymentReceipt")
@@ -368,6 +370,8 @@ public class WebController {
      */
     @PostMapping("/process3ds")
     public ModelAndView process3ds(HttpServletRequest request) {
+
+        System.out.println("######## process3ds");
 
         ModelAndView mav = new ModelAndView();
 
