@@ -63,10 +63,7 @@ public class WebController {
         return mav;
     }
 
-    @RequestMapping(
-            value = "/process-webhooks",
-            method = RequestMethod.POST,
-            consumes = "text/plain")
+    @PostMapping("/webhooks")
     public void processWebhooks(@RequestBody String payload) {
         System.out.println("Webhook Payload = " + payload);
     }
