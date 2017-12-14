@@ -16,6 +16,10 @@
       "required": true,
       "description": "The Gateway base URL to target. Use your region specific url if you have one.", 
       "value": "https://test-gateway.mastercard.com"
+    },
+    "WEBHOOKS_NOTIFICATION_SECRET": {
+      "required": false,
+      "description": "Webhook notification secret for payload validation"
     }
   },
   "buildpacks": [
