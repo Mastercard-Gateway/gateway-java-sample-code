@@ -63,9 +63,9 @@ public class WebController {
         return mav;
     }
 
-    @PostMapping("/process-webhook")
-    public void processWebhooks(@RequestBody String payload) {
-        System.out.println("Webhook Payload = " + payload);
+    @RequestMapping(value="/body", method=RequestMethod.POST)
+    public void getBody(@RequestBody String body) {
+            System.out.println("body:" + body);
     }
 
     @GetMapping("/browserPaymentReceipt")
