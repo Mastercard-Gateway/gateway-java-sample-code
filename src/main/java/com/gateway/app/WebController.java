@@ -2,19 +2,17 @@ package com.gateway.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 @Controller
@@ -60,47 +58,6 @@ public class WebController {
         req.setOrderId(ClientUtil.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
-    }
-
-    @PostMapping("/process-webhook")
-    public ModelAndView processWebhook(@RequestBody String payload) throws IOException {
-        System.out.println("Processing Webhook Notications....");
-        JsonObject payloadJSON = new Gson().fromJson(payload, JsonObject.class);
-        JsonObject order = (JsonObject) payloadJSON.get("order");
-        JsonObject transaction = (JsonObject) payloadJSON.get("transaction");
-
-        writeWebhookNotification(order.get("id").getAsString(), transaction.get("id").getAsString(), order.get("status").getAsString(), order.get("amount").getAsString());
-
-        ModelAndView mav = new ModelAndView("webhooks");
-        return mav;
-    }
-
-    private void writeWebhookNotification(String orderId, String transactionId, String orderStatus, String orderAmount) throws IOException {
-        FileWriter fileWriter = null;
-        try {
-            System.out.println("Webhook Notification - orderId = " + orderId + ", transactionId = " + transactionId + ", orderStatus = " + orderStatus + ", Amount = " + orderAmount);
-
-            long timeInMillis = System.currentTimeMillis();
-            File jsonFile = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER, "WebHookNotifications_" + timeInMillis + ".json");
-
-            System.out.println("Writing webhook notification file - " + jsonFile.getAbsolutePath() + "...");
-
-            fileWriter = new FileWriter(jsonFile);
-            Gson gson = new GsonBuilder().create();
-            JsonObject notification = new JsonObject();
-            notification.addProperty("timestamp", timeInMillis);
-            notification.addProperty("orderId", orderId);
-            notification.addProperty("transactionId", transactionId);
-            notification.addProperty("orderStatus", orderStatus);
-            notification.addProperty("orderAmount", orderAmount);
-            gson.toJson(notification, fileWriter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fileWriter != null) {
-                fileWriter.close();
-            }
-        }
     }
 
     @GetMapping("/browserPaymentReceipt")
