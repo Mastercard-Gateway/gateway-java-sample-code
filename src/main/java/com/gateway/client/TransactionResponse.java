@@ -7,7 +7,6 @@ public class TransactionResponse {
     String gatewayCode;
     String orderAmount;
     String orderCurrency;
-    String orderDescription;
     String orderId;
 
     public String getApiResult() {
@@ -48,21 +47,5 @@ public class TransactionResponse {
 
     public void setOrderCurrency(String orderCurrency) {
         this.orderCurrency = orderCurrency;
-    }
-
-    public String getOrderDescription() {
-        return orderDescription;
-    }
-
-    public void setOrderDescription(String orderDescription) {
-        this.orderDescription = orderDescription;
-    }
-
-    public String getAcquirerMessage() {
-        return acquirerMessage;
-    }
-
-    public void setAcquirerMessage(String acquirerMessage) {
-        this.acquirerMessage = acquirerMessage;
     }
 }

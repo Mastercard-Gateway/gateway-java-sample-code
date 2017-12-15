@@ -188,9 +188,9 @@ public class ClientUtil {
         return secureId;
     }
 
-    public static TransactionResponse parseHostedCheckoutResponse(String response)  {
+    public static HostedCheckoutResponse parseHostedCheckoutResponse(String response)  {
 
-        TransactionResponse resp = new TransactionResponse();
+        HostedCheckoutResponse resp = new HostedCheckoutResponse();
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
         JsonArray arr = json.get("transaction").getAsJsonArray();
@@ -209,9 +209,9 @@ public class ClientUtil {
         return resp;
     }
 
-    public static TransactionResponse parseBrowserPaymentResponse(String response) {
+    public static BrowserPaymentResponse parseBrowserPaymentResponse(String response) {
 
-        TransactionResponse resp = new TransactionResponse();
+        BrowserPaymentResponse resp = new BrowserPaymentResponse();
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
         JsonObject r = json.get("response").getAsJsonObject();

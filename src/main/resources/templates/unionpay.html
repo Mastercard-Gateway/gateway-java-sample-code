@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'unionpay')}">
-
 <body>
 <div class="col-9">
     <div class="row">
-        <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
+        <form action="#" class="col-12 form-horizontal" th:action="@{/processBrowserPayment}" th:object="${apiRequest}" method="post">
             <h3>Pay with UnionPay SecurePay</h3>
             <div class="alert alert-warning" role="alert">
                 To access the browser payment simulator, copy and paste the redirectUrl from the response into a new browser window. Then complete the payment.
@@ -15,20 +14,8 @@
                 <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
                 <input type="hidden" th:field="*{apiMethod}" th:value="${apiMethod}" name="apiMethod" />
                 <input type="hidden" th:field="*{sourceType}" th:value="${sourceType}" name="sourceType" />
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="browser-payment-operation">Payment Operation</label>
-                    <div class="col-md-7">
-                        <input id="browser-payment-operation" th:field="*{browserPaymentOperation}" type="text" placeholder="PAY" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="return-url">Return URL</label>
-                    <div class="col-md-7">
-                        <input id="return-url" th:field="*{returnUrl}" type="text" placeholder="" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
+                <input type="hidden" th:field="*{browserPaymentOperation}" th:value="${browserPaymentOperation}" name="browserPaymentOperation" />
+                <input type="hidden" th:field="*{returnUrl}" th:value="${returnUrl}" name="returnUrl" />
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="order-amount">Amount</label>
                     <div class="col-md-7">

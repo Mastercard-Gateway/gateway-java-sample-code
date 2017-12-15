@@ -61,12 +61,21 @@ public class WebController {
     }
 
     @GetMapping("/unionpay")
-    public ModelAndView showUnionPay() {
-        ModelAndView mav = new ModelAndView("unionpay");
-        ApiRequest req = ClientUtil.createApiRequest("INITIATE_BROWSER_PAYMENT");
-        req.setTransactionId(ClientUtil.randomNumber());
-        req.setOrderId(ClientUtil.randomNumber());
-        mav.addObject("apiRequest", req);
+    public ModelAndView showUnionPay(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            ApiRequest req = ClientUtil.createBrowserPaymentsRequest("PAY", "UNION_PAY", request.getRequestURL().toString());
+            mav.setViewName("unionpay");
+            mav.addObject("apiRequest", req);
+        }
+        catch (Exception e) {
+            mav.setViewName("error");
+            logger.error("An error occurred", e);
+            mav.addObject("cause", e.getCause());
+            mav.addObject("message", e.getMessage());
+        }
+
         return mav;
     }
 
@@ -178,16 +187,16 @@ public class WebController {
 
             ApiClient connection = new ApiClient();
             String resp = connection.getTransaction(requestUrl, config);
-            TransactionResponse transactionResponse = ClientUtil.parseHostedCheckoutResponse(resp);
+            HostedCheckoutResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
 
             if(result.equals(ApiResponses.SUCCESS.toString())) {
-                mav.addObject("response", transactionResponse);
+                mav.addObject("response", hostedCheckoutResponse);
                 mav.setViewName("receipt");
             }
             else {
                 mav.setViewName("error");
-                mav.addObject("cause", transactionResponse.getApiResult());
-                mav.addObject("message", transactionResponse.getAcquirerMessage());
+                mav.addObject("cause", hostedCheckoutResponse.getApiResult());
+                //mav.addObject("message", hostedCheckoutResponse.getAcquirerMessage());
             }
         }
         catch (Exception e) {
@@ -215,16 +224,16 @@ public class WebController {
             // Retrieve transaction
             ApiClient connection = new ApiClient();
             String resp = connection.getTransaction(requestUrl, config);
-            TransactionResponse transactionResponse = ClientUtil.parseBrowserPaymentResponse(resp);
+            BrowserPaymentResponse browserPaymentResponse = ClientUtil.parseBrowserPaymentResponse(resp);
 
-            if(transactionResponse.getApiResult().equals(ApiResponses.SUCCESS.toString())) {
-                mav.addObject("response", transactionResponse);
+            if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString())) {
+                mav.addObject("response", browserPaymentResponse);
                 mav.setViewName("receipt");
             }
             else {
                 mav.setViewName("error");
-                mav.addObject("cause", transactionResponse.getApiResult());
-                mav.addObject("message", transactionResponse.getAcquirerMessage());
+                mav.addObject("cause", browserPaymentResponse.getApiResult());
+                mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
             }
         } catch (Exception e) {
             mav.setViewName("error");
@@ -326,7 +335,7 @@ public class WebController {
      * Processing endpoint for browser payments (PayPal, Union Pay, etc)
      */
     @PostMapping("/processBrowserPayment")
-    public ModelAndView processBrowserPayment(HttpServletRequest request, ApiRequest apiReq) {
+    public ModelAndView processBrowserPayment(ApiRequest apiReq) {
         ModelAndView mav = new ModelAndView();
 
         // INITIATE_BROWSER_PAYMENT
