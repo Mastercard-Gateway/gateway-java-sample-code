@@ -7,6 +7,10 @@ public class WebhookNotification {
     String orderStatus;
     String amount;
 
+
+    public WebhookNotification() {
+    }
+
     public WebhookNotification(String orderId, String transactionId, String orderStatus, String amount) {
         this.timestamp = System.currentTimeMillis();
         this.orderId = orderId;
