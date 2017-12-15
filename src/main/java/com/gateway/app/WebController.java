@@ -70,6 +70,12 @@ public class WebController {
         return mav;
     }
 
+    @GetMapping("/masterpass")
+    public ModelAndView showMasterpass() {
+        ModelAndView mav = new ModelAndView("masterpass");
+        return mav;
+    }
+
     @GetMapping("/webhooks")
     public ModelAndView showWebhooks() {
         ModelAndView mav = new ModelAndView("webhooks");
