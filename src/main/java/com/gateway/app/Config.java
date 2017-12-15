@@ -17,6 +17,9 @@ public class Config {
     private String trustStorePath;
     private String trustStorePassword;
 
+
+    public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notification";
+
     public Config(String merchantId, String apiPassword, String apiBaseURL, int apiVersion) {
         this.merchantId = merchantId;
         this.apiPassword = apiPassword;
