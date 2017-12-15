@@ -19,6 +19,26 @@ public class WebhookNotification {
         this.amount = amount;
     }
 
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

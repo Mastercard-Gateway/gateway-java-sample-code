@@ -1,8 +1,8 @@
 package com.gateway.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.WebhookNotification;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +20,6 @@ import java.util.List;
 @Controller
 public class WebHooksController {
 
-
-    private ObjectMapper jsonMapper = new ObjectMapper();
 
     @GetMapping("/webhooks")
     public ModelAndView showWebhooks() {
@@ -40,7 +39,8 @@ public class WebHooksController {
 
         if (files != null) {
             for (File file : files) {
-                WebhookNotification notification = jsonMapper.readValue(file, WebhookNotification.class);
+                Gson gson = new Gson();
+                WebhookNotification notification = gson.fromJson(new FileReader(file), WebhookNotification.class);
                 notifications.add(notification);
             }
         } else {
@@ -67,14 +67,16 @@ public class WebHooksController {
         try {
             System.out.println("Webhook Notification - orderId = " + orderId + ", transactionId = " + transactionId + ", orderStatus = " + orderStatus + ", Amount = " + orderAmount);
 
-            WebhookNotification notification = new WebhookNotification(orderId, transactionId, orderStatus, orderAmount);
-
-            File jsonFile = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER, "WebHookNotifications_" + notification.getTimestamp() + ".json");
+            long timeInMillis = System.currentTimeMillis();
+            File jsonFile = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER, "WebHookNotifications_" + timeInMillis + ".json");
 
             System.out.println("Writing webhook notification file - " + jsonFile.getAbsolutePath() + "...");
 
-            jsonMapper.writeValue(jsonFile, WebhookNotification.class);
+            fileWriter = new FileWriter(jsonFile);
+            Gson gson = new GsonBuilder().create();
 
+            WebhookNotification notification = new WebhookNotification(orderId, transactionId, orderStatus, orderAmount);
+            gson.toJson(notification, fileWriter);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -83,6 +85,5 @@ public class WebHooksController {
             }
         }
     }
-
 
 }
