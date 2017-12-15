@@ -62,12 +62,6 @@ public class WebController {
         return mav;
     }
 
-    @GetMapping("/webhooks")
-    public ModelAndView showWebhooks() {
-        ModelAndView mav = new ModelAndView("webhooks");
-        return mav;
-    }
-
     @PostMapping("/process-webhook")
     public ModelAndView processWebhook(@RequestBody String payload) throws IOException {
         System.out.println("Processing Webhook Notications....");
