@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -83,9 +84,14 @@ public class WebController {
     private void writeWebhookNotification(String orderId, String transactionId, String orderStatus, String orderAmount) throws IOException {
         FileWriter fileWriter = null;
         try {
-            long timeInMillis = System.currentTimeMillis();
+            System.out.println("Webhook Notification - orderId = " + orderId + ", transactionId = " + transactionId + ", orderStatus = " + orderStatus + ", Amount = " + orderAmount);
 
-            fileWriter = new FileWriter(Config.WEBHOOKS_NOTIFICATION_FOLDER + "/" + "WebHook_" + timeInMillis + ".json");
+            long timeInMillis = System.currentTimeMillis();
+            File jsonFile = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER, "WebHookNotifications_" + timeInMillis + ".json");
+
+            System.out.println("Writing webhook notification file - " + jsonFile.getAbsolutePath() + "...");
+
+            fileWriter = new FileWriter(jsonFile);
             Gson gson = new GsonBuilder().create();
             JsonObject notification = new JsonObject();
             notification.addProperty("timestamp", timeInMillis);
