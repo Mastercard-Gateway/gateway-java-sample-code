@@ -15,6 +15,10 @@ import java.io.IOException;
 
 public final class ApiClient {
 
+
+    private static final String UTF8_ENCODING = "UTF-8";
+    private static final String CONTENT_TYPE = "application/json";
+
     public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
@@ -27,7 +31,7 @@ public final class ApiClient {
         putMethod.setDoAuthentication(true);
 
         // Set the charset to UTF-8
-        StringRequestEntity entity = new StringRequestEntity(data, "application/json", "UTF-8");
+        StringRequestEntity entity = new StringRequestEntity(data, CONTENT_TYPE, UTF8_ENCODING);
         putMethod.setRequestEntity(entity);
 
         HostConfiguration hostConfig = new HostConfiguration();
@@ -61,7 +65,7 @@ public final class ApiClient {
         postMethod.setDoAuthentication(true);
 
         // Set the charset to UTF-8
-        StringRequestEntity entity = new StringRequestEntity(data, "application/json", "UTF-8");
+        StringRequestEntity entity = new StringRequestEntity(data, "application/json", UTF8_ENCODING);
         postMethod.setRequestEntity(entity);
 
         HostConfiguration hostConfig = new HostConfiguration();

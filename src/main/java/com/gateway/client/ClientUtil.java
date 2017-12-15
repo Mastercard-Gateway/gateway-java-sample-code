@@ -6,12 +6,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ClientUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientUtil.class);
 
     public static ApiRequest createApiRequest(String apiOperation) {
         ApiRequest req = new ApiRequest();
@@ -37,7 +40,26 @@ public class ClientUtil {
             req.setApiMethod("POST");
         }
         //TODO: This URL should come from the client dynamically
-        req.setReturnUrl("/browserPaymentReceipt");
+        req.setReturnUrl("http://localhost:5000/browserPaymentReceipt");
+        return req;
+    }
+
+    public static ApiRequest createBrowserPaymentsRequest(String operation, String source, String requestUrl) throws MalformedURLException {
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
+        req.setBrowserPaymentOperation(operation);
+        req.setSourceType(source);
+        try {
+            URL url = new URL(requestUrl);
+            String returnUrlBase = url.getProtocol() + "://" + url.getAuthority();
+            req.setReturnUrl(returnUrlBase + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
+        }
+        catch (MalformedURLException e) {
+            logger.error("Unable to parse return URL", e);
+            throw e;
+        }
         return req;
     }
 
@@ -166,24 +188,51 @@ public class ClientUtil {
         return secureId;
     }
 
-    public static Order parseOrderDetails(String response)  {
+    public static TransactionResponse parseHostedCheckoutResponse(String response)  {
+
+        TransactionResponse resp = new TransactionResponse();
+
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
         JsonArray arr = json.get("transaction").getAsJsonArray();
         JsonObject transactionJson = arr.get(0).getAsJsonObject();
         JsonObject orderJson = transactionJson.get("order").getAsJsonObject();
+        JsonObject responseJson = transactionJson.getAsJsonObject("response").getAsJsonObject();
 
-        Order order = new Order();
-        order.setAmount(orderJson.get("amount").getAsString());
-        order.setCurrency(orderJson.get("currency").getAsString());
-        order.setId(orderJson.get("id").getAsString());
-        order.setDescription(orderJson.get("description").getAsString());
+        //resp.setAcquirerMessage();
+        resp.setApiResult(transactionJson.get("result").getAsString());
+        resp.setGatewayCode(responseJson.get("gatewayCode").getAsString());
+        resp.setOrderAmount(orderJson.get("amount").getAsString());
+        resp.setOrderCurrency(orderJson.get("currency").getAsString());
+        resp.setOrderDescription(orderJson.get("description").getAsString());
+        resp.setOrderId(orderJson.get("id").getAsString());
 
-        return order;
+        return resp;
     }
 
-    public static String getApiResult(String response) {
+    public static TransactionResponse parseBrowserPaymentResponse(String response) {
+
+        TransactionResponse resp = new TransactionResponse();
+
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        return json.get("result").getAsString();
+        JsonObject r = json.get("response").getAsJsonObject();
+        JsonObject orderJson = json.get("order").getAsJsonObject();
+
+        if(r.get("acquirerMessage") != null) {
+            resp.setAcquirerMessage(r.get("acquirerMessage").getAsString());
+        }
+        resp.setApiResult(json.get("result").getAsString());
+        resp.setGatewayCode(r.get("gatewayCode").getAsString());
+        resp.setOrderAmount(orderJson.get("amount").getAsString());
+        resp.setOrderCurrency(orderJson.get("currency").getAsString());
+        resp.setOrderId(orderJson.get("id").getAsString());
+
+        return resp;
+    }
+
+    public static String getBrowserPaymentRedirectUrl(String response) {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
+        return browserPayment.get("redirectUrl").getAsString();
     }
 
     public static String randomNumber() {

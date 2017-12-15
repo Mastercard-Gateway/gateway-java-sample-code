@@ -65,8 +65,8 @@
         console.log("successIndicator: ", sessionStorage.getItem("successIndicator"));
         console.log("Payment complete");
 
-        var result = (response === sessionStorage.getItem("successIndicator")) ? "success" : "error";
-        window.location.href = "/hostedCheckoutReceipt/" + sessionStorage.getItem("orderId") + "/" + result;
+        var result = (response === sessionStorage.getItem("successIndicator")) ? "SUCCESS" : "ERROR";
+        window.location.href = "/hostedCheckout/" + sessionStorage.getItem("orderId") + "/" + result;
         sessionStorage.clear();
     }
 
