@@ -29,7 +29,7 @@ import java.io.File;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        initNotificationsFolder();
+        initWebhooksNotificationsFolder();
         SpringApplication.run(Main.class, args);
     }
 
@@ -38,7 +38,7 @@ public class Main {
         return new ModelAndView("redirect:/authorize");
     }
 
-    private static void initNotificationsFolder() {
+    private static void initWebhooksNotificationsFolder() {
         File webhooksNotificationsFolder = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER);
         if (!webhooksNotificationsFolder.exists()) {
             System.out.println("Creating Webhooks Notifications folder... ");
