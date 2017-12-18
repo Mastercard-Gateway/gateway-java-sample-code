@@ -23,24 +23,38 @@ public class WebController {
     @Autowired
     public Config config;
 
-    /*
-     * Browser operations
+    /**
+     * Display AUTHORIZE operation page
+     * @return ModelAndView for authorize.html
      */
     @GetMapping("/authorize")
     public ModelAndView showAuthorize() {
         return createModel("authorize");
     }
 
+    /**
+     * Display PAY operation page
+     * @return ModelAndView for pay.html
+     */
     @GetMapping("/pay")
     public ModelAndView showPay() {
         return createModel("pay");
     }
 
+    /**
+     * Display VERIFY operation page
+     * @return ModelAndView for verify.html
+     */
     @GetMapping("/verify")
     public ModelAndView showVerify() {
         return createModel("verify");
     }
 
+    /**
+     * Display page for PayPal browser payment
+     * @param request Get request URL hostname to properly set the redirect URL
+     * @return ModelAndView for paypal.html
+     */
     @GetMapping("/paypal")
     public ModelAndView showPaypal(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
@@ -60,6 +74,11 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * Display page for UnionPay SecurePay browser payment
+     * @param request Get request URL hostname to properly set the redirect URL
+     * @return ModelAndView for unionpay.html
+     */
     @GetMapping("/unionpay")
     public ModelAndView showUnionPay(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
@@ -79,12 +98,20 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * Display page for Masterpass interaction
+     * @return ModelAndView for masterpass.html
+     */
     @GetMapping("/masterpass")
     public ModelAndView showMasterpass() {
         ModelAndView mav = new ModelAndView("masterpass");
         return mav;
     }
 
+    /**
+     * Display CAPTURE operation page
+     * @return ModelAndView for capture.html
+     */
     @GetMapping("/capture")
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
@@ -93,6 +120,10 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * Display REFUND operation page
+     * @return ModelAndView for refund.html
+     */
     @GetMapping("/refund")
     public ModelAndView showRefund() {
         ModelAndView mav = new ModelAndView("refund");
@@ -101,6 +132,10 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * Display RETRIEVE_TRANSACTION operation page
+     * @return ModelAndView for retrieve.html
+     */
     @GetMapping("/retrieve")
     public ModelAndView showRetrieve() {
         ModelAndView mav = new ModelAndView("retrieve");
@@ -109,6 +144,10 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * Display UPDATE_AUTHORIZATION operation page
+     * @return ModelAndView for update.html
+     */
     @GetMapping("/update")
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
@@ -118,6 +157,10 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * Display VOID operation page
+     * @return ModelAndView for void.html
+     */
     @GetMapping("/void")
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
@@ -127,8 +170,22 @@ public class WebController {
         return mav;
     }
 
-    /*
-     * Hosted checkout
+    /**
+     * Display 3DSecure operation page
+     * @return ModelAndView for secureId.html
+     */
+    @GetMapping("/secureId")
+    public ModelAndView showSecureId() {
+        ModelAndView mav = new ModelAndView("secureId");
+        mav.addObject("merchantId", config.getMerchantId());
+        mav.addObject("baseUrl", config.getApiBaseURL());
+        mav.addObject("redirectUrlEndpoint", "process3ds");
+        return mav;
+    }
+
+    /**
+     * Display page for Hosted Checkout operation
+     * @return ModelAndView for hostedCheckout.html
      */
     @GetMapping("/hostedCheckout")
     public ModelAndView showHostedCheckout() {
@@ -165,6 +222,13 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * This method receives the callback from the Hosted Checkout redirect. It looks up the order using the RETRIEVE_ORDER operation and
+     * displays either the receipt or an error page.
+     * @param orderId needed to retrieve order
+     * @param result of Hosted Checkout operation (success or error) - sent from hostedCheckout.html complete() callback
+     * @return ModelAndView for hosted checkout receipt page or error page
+     */
     @GetMapping("/hostedCheckout/{orderId}/{result}")
     public ModelAndView hostedCheckoutReceipt(@PathVariable(value="orderId") String orderId, @PathVariable(value="result") String result) {
 
@@ -202,42 +266,12 @@ public class WebController {
         return mav;
     }
 
-    @GetMapping("/browserPaymentReceipt")
-    public ModelAndView browserPaymentReceipt(@RequestParam("transactionId") String transactionId, @RequestParam("orderId") String orderId) {
-
-        ModelAndView mav = new ModelAndView();
-
-        ApiRequest apiReq = new ApiRequest();
-        apiReq.setTransactionId(transactionId);
-        apiReq.setOrderId(orderId);
-        String requestUrl = ClientUtil.getRequestUrl(config, apiReq);
-
-        String data = "";
-        try {
-            // Retrieve transaction
-            ApiClient connection = new ApiClient();
-            String resp = connection.getTransaction(requestUrl, config);
-            BrowserPaymentResponse browserPaymentResponse = ClientUtil.parseBrowserPaymentResponse(resp);
-
-            if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString()) && browserPaymentResponse.getInteractionStatus().equals(ApiResponses.COMPLETED.toString())) {
-                mav.addObject("response", browserPaymentResponse);
-                mav.setViewName("receipt");
-            }
-            else {
-                mav.setViewName("error");
-                mav.addObject("cause", browserPaymentResponse.getApiResult());
-                mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
-            }
-        } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause().toString());
-            mav.addObject("message", e.getMessage());
-        }
-        return mav;
-    }
-
-    // Endpoint for Hosted Session
+    /**
+     * This method processes the API request for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
+     * @param operation indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
+     * @param sessionId used to retrieve session created in hostedSession.js
+     * @return ModelAndView for api response page or error page
+     */
     @GetMapping("/process/{operation}/{sessionId}")
     public ModelAndView processHostedSession(@PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId) {
 
@@ -284,8 +318,10 @@ public class WebController {
         return mav;
     }
 
-    /*
-     * Processing endpoint for server-to-server operations
+    /**
+     * This method processes the API request for server-to-server operations. These are operations that would not commonly be invoked via a user interacting with the browser, but a system event (CAPTURE, REFUND, VOID).
+     * @param request contains info on how to construct API call
+     * @return ModelAndView for api response page or error page
      */
     @PostMapping("/process")
     public ModelAndView process(ApiRequest request) {
@@ -323,16 +359,18 @@ public class WebController {
         return mav;
     }
 
-    /*
-     * Processing endpoint for browser payments (PayPal, Union Pay, etc)
+    /**
+     * This method calls the INTIATE_BROWSER_PAYMENT operation, which returns a URL to the provider's website, where the user completes the purchase.
+     * @param request contains info on how to construct API call
+     * @return ModelAndView - either redirects to appropriate provider website or returns error page
      */
     @PostMapping("/processBrowserPayment")
-    public ModelAndView processBrowserPayment(ApiRequest apiReq) {
+    public ModelAndView processBrowserPayment(ApiRequest request) {
         ModelAndView mav = new ModelAndView();
 
         // INITIATE_BROWSER_PAYMENT
-        String requestUrl = ClientUtil.getRequestUrl(config, apiReq);
-        String jsonPayload = ClientUtil.buildJSONPayload(apiReq);
+        String requestUrl = ClientUtil.getRequestUrl(config, request);
+        String jsonPayload = ClientUtil.buildJSONPayload(request);
 
         try {
             ApiClient connection = new ApiClient();
@@ -347,20 +385,56 @@ public class WebController {
         return mav;
     }
 
-    /*
-     * Display 3DS page
+    /**
+     * This method handles the callback from the payment provider (PayPal, UnionPay, etc). It looks up the transaction based on the transaction ID and order ID and displays
+     * either a receipt page or an error page.
+     * @param transactionId used to retrieve transaction
+     * @param orderId used to construct API endpoint
+     * @return ModelAndView for PayPal or UnionPay SecurePay receipt page or error page
      */
-    @GetMapping("/secureId")
-    public ModelAndView showSecureId() {
-        ModelAndView mav = new ModelAndView("secureId");
-        mav.addObject("merchantId", config.getMerchantId());
-        mav.addObject("baseUrl", config.getApiBaseURL());
-        mav.addObject("redirectUrlEndpoint", "process3ds");
+    @GetMapping("/browserPaymentReceipt")
+    public ModelAndView browserPaymentReceipt(@RequestParam("transactionId") String transactionId, @RequestParam("orderId") String orderId) {
+
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest apiReq = new ApiRequest();
+        apiReq.setTransactionId(transactionId);
+        apiReq.setOrderId(orderId);
+        String requestUrl = ClientUtil.getRequestUrl(config, apiReq);
+
+        String data = "";
+        try {
+            // Retrieve transaction
+            ApiClient connection = new ApiClient();
+            String resp = connection.getTransaction(requestUrl, config);
+            BrowserPaymentResponse browserPaymentResponse = ClientUtil.parseBrowserPaymentResponse(resp);
+
+            if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString()) && browserPaymentResponse.getInteractionStatus().equals(ApiResponses.COMPLETED.toString())) {
+                mav.addObject("response", browserPaymentResponse);
+                mav.setViewName("receipt");
+            }
+            else {
+                mav.setViewName("error");
+                mav.addObject("cause", browserPaymentResponse.getApiResult());
+                mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
+            }
+        } catch (Exception e) {
+            mav.setViewName("error");
+            logger.error("An error occurred", e);
+            mav.addObject("cause", e.getCause().toString());
+            mav.addObject("message", e.getMessage());
+        }
         return mav;
     }
 
-    /*
-     * Checks for 3DS enrollment and, if enrolled, redirects to issuer's authentication form
+    /**
+     * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into secureIdPayerAuthenticationForm.html.
+     * Otherwise, it displays an error.
+     * @param request needed to store 3DSecure ID and session ID in HttpSession
+     * @param operation indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
+     * @param sessionId store in HttpSession to to retrieve after returning from issuer authentication form
+     * @param redirectUrl indicates where the user should be redirected to after completing issuer authentication
+     * @return ModelAndView - displays issuer authentication form or error page
      */
     @GetMapping("/check3dsEnrollment/{operation}/{sessionId}")
     public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
@@ -417,8 +491,11 @@ public class WebController {
         return mav;
     }
 
-    /*
-     * Processing endpoint for server-to-server operations
+    /**
+     * This method completes the 3DS process after the enrollment check. It calls PROCESS_ACS_RESULT, which returns either a successful or failed authentication response.
+     * If the response is successful, complete the operation (PAY, AUTHORIZE, etc) or shows an error page.
+     * @param request needed to retrieve 3DSecure ID and session ID to complete 3DS transaction
+     * @return ModelAndView - displays api response page or error page
      */
     @PostMapping("/process3ds")
     public ModelAndView process3ds(HttpServletRequest request) {
