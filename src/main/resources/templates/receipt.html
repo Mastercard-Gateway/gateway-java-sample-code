@@ -15,7 +15,7 @@
                 <p th:text="${response.orderId}"></p>
             </div>
         </div>
-        <th:block th:if="${response.orderDescription}">
+        <th:block th:if="${response.orderDescription != null}">
             <div class="row">
                 <div class="col">
                     Description

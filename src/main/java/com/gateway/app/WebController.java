@@ -187,7 +187,7 @@ public class WebController {
 
             ApiClient connection = new ApiClient();
             String resp = connection.getTransaction(requestUrl, config);
-            HostedCheckoutResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
+            TransactionResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
 
             if(result.equals(ApiResponses.SUCCESS.toString())) {
                 mav.addObject("response", hostedCheckoutResponse);
@@ -196,7 +196,7 @@ public class WebController {
             else {
                 mav.setViewName("error");
                 mav.addObject("cause", hostedCheckoutResponse.getApiResult());
-                //mav.addObject("message", hostedCheckoutResponse.getAcquirerMessage());
+                mav.addObject("message", "There was a problem completing your transaction.");
             }
         }
         catch (Exception e) {
@@ -226,7 +226,7 @@ public class WebController {
             String resp = connection.getTransaction(requestUrl, config);
             BrowserPaymentResponse browserPaymentResponse = ClientUtil.parseBrowserPaymentResponse(resp);
 
-            if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString())) {
+            if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString()) && browserPaymentResponse.getInteractionStatus().equals(ApiResponses.COMPLETED.toString())) {
                 mav.addObject("response", browserPaymentResponse);
                 mav.setViewName("receipt");
             }

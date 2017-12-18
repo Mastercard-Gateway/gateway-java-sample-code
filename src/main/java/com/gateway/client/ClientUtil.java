@@ -188,9 +188,9 @@ public class ClientUtil {
         return secureId;
     }
 
-    public static HostedCheckoutResponse parseHostedCheckoutResponse(String response)  {
+    public static TransactionResponse parseHostedCheckoutResponse(String response)  {
 
-        HostedCheckoutResponse resp = new HostedCheckoutResponse();
+        TransactionResponse resp = new TransactionResponse();
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
         JsonArray arr = json.get("transaction").getAsJsonArray();
@@ -215,6 +215,8 @@ public class ClientUtil {
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
         JsonObject r = json.get("response").getAsJsonObject();
+        JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
+        JsonObject interaction = browserPayment.get("interaction").getAsJsonObject();
         JsonObject orderJson = json.get("order").getAsJsonObject();
 
         if(r.get("acquirerMessage") != null) {
@@ -222,6 +224,7 @@ public class ClientUtil {
         }
         resp.setApiResult(json.get("result").getAsString());
         resp.setGatewayCode(r.get("gatewayCode").getAsString());
+        resp.setInteractionStatus(interaction.get("status").getAsString());
         resp.setOrderAmount(orderJson.get("amount").getAsString());
         resp.setOrderCurrency(orderJson.get("currency").getAsString());
         resp.setOrderId(orderJson.get("id").getAsString());

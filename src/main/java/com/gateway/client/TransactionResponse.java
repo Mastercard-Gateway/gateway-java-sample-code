@@ -2,12 +2,12 @@ package com.gateway.client;
 
 public class TransactionResponse {
 
-    String acquirerMessage;
     String apiResult;
     String gatewayCode;
     String orderAmount;
     String orderCurrency;
     String orderId;
+    String orderDescription;
 
     public String getApiResult() {
         return apiResult;
@@ -47,5 +47,13 @@ public class TransactionResponse {
 
     public void setOrderCurrency(String orderCurrency) {
         this.orderCurrency = orderCurrency;
+    }
+
+    public String getOrderDescription() {
+        return orderDescription;
+    }
+
+    public void setOrderDescription(String orderDescription) {
+        this.orderDescription = orderDescription;
     }
 }
