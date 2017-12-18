@@ -237,6 +237,7 @@ public class WebController {
             mav.setViewName("receipt");
             mav.addObject("merchantId", config.getMerchantId());
             mav.addObject("baseUrl", config.getApiBaseURL());
+            mav.addObject("apiVersion", config.getApiVersion());
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
             mav.addObject("operation", request.getApiOperation());
             mav.addObject("method", request.getApiMethod());
