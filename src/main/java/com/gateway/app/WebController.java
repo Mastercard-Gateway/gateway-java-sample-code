@@ -21,7 +21,7 @@ public class WebController {
     private static final Logger logger = LoggerFactory.getLogger(WebController.class);
 
     @Autowired
-    private Config config;
+    public Config config;
 
     /*
      * Browser operations
@@ -151,12 +151,11 @@ public class WebController {
             CheckoutSession session = ClientUtil.parseSessionResponse(resp);
 
             mav.setViewName("hostedCheckout");
+            mav.addObject("config", config);
             mav.addObject("orderId", req.getOrderId());
             mav.addObject("sessionId", session.getId());
             mav.addObject("sessionVersion", session.getVersion());
             mav.addObject("successIndicator", session.getSuccessIndicator());
-            mav.addObject("merchantId", config.getMerchantId());
-            mav.addObject("apiPassword", config.getApiPassword());
         } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
@@ -269,8 +268,7 @@ public class WebController {
             Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
 
             mav.setViewName("apiResponse");
-            mav.addObject("merchantId", config.getMerchantId());
-            mav.addObject("baseUrl", config.getApiBaseURL());
+            mav.addObject("config", config);
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
             mav.addObject("operation", request.getApiOperation());
             mav.addObject("method", request.getApiMethod());
@@ -485,9 +483,7 @@ public class WebController {
 
     private ModelAndView createModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);
-        mav.addObject("merchantId", config.getMerchantId());
-        mav.addObject("baseUrl", config.getApiBaseURL());
-        mav.addObject("apiVersion", config.getApiVersion());
+        mav.addObject("config", config);
         return mav;
     }
 

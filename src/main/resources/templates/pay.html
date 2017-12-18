@@ -17,7 +17,7 @@
 <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
 <style id="antiClickjack">body{display:none !important;}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-<script th:src="@{${baseUrl} + '/form/version/'+ ${apiVersion} + '/merchant/' + ${merchantId} + '/session.js'}"></script>
+<script th:src="@{${config.apiBaseURL} + '/form/version/'+ ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
