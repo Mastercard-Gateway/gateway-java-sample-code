@@ -4,6 +4,8 @@ import com.gateway.client.WebhookNotification;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +21,10 @@ import java.util.List;
 public class WebHooksController {
 
 
+    @Autowired
+    private Config config;
+
+
     @GetMapping("/webhooks")
     public ModelAndView showWebhooks() {
         ModelAndView mav = new ModelAndView("webhooks");
@@ -26,7 +32,9 @@ public class WebHooksController {
     }
 
     @GetMapping("/list-webhook-notifications")
-    public @ResponseBody List<WebhookNotification> listWebhooks() throws IOException {
+    public
+    @ResponseBody
+    List<WebhookNotification> listWebhooks() throws IOException {
         System.out.println("Listing Webhooks Notifications...");
 
         File notificationsFolder = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER);
@@ -48,16 +56,20 @@ public class WebHooksController {
     }
 
     @PostMapping("/process-webhook")
-    public ModelAndView processWebhook(@RequestBody String payload) throws IOException {
+    @ResponseStatus(HttpStatus.OK)
+    public void processWebhook(@RequestBody String payload, @RequestHeader("X-Notification-Secret") String notificationSecret) throws IOException {
         System.out.println("Processing Webhook Notications....");
+
+        if (config.getWebhooksNotificationSecret() != null && notificationSecret != null && !config.getWebhooksNotificationSecret().equalsIgnoreCase(notificationSecret)) {
+            System.err.println("Web hooks notification secret doesn't match, so not processing the incoming request!");
+            return;
+        }
+
         JsonObject payloadJSON = new Gson().fromJson(payload, JsonObject.class);
         JsonObject order = (JsonObject) payloadJSON.get("order");
         JsonObject transaction = (JsonObject) payloadJSON.get("transaction");
 
         writeWebhookNotification(order.get("id").getAsString(), transaction.get("id").getAsString(), order.get("status").getAsString(), order.get("amount").getAsString());
-
-        ModelAndView mav = new ModelAndView("webhooks");
-        return mav;
     }
 
     private void writeWebhookNotification(String orderId, String transactionId, String orderStatus, String orderAmount) throws IOException {

@@ -8,6 +8,26 @@ public class AppConfiguration {
 
     @Bean
     public Config buildConfig() {
-        return new Config(System.getenv("GATEWAY_MERCHANT_ID"), System.getenv("GATEWAY_API_PASSWORD"), System.getenv("GATEWAY_BASE_URL"), Integer.valueOf(System.getenv("GATEWAY_API_VERSION")));
+        Config config = new Config(getEnv("GATEWAY_MERCHANT_ID"), getEnv("GATEWAY_API_PASSWORD"), getEnv("GATEWAY_BASE_URL"));
+
+
+        String api_version = getEnv("GATEWAY_API_VERSION");
+
+        if (api_version != null) {
+            config.setApiVersion(Integer.parseInt(api_version));
+        }
+
+
+        String notificationSecret = getEnv("WEBHOOKS_NOTIFICATION_SECRET");
+
+        if (notificationSecret != null) {
+            config.setWebhooksNotificationSecret(notificationSecret);
+        }
+
+        return config;
+    }
+
+    private String getEnv(String envVariable) {
+        return System.getenv(envVariable) != null && System.getenv(envVariable).trim().length() > 0 ? System.getenv(envVariable).trim() : null;
     }
 }
