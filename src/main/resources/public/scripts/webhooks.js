@@ -13,6 +13,7 @@ $(function () {
             $('.no-notification').append(noNotificationText).removeClass('invisible');
         }
         else {
+            $('.no-notification').remove();
             $('.notifications').append(notifications).removeClass('invisible');
         }
     });
