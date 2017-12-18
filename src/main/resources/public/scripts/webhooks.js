@@ -8,7 +8,10 @@ $(function () {
 
         console.log("##### Notifications = ", notifications);
         if (notifications.length == 0) {
-            $('.no-notification').removeClass('invisible');
+            var notificationUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+            var noNotificationText = "No notifications found, please configure the url - '" + notificationUrl + "' in merchant settings to receive notifications.";
+
+            $('.no-notification').append(noNotificationText).removeClass('invisible');
         }
         else {
             $('.notifications').append(notifications).removeClass('invisible');
