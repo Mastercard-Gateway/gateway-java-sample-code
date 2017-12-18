@@ -32,9 +32,7 @@ public class WebHooksController {
     }
 
     @GetMapping("/list-webhook-notifications")
-    public
-    @ResponseBody
-    List<WebhookNotification> listWebhooks() throws IOException {
+    public @ResponseBody List<WebhookNotification> listWebhooks() throws IOException {
         System.out.println("Listing Webhooks Notifications...");
 
         File notificationsFolder = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER);
