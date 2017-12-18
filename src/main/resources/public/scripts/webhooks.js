@@ -8,10 +8,10 @@ $(function () {
 
         console.log("##### Notifications = ", notifications);
         if (notifications.length == 0) {
-            $('.no-notification').remove('.invisible');
+            $('.no-notification').removeClass('invisible');
         }
         else {
-            $('.notifications').append(notifications).remove('.invisible');
+            $('.notifications').append(notifications).removeClass('invisible');
         }
     });
 });
