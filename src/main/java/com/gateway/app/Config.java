@@ -16,12 +16,21 @@ public class Config {
     private String ntDomain;
     private String trustStorePath;
     private String trustStorePassword;
+    private String webhooksNotificationSecret;
 
-    public Config(String merchantId, String apiPassword, String apiBaseURL, int apiVersion) {
+
+    public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
+    public static int DEFAULT_API_VERSION = 45;
+
+    public Config(String merchantId, String apiPassword, String apiBaseURL) {
         this.merchantId = merchantId;
         this.apiPassword = apiPassword;
         this.apiBaseURL = apiBaseURL;
-        this.apiVersion = apiVersion;
+
+        if (merchantId == null || apiPassword == null || apiBaseURL == null) {
+            throw new IllegalArgumentException("Merchant ID, Api Password & Api Base URL are required arguments!");
+        }
+
         this.gatewayHost = this.apiBaseURL + "/api/rest";
         this.apiUsername = "merchant." + this.merchantId;
     }
@@ -80,5 +89,17 @@ public class Config {
 
     public String getTrustStorePassword() {
         return trustStorePassword;
+    }
+
+    public String getWebhooksNotificationSecret() {
+        return webhooksNotificationSecret;
+    }
+
+    public void setWebhooksNotificationSecret(String webhooksNotificationSecret) {
+        this.webhooksNotificationSecret = webhooksNotificationSecret;
+    }
+
+    public void setApiVersion(int apiVersion) {
+        this.apiVersion = apiVersion;
     }
 }
