@@ -423,6 +423,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView(viewName);
         mav.addObject("merchantId", config.getMerchantId());
         mav.addObject("baseUrl", config.getApiBaseURL());
+        mav.addObject("apiVersion", config.getApiVersion());
         return mav;
     }
 
