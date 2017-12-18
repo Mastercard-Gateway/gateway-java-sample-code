@@ -1,6 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'masterpass')}">
 <body>
+<script src="https://masterpass.com/lightbox/Switch/integration/MasterPass.client.js"></script>
+<script type="text/javascript">
+    // INITIALIZE and INVOKE THE MASTERPASS LIGHTBOX
+    MasterPass.client.checkout({
+        "version":"v6",
+        "successCallback": onSuccessfulCheckout,
+        "cancelCallback": onCancel,
+        "failureCallback": onFailure,
+        // USE PARAMETERS FROM THE OPEN WALLET RESPONSE
+        "requestToken": "<wallet.masterpass.requestToken>",
+        "merchantCheckoutId": "<wallet.masterpass.merchantCheckoutId>",
+        "allowedCardTypes": "<wallet.masterpass.allowedCardTypes>"
+    });
+
+    // RETRIEVE PARAMETERS FROM THE LIGHTBOX INTERACTION
+    function onSuccessfulCheckout(data) {
+        document.getElementById('oauthToken').value=data.oauth_token;
+        document.getElementById('oauthVerifier').value=data.oauth_verifier;
+        document.getElementById('checkoutUrl').value=data.checkout_resource_url;
+    }
+    function onCancel() {
+        // do something to tell you the cardholder cancelled
+        alert('cancelled');
+    }
+    function onFailure() {
+        // do something to tell you things have gone wrong
+        alert('failure');
+    }
+</script>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
