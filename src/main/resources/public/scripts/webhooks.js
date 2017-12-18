@@ -3,7 +3,9 @@ $(function () {
     $.getJSON("list-webhook-notifications", function (data) {
         var notifications = [];
         $.each(data, function (key, val) {
-            notifications.push("<tr><td scope=\"row\">" + new Date(val.timestamp) + "</td><td>" + val.orderId + "</td><td>" + val.transactionId + "</td><td>" + val.orderStatus + "</td><td>" + val.amount + "</td></tr>");
+            var timestamp = new Date(val.timestamp);
+            timestamp.substring(0, timestamp.lastIndexOf(' '));
+            notifications.push("<tr><td scope=\"row\">" + timestamp + "</td><td>" + val.orderId + "</td><td>" + val.transactionId + "</td><td>" + val.orderStatus + "</td><td>" + val.amount + "</td></tr>");
         });
         console.log("Notifications = ", notifications);
         if (notifications.length == 0) {
