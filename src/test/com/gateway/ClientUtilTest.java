@@ -18,7 +18,7 @@ public class ClientUtilTest {
 
     @Before
     public void setUp() {
-        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com", 45);
+        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com");
     }
 
     @Test
