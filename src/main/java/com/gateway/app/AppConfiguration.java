@@ -15,6 +15,8 @@ public class AppConfiguration {
 
         if (api_version != null) {
             config.setApiVersion(Integer.parseInt(api_version));
+        } else {
+            config.setApiVersion(Config.DEFAULT_API_VERSION);
         }
 
 
