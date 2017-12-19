@@ -212,15 +212,22 @@ public class ClientUtil {
      * @return CheckoutSession
      */
     public static CheckoutSession parseSessionResponse(String sessionResponse) {
-        JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
-        JsonObject jsonSession = json.get("session").getAsJsonObject();
+        try {
+            JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
+            JsonObject jsonSession = json.get("session").getAsJsonObject();
 
-        CheckoutSession checkoutSession = new CheckoutSession();
-        checkoutSession.setId(jsonSession.get("id").getAsString());
-        checkoutSession.setVersion(jsonSession.get("version").getAsString());
-        if(json.get("successIndicator") != null) checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+            CheckoutSession checkoutSession = new CheckoutSession();
+            checkoutSession.setId(jsonSession.get("id").getAsString());
+            checkoutSession.setVersion(jsonSession.get("version").getAsString());
+            if(json.get("successIndicator") != null) checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
 
-        return checkoutSession;
+            return checkoutSession;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse session response", e);
+            throw e;
+        }
+
     }
 
     /**
@@ -229,16 +236,22 @@ public class ClientUtil {
      * @return SecureId
      */
     public static SecureId parse3DSecureResponse(String response) {
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
-        JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
-        JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
+        try {
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
+            JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
+            JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
 
-        SecureId secureId = new SecureId();
-        secureId.setStatus(json3ds.get("summaryStatus").getAsString());
-        secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
+            SecureId secureId = new SecureId();
+            secureId.setStatus(json3ds.get("summaryStatus").getAsString());
+            secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
 
-        return secureId;
+            return secureId;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse 3DSecure response", e);
+            throw e;
+        }
     }
 
     /**
@@ -248,23 +261,30 @@ public class ClientUtil {
      */
     public static TransactionResponse parseHostedCheckoutResponse(String response)  {
 
-        TransactionResponse resp = new TransactionResponse();
+        try {
 
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonArray arr = json.get("transaction").getAsJsonArray();
-        JsonObject transactionJson = arr.get(0).getAsJsonObject();
-        JsonObject orderJson = transactionJson.get("order").getAsJsonObject();
-        JsonObject responseJson = transactionJson.getAsJsonObject("response").getAsJsonObject();
+            TransactionResponse resp = new TransactionResponse();
 
-        //resp.setAcquirerMessage();
-        resp.setApiResult(transactionJson.get("result").getAsString());
-        resp.setGatewayCode(responseJson.get("gatewayCode").getAsString());
-        resp.setOrderAmount(orderJson.get("amount").getAsString());
-        resp.setOrderCurrency(orderJson.get("currency").getAsString());
-        resp.setOrderDescription(orderJson.get("description").getAsString());
-        resp.setOrderId(orderJson.get("id").getAsString());
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonArray arr = json.get("transaction").getAsJsonArray();
+            JsonObject transactionJson = arr.get(0).getAsJsonObject();
+            JsonObject orderJson = transactionJson.get("order").getAsJsonObject();
+            JsonObject responseJson = transactionJson.getAsJsonObject("response").getAsJsonObject();
 
-        return resp;
+            resp.setApiResult(transactionJson.get("result").getAsString());
+            resp.setGatewayCode(responseJson.get("gatewayCode").getAsString());
+            resp.setOrderAmount(orderJson.get("amount").getAsString());
+            resp.setOrderCurrency(orderJson.get("currency").getAsString());
+            resp.setOrderDescription(orderJson.get("description").getAsString());
+            resp.setOrderId(orderJson.get("id").getAsString());
+
+            return resp;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse Hosted Checkout response", e);
+            throw e;
+        }
+
     }
 
     /**
@@ -274,25 +294,32 @@ public class ClientUtil {
      */
     public static BrowserPaymentResponse parseBrowserPaymentResponse(String response) {
 
-        BrowserPaymentResponse resp = new BrowserPaymentResponse();
+        try {
+            BrowserPaymentResponse resp = new BrowserPaymentResponse();
 
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject r = json.get("response").getAsJsonObject();
-        JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
-        JsonObject interaction = browserPayment.get("interaction").getAsJsonObject();
-        JsonObject orderJson = json.get("order").getAsJsonObject();
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject r = json.get("response").getAsJsonObject();
+            JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
+            JsonObject interaction = browserPayment.get("interaction").getAsJsonObject();
+            JsonObject orderJson = json.get("order").getAsJsonObject();
 
-        if(r.get("acquirerMessage") != null) {
-            resp.setAcquirerMessage(r.get("acquirerMessage").getAsString());
+            if(r.get("acquirerMessage") != null) {
+                resp.setAcquirerMessage(r.get("acquirerMessage").getAsString());
+            }
+            resp.setApiResult(json.get("result").getAsString());
+            resp.setGatewayCode(r.get("gatewayCode").getAsString());
+            resp.setInteractionStatus(interaction.get("status").getAsString());
+            resp.setOrderAmount(orderJson.get("amount").getAsString());
+            resp.setOrderCurrency(orderJson.get("currency").getAsString());
+            resp.setOrderId(orderJson.get("id").getAsString());
+
+            return resp;
         }
-        resp.setApiResult(json.get("result").getAsString());
-        resp.setGatewayCode(r.get("gatewayCode").getAsString());
-        resp.setInteractionStatus(interaction.get("status").getAsString());
-        resp.setOrderAmount(orderJson.get("amount").getAsString());
-        resp.setOrderCurrency(orderJson.get("currency").getAsString());
-        resp.setOrderId(orderJson.get("id").getAsString());
+        catch(Exception e) {
+            logger.error("Unable to parse browser payment response", e);
+            throw e;
+        }
 
-        return resp;
     }
 
     /**
@@ -301,9 +328,16 @@ public class ClientUtil {
      * @return redirect URL
      */
     public static String getBrowserPaymentRedirectUrl(String response) {
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
-        return browserPayment.get("redirectUrl").getAsString();
+
+        try {
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
+            return browserPayment.get("redirectUrl").getAsString();
+        }
+        catch(Exception e) {
+            logger.error("Unable to get browser payment redirect URL", e);
+            throw e;
+        }
     }
 
     /**
