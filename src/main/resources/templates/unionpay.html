@@ -4,9 +4,9 @@
 <div class="col-9">
     <div class="row">
         <form action="#" class="col-12 form-horizontal" th:action="@{/processBrowserPayment}" th:object="${apiRequest}" method="post">
-            <h3>Pay with UnionPay SecurePay</h3>
+            <h3>Authorize with UnionPay SecurePay</h3>
             <div class="alert alert-warning" role="alert">
-                To access the browser payment simulator, copy and paste the redirectUrl from the response into a new browser window. Then complete the payment.
+                You can access test card numbers <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/testDetails.html#x_SecurePayTest'}" target="_blank">here</a>.
             </div>
             <fieldset>
                 <input type="hidden" th:field="*{orderId}" th:value="${orderId}" name="orderId" />
@@ -33,7 +33,7 @@
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="process"></label>
                     <div class="col-md-7">
-                        <button id="process" name="process" class="btn btn-primary">Pay with SecurePay</button>
+                        <button id="process" name="process" class="btn btn-primary">Authorize with SecurePay</button>
                     </div>
                 </div>
             </fieldset>

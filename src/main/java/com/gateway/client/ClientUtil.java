@@ -143,7 +143,11 @@ public class ClientUtil {
         JsonObject browserPayment = new JsonObject();
         if (notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
-        if (notNullOrEmpty(request.getSourceType())) addPaymentConfirmation(browserPayment, request);
+        if (notNullOrEmpty(request.getSourceType()) && request.getSourceType().equals("PAYPAL")) {
+            JsonObject paypal = new JsonObject();
+            paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
+            browserPayment.add("paypal", paypal);
+        }
 
         JsonObject interaction = new JsonObject();
         if (notNullOrEmpty(request.getReturnUrl())) {
@@ -303,7 +307,7 @@ public class ClientUtil {
     }
 
     /**
-     * Generates a random 10-digit alphanumeric number to use as a unique identifier (for order ID and transaction ID, which are provided by the merchant)
+     * Generates a random 10-digit alphanumeric number to use as a unique identifier (order ID and transaction ID, for instance)
      * @return random identifier
      */
     public static String randomNumber() {
@@ -312,50 +316,5 @@ public class ClientUtil {
 
     private static boolean notNullOrEmpty(String value) {
         return (value != null && !value.equals(""));
-    }
-
-    private static void addPaymentConfirmation(JsonObject browserPayment, ApiRequest request) {
-        switch (request.getSourceType().toUpperCase()) {
-            case "ALIPAY":
-                JsonObject alipay = new JsonObject();
-                alipay.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("alipay", alipay);
-                break;
-            case "BANCANET":
-                JsonObject bancanet = new JsonObject();
-                bancanet.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("bancanet", bancanet);
-                break;
-            case "GIROPAY":
-                JsonObject giropay = new JsonObject();
-                giropay.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("giropay", giropay);
-                break;
-            case "IDEAL":
-                JsonObject ideal = new JsonObject();
-                ideal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("ideal", ideal);
-                break;
-            case "MULTIBANCO":
-                JsonObject multibanco = new JsonObject();
-                multibanco.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("multibanco", multibanco);
-                break;
-            case "PAYPAL":
-                JsonObject paypal = new JsonObject();
-                paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("paypal", paypal);
-                break;
-            case "SOFORT":
-                JsonObject sofort = new JsonObject();
-                sofort.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("sofort", sofort);
-                break;
-            case "UNION_PAY":
-                JsonObject unionpay = new JsonObject();
-                unionpay.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("unionpay", unionpay);
-                break;
-        }
     }
 }

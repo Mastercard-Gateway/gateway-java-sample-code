@@ -87,6 +87,7 @@ public class WebController {
             ApiRequest req = ClientUtil.createBrowserPaymentsRequest("PAY", "UNION_PAY", request.getRequestURL().toString());
             mav.setViewName("unionpay");
             mav.addObject("apiRequest", req);
+            mav.addObject("config", config);
         }
         catch (Exception e) {
             mav.setViewName("error");
@@ -360,7 +361,7 @@ public class WebController {
     }
 
     /**
-     * This method calls the INTIATE_BROWSER_PAYMENT operation, which returns a URL to the provider's website, where the user completes the purchase.
+     * This method calls the INTIATE_BROWSER_PAYMENT operation, which returns a URL to the provider's website. The user is redirected to this URL, where the purchase is completed.
      * @param request contains info on how to construct API call
      * @return ModelAndView - either redirects to appropriate provider website or returns error page
      */
@@ -368,7 +369,6 @@ public class WebController {
     public ModelAndView processBrowserPayment(ApiRequest request) {
         ModelAndView mav = new ModelAndView();
 
-        // INITIATE_BROWSER_PAYMENT
         String requestUrl = ClientUtil.getRequestUrl(config, request);
         String jsonPayload = ClientUtil.buildJSONPayload(request);
 
