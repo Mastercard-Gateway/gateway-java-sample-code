@@ -22,11 +22,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.File;
+
 @Controller
 @SpringBootApplication
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        initWebhooksNotificationsFolder();
         SpringApplication.run(Main.class, args);
     }
 
@@ -35,4 +38,20 @@ public class Main {
         return new ModelAndView("redirect:/authorize");
     }
 
+    private static void initWebhooksNotificationsFolder() {
+        File webhooksNotificationsFolder = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER);
+        if (!webhooksNotificationsFolder.exists()) {
+            System.out.println("Creating Webhooks Notifications folder... ");
+            webhooksNotificationsFolder.mkdir();
+        } else {
+            System.out.println("Webhooks Notifications folder already exists!");
+            //delete all json files from notifications folder
+            File[] files = webhooksNotificationsFolder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+        }
+    }
 }

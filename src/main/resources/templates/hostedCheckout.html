@@ -32,7 +32,7 @@
         </div>
     </div> <!-- row -->
 </div>
-<script src="https://test-gateway.mastercard.com/checkout/version/45/checkout.js"
+<script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
         data-error="errorCallback"
         data-cancel="cancelCallback"
         data-complete="completeCallback">
@@ -40,7 +40,7 @@
 <script th:inline="javascript">
 
     /*<![CDATA[*/
-        var merchantId = /*[[${merchantId}]]*/ null;
+        var merchantId = /*[[${config.merchantId}]]*/ null;
         var sessionId = /*[[${sessionId}]]*/ null;
         var sessionVersion = /*[[${sessionVersion}]]*/ null;
         var successIndicator = /*[[${successIndicator}]]*/ null;

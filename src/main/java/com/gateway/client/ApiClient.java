@@ -19,6 +19,14 @@ public final class ApiClient {
     private static final String UTF8_ENCODING = "UTF-8";
     private static final String CONTENT_TYPE = "application/json";
 
+    /**
+     * Performs a PUT operation (required for the following API operations: AUTHORIZE, CAPTURE, PAY, REFUND, UPDATE_AUTHORIZATION, VERIFY, VOID, CHECK_3DS_ENROLLMENT, INITIATE_BROWSER_PAYMENT)
+     * @param data JSON payload
+     * @param requestUrl API endpoint
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return body
+     * @throws Exception
+     */
     public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
@@ -53,6 +61,14 @@ public final class ApiClient {
         return body;
     }
 
+    /**
+     * Performs a POST operation (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION)
+     * @param data JSON payload
+     * @param requestUrl API endpoint
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return body
+     * @throws Exception
+     */
     public String postTransaction(String data, String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
@@ -87,6 +103,13 @@ public final class ApiClient {
         return body;
     }
 
+    /**
+     * Performs a GET operation (required for the following API operations: Retrieve session, Retrieve transaction, Retrieve order)
+     * @param requestUrl API endpoint
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return body
+     * @throws Exception
+     */
     public String getTransaction(String requestUrl, Config config) throws Exception {
         HttpClient httpClient = new HttpClient();
 
@@ -118,11 +141,9 @@ public final class ApiClient {
     }
 
     /**
-     * configureProxy
-     * <p/>
      * Check if proxy config is defined; if so configure the host and http client to tunnel through
-     *
      * @param httpClient
+     * @param config object that contains frequently used information like Merchant ID, API password, etc.
      * @return void
      */
     private void configureProxy(HttpClient httpClient, Config config) {

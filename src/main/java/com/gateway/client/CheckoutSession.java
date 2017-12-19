@@ -5,8 +5,7 @@ public class CheckoutSession {
     private String version;
     private String successIndicator;
 
-    public CheckoutSession() {
-    }
+    public CheckoutSession() {}
 
     public String getId() {
         return id;
