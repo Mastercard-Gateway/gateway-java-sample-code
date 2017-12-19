@@ -206,14 +206,12 @@ public class WebController {
             ApiClient connection = new ApiClient();
             String resp = connection.postTransaction(data, requestUrl, config);
 
-            CheckoutSession session = ClientUtil.parseSessionResponse(resp);
+            CheckoutSession checkoutSession = ClientUtil.parseSessionResponse(resp);
 
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("orderId", req.getOrderId());
-            mav.addObject("sessionId", session.getId());
-            mav.addObject("sessionVersion", session.getVersion());
-            mav.addObject("successIndicator", session.getSuccessIndicator());
+            mav.addObject("checkoutSession", checkoutSession);
         } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
@@ -236,24 +234,24 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            // Retrieve order details
-            ApiRequest req = new ApiRequest();
-            req.setApiOperation("RETRIEVE_ORDER");
-            req.setOrderId(orderId);
-
-            String requestUrl = ClientUtil.getRequestUrl(config, req);
-
-            ApiClient connection = new ApiClient();
-            String resp = connection.getTransaction(requestUrl, config);
-            TransactionResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
-
             if(result.equals(ApiResponses.SUCCESS.toString())) {
+                ApiRequest req = new ApiRequest();
+                req.setApiOperation("RETRIEVE_ORDER");
+                req.setOrderId(orderId);
+
+                String requestUrl = ClientUtil.getRequestUrl(config, req);
+
+                ApiClient connection = new ApiClient();
+                String resp = connection.getTransaction(requestUrl, config);
+                TransactionResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
+
                 mav.addObject("response", hostedCheckoutResponse);
                 mav.setViewName("receipt");
             }
             else {
                 mav.setViewName("error");
-                mav.addObject("cause", hostedCheckoutResponse.getApiResult());
+                logger.info("The payment was unsuccessful");
+                mav.addObject("cause", "Payment was unsuccessful");
                 mav.addObject("message", "There was a problem completing your transaction.");
             }
         }
@@ -511,6 +509,10 @@ public class WebController {
             HttpSession session = request.getSession();
             String secureId = (String) session.getAttribute("secureId");
             String sessionId = (String) session.getAttribute("sessionId");
+
+            // Remove from session after using
+            session.removeAttribute("secureId");
+            session.removeAttribute("sessionId");
 
             // Process Access Control Server (ACS) result
             String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);

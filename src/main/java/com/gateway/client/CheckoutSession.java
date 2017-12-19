@@ -1,6 +1,7 @@
 package com.gateway.client;
 
 public class CheckoutSession {
+
     private String id;
     private String version;
     private String successIndicator;
