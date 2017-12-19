@@ -6,13 +6,21 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ClientUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClientUtil.class);
+
+    /**
+     * Constructs an object used to complete the API. Contains information about which operation to target and what info is needed in the request body.
+     * @param apiOperation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
+     * @return ApiRequest
+     */
     public static ApiRequest createApiRequest(String apiOperation) {
         ApiRequest req = new ApiRequest();
         req.setApiOperation(apiOperation);
@@ -36,11 +44,15 @@ public class ClientUtil {
         if(apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
             req.setApiMethod("POST");
         }
-        //TODO: This URL should come from the client dynamically
-        req.setReturnUrl("/browserPaymentReceipt");
         return req;
     }
 
+    /**
+     * Constructs API endpoint
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param request contains information needed to create the API request
+     * @return url
+     */
     public static String getRequestUrl(Config config, ApiRequest request) {
         String url = config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
         if(notNullOrEmpty(request.getTransactionId())) {
@@ -49,18 +61,40 @@ public class ClientUtil {
         return url;
     }
 
+    /**
+     * Constructs API endpoint to create a new session
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return url
+     */
     public static String getSessionRequestUrl(Config config) {
         return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session";
     }
 
+    /**
+     * Constructs API endpoint for session-based requests with an existing session ID
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId used to target a specific session
+     * @return url
+     */
     public static String getSessionRequestUrl(Config config, String sessionId) {
         return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
     }
 
+    /**
+     * Constructs API endpoint for 3DS requests
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param secureId used to target a specific secureId
+     * @return url
+     */
     public static String getSecureIdRequest(Config config, String secureId) {
         return config.getGatewayHost() + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/3DSecureId/" + secureId;
     }
 
+    /**
+     * Constructs the API payload based on properties of ApiRequest
+     * @param request contains info on what data the payload should include (order ID, amount, currency, etc) depending on the operation (PAY, AUTHORIZE, CAPTURE, etc)
+     * @return JSON string
+     */
     public static String buildJSONPayload(ApiRequest request) {
         JsonObject order = new JsonObject();
 
@@ -109,7 +143,11 @@ public class ClientUtil {
         JsonObject browserPayment = new JsonObject();
         if (notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
-        if (notNullOrEmpty(request.getSourceType())) addPaymentConfirmation(browserPayment, request);
+        if (notNullOrEmpty(request.getSourceType()) && request.getSourceType().equals("PAYPAL")) {
+            JsonObject paypal = new JsonObject();
+            paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
+            browserPayment.add("paypal", paypal);
+        }
 
         JsonObject interaction = new JsonObject();
         if (notNullOrEmpty(request.getReturnUrl())) {
@@ -141,101 +179,176 @@ public class ClientUtil {
         return gson.toJson(data);
     }
 
+    /**
+     *
+     * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
+     * @param source provider for the browser payment (PayPal, UnionPay SecurePay, etc)
+     * @param requestUrl needed to determine redirect URL
+     * @return ApiRequest
+     * @throws MalformedURLException
+     */
+    public static ApiRequest createBrowserPaymentsRequest(String operation, String source, String requestUrl) throws MalformedURLException {
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ClientUtil.randomNumber());
+        req.setBrowserPaymentOperation(operation);
+        req.setSourceType(source);
+        try {
+            URL url = new URL(requestUrl);
+            String returnUrlBase = url.getProtocol() + "://" + url.getAuthority();
+            req.setReturnUrl(returnUrlBase + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
+        }
+        catch (MalformedURLException e) {
+            logger.error("Unable to parse return URL", e);
+            throw e;
+        }
+        return req;
+    }
+
+    /**
+     * Parses JSON response from session-based API call into CheckoutSession object
+     * @param sessionResponse response from API
+     * @return CheckoutSession
+     */
     public static CheckoutSession parseSessionResponse(String sessionResponse) {
-        JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
-        JsonObject jsonSession = json.get("session").getAsJsonObject();
+        try {
+            JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
+            JsonObject jsonSession = json.get("session").getAsJsonObject();
 
-        CheckoutSession checkoutSession = new CheckoutSession();
-        checkoutSession.setId(jsonSession.get("id").getAsString());
-        checkoutSession.setVersion(jsonSession.get("version").getAsString());
-        if(json.get("successIndicator") != null) checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+            CheckoutSession checkoutSession = new CheckoutSession();
+            checkoutSession.setId(jsonSession.get("id").getAsString());
+            checkoutSession.setVersion(jsonSession.get("version").getAsString());
+            if(json.get("successIndicator") != null) checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
 
-        return checkoutSession;
+            return checkoutSession;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse session response", e);
+            throw e;
+        }
+
     }
 
+    /**
+     * Parses JSON response from 3DS transaction into SecureId object
+     * @param response response from API
+     * @return SecureId
+     */
     public static SecureId parse3DSecureResponse(String response) {
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
-        JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
-        JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
+        try {
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
+            JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
+            JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
 
-        SecureId secureId = new SecureId();
-        secureId.setStatus(json3ds.get("summaryStatus").getAsString());
-        secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
+            SecureId secureId = new SecureId();
+            secureId.setStatus(json3ds.get("summaryStatus").getAsString());
+            secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
 
-        return secureId;
+            return secureId;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse 3DSecure response", e);
+            throw e;
+        }
     }
 
-    public static Order parseOrderDetails(String response)  {
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonArray arr = json.get("transaction").getAsJsonArray();
-        JsonObject transactionJson = arr.get(0).getAsJsonObject();
-        JsonObject orderJson = transactionJson.get("order").getAsJsonObject();
+    /**
+     * Parses JSON response from Hosted Checkout transaction into TransactionResponse object
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    public static TransactionResponse parseHostedCheckoutResponse(String response)  {
 
-        Order order = new Order();
-        order.setAmount(orderJson.get("amount").getAsString());
-        order.setCurrency(orderJson.get("currency").getAsString());
-        order.setId(orderJson.get("id").getAsString());
-        order.setDescription(orderJson.get("description").getAsString());
+        try {
 
-        return order;
+            TransactionResponse resp = new TransactionResponse();
+
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonArray arr = json.get("transaction").getAsJsonArray();
+            JsonObject transactionJson = arr.get(0).getAsJsonObject();
+            JsonObject orderJson = transactionJson.get("order").getAsJsonObject();
+            JsonObject responseJson = transactionJson.getAsJsonObject("response").getAsJsonObject();
+
+            resp.setApiResult(transactionJson.get("result").getAsString());
+            resp.setGatewayCode(responseJson.get("gatewayCode").getAsString());
+            resp.setOrderAmount(orderJson.get("amount").getAsString());
+            resp.setOrderCurrency(orderJson.get("currency").getAsString());
+            resp.setOrderDescription(orderJson.get("description").getAsString());
+            resp.setOrderId(orderJson.get("id").getAsString());
+
+            return resp;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse Hosted Checkout response", e);
+            throw e;
+        }
+
     }
 
-    public static String getApiResult(String response) {
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        return json.get("result").getAsString();
+    /**
+     * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object
+     * @param response response from API
+     * @return BrowserPaymentResponse
+     */
+    public static BrowserPaymentResponse parseBrowserPaymentResponse(String response) {
+
+        try {
+            BrowserPaymentResponse resp = new BrowserPaymentResponse();
+
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject r = json.get("response").getAsJsonObject();
+            JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
+            JsonObject interaction = browserPayment.get("interaction").getAsJsonObject();
+            JsonObject orderJson = json.get("order").getAsJsonObject();
+
+            if(r.get("acquirerMessage") != null) {
+                resp.setAcquirerMessage(r.get("acquirerMessage").getAsString());
+            }
+            resp.setApiResult(json.get("result").getAsString());
+            resp.setGatewayCode(r.get("gatewayCode").getAsString());
+            resp.setInteractionStatus(interaction.get("status").getAsString());
+            resp.setOrderAmount(orderJson.get("amount").getAsString());
+            resp.setOrderCurrency(orderJson.get("currency").getAsString());
+            resp.setOrderId(orderJson.get("id").getAsString());
+
+            return resp;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse browser payment response", e);
+            throw e;
+        }
+
     }
 
+    /**
+     * Retrieve redirect URL from browser payment response
+     * @param response response from API
+     * @return redirect URL
+     */
+    public static String getBrowserPaymentRedirectUrl(String response) {
+
+        try {
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject browserPayment = json.get("browserPayment").getAsJsonObject();
+            return browserPayment.get("redirectUrl").getAsString();
+        }
+        catch(Exception e) {
+            logger.error("Unable to get browser payment redirect URL", e);
+            throw e;
+        }
+    }
+
+    /**
+     * Generates a random 10-digit alphanumeric number to use as a unique identifier (order ID and transaction ID, for instance)
+     * @return random identifier
+     */
     public static String randomNumber() {
         return RandomStringUtils.random(10, true, true);
     }
 
     private static boolean notNullOrEmpty(String value) {
         return (value != null && !value.equals(""));
-    }
-
-    private static void addPaymentConfirmation(JsonObject browserPayment, ApiRequest request) {
-        switch (request.getSourceType().toUpperCase()) {
-            case "ALIPAY":
-                JsonObject alipay = new JsonObject();
-                alipay.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("alipay", alipay);
-                break;
-            case "BANCANET":
-                JsonObject bancanet = new JsonObject();
-                bancanet.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("bancanet", bancanet);
-                break;
-            case "GIROPAY":
-                JsonObject giropay = new JsonObject();
-                giropay.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("giropay", giropay);
-                break;
-            case "IDEAL":
-                JsonObject ideal = new JsonObject();
-                ideal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("ideal", ideal);
-                break;
-            case "MULTIBANCO":
-                JsonObject multibanco = new JsonObject();
-                multibanco.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("multibanco", multibanco);
-                break;
-            case "PAYPAL":
-                JsonObject paypal = new JsonObject();
-                paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("paypal", paypal);
-                break;
-            case "SOFORT":
-                JsonObject sofort = new JsonObject();
-                sofort.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("sofort", sofort);
-                break;
-            case "UNION_PAY":
-                JsonObject unionpay = new JsonObject();
-                unionpay.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
-                browserPayment.add("unionpay", unionpay);
-                break;
-        }
     }
 }

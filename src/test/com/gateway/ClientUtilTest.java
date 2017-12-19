@@ -18,7 +18,8 @@ public class ClientUtilTest {
 
     @Before
     public void setUp() {
-        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com", 45);
+        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com");
+        config.setApiVersion(45);
     }
 
     @Test
@@ -151,7 +152,7 @@ public class ClientUtilTest {
     }
 
     @Test
-    public void parseInitiateBrowserPaymentRequest() throws Exception {
+    public void parsePayPalRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("INITIATE_BROWSER_PAYMENT");
         request.setOrderAmount("10.00");
@@ -163,6 +164,22 @@ public class ClientUtilTest {
         String result = ClientUtil.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"INITIATE_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"PAYPAL\"},\"browserPayment\":{\"operation\":\"PAY\",\"paypal\":{\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseUnionPayRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setBrowserPaymentOperation("PAY");
+        request.setReturnUrl("http://www.mysite.com/receipt");
+        request.setSourceType("UNION_PAY");
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\"INITIATE_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"UNION_PAY\"},\"browserPayment\":{\"operation\":\"PAY\",\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
 
         assertEquals(prettifyJson(data), result);
     }
