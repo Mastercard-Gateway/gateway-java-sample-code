@@ -31,7 +31,7 @@ public class Config {
             throw new IllegalArgumentException("Merchant ID, Api Password & Api Base URL are required arguments!");
         }
 
-        this.gatewayHost = this.apiBaseURL + "/api/rest";
+        this.gatewayHost = this.apiBaseURL;
         this.apiUsername = "merchant." + this.merchantId;
     }
 

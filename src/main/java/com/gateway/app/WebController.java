@@ -25,6 +25,7 @@ public class WebController {
 
     /**
      * Display AUTHORIZE operation page
+     *
      * @return ModelAndView for authorize.html
      */
     @GetMapping("/authorize")
@@ -34,6 +35,7 @@ public class WebController {
 
     /**
      * Display PAY operation page
+     *
      * @return ModelAndView for pay.html
      */
     @GetMapping("/pay")
@@ -43,6 +45,7 @@ public class WebController {
 
     /**
      * Display PAY operation page for NVP mode
+     *
      * @return ModelAndView for pay.html
      */
     @GetMapping("/payThroughNVP")
@@ -52,6 +55,7 @@ public class WebController {
 
     /**
      * Display VERIFY operation page
+     *
      * @return ModelAndView for verify.html
      */
     @GetMapping("/verify")
@@ -61,6 +65,7 @@ public class WebController {
 
     /**
      * Display page for PayPal browser payment
+     *
      * @param request Get request URL hostname to properly set the redirect URL
      * @return ModelAndView for paypal.html
      */
@@ -72,8 +77,7 @@ public class WebController {
             ApiRequest req = ClientUtil.createBrowserPaymentsRequest("PAY", "PAYPAL", request.getRequestURL().toString());
             mav.setViewName("paypal");
             mav.addObject("apiRequest", req);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
@@ -85,6 +89,7 @@ public class WebController {
 
     /**
      * Display page for UnionPay SecurePay browser payment
+     *
      * @param request Get request URL hostname to properly set the redirect URL
      * @return ModelAndView for unionpay.html
      */
@@ -97,8 +102,7 @@ public class WebController {
             mav.setViewName("unionpay");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
@@ -110,6 +114,7 @@ public class WebController {
 
     /**
      * Display page for Masterpass interaction
+     *
      * @return ModelAndView for masterpass.html
      */
     @GetMapping("/masterpass")
@@ -120,6 +125,7 @@ public class WebController {
 
     /**
      * Display CAPTURE operation page
+     *
      * @return ModelAndView for capture.html
      */
     @GetMapping("/capture")
@@ -132,6 +138,7 @@ public class WebController {
 
     /**
      * Display REFUND operation page
+     *
      * @return ModelAndView for refund.html
      */
     @GetMapping("/refund")
@@ -144,6 +151,7 @@ public class WebController {
 
     /**
      * Display RETRIEVE_TRANSACTION operation page
+     *
      * @return ModelAndView for retrieve.html
      */
     @GetMapping("/retrieve")
@@ -156,6 +164,7 @@ public class WebController {
 
     /**
      * Display UPDATE_AUTHORIZATION operation page
+     *
      * @return ModelAndView for update.html
      */
     @GetMapping("/update")
@@ -169,6 +178,7 @@ public class WebController {
 
     /**
      * Display VOID operation page
+     *
      * @return ModelAndView for void.html
      */
     @GetMapping("/void")
@@ -182,6 +192,7 @@ public class WebController {
 
     /**
      * Display 3DSecure operation page
+     *
      * @return ModelAndView for secureId.html
      */
     @GetMapping("/secureId")
@@ -195,6 +206,7 @@ public class WebController {
 
     /**
      * Display page for Hosted Checkout operation
+     *
      * @return ModelAndView for hostedCheckout.html
      */
     @GetMapping("/hostedCheckout")
@@ -207,12 +219,12 @@ public class WebController {
         req.setOrderId(ClientUtil.randomNumber());
         req.setOrderCurrency("USD");
 
-        String requestUrl = ClientUtil.getSessionRequestUrl(config);
+        String requestUrl = ClientUtil.getSessionRequestUrl(ApiProtocol.REST, config);
 
         String data = ClientUtil.buildJSONPayload(req);
 
         try {
-            ApiClient connection = new ApiClient();
+            RESTApiClient connection = new RESTApiClient();
             String resp = connection.postTransaction(data, requestUrl, config);
 
             CheckoutSession checkoutSession = ClientUtil.parseSessionResponse(resp);
@@ -233,38 +245,37 @@ public class WebController {
     /**
      * This method receives the callback from the Hosted Checkout redirect. It looks up the order using the RETRIEVE_ORDER operation and
      * displays either the receipt or an error page.
+     *
      * @param orderId needed to retrieve order
-     * @param result of Hosted Checkout operation (success or error) - sent from hostedCheckout.html complete() callback
+     * @param result  of Hosted Checkout operation (success or error) - sent from hostedCheckout.html complete() callback
      * @return ModelAndView for hosted checkout receipt page or error page
      */
     @GetMapping("/hostedCheckout/{orderId}/{result}")
-    public ModelAndView hostedCheckoutReceipt(@PathVariable(value="orderId") String orderId, @PathVariable(value="result") String result) {
+    public ModelAndView hostedCheckoutReceipt(@PathVariable(value = "orderId") String orderId, @PathVariable(value = "result") String result) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
-            if(result.equals(ApiResponses.SUCCESS.toString())) {
+            if (result.equals(ApiResponses.SUCCESS.toString())) {
                 ApiRequest req = new ApiRequest();
                 req.setApiOperation("RETRIEVE_ORDER");
                 req.setOrderId(orderId);
 
-                String requestUrl = ClientUtil.getRequestUrl(config, req);
+                String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.REST, config, req);
 
-                ApiClient connection = new ApiClient();
+                RESTApiClient connection = new RESTApiClient();
                 String resp = connection.getTransaction(requestUrl, config);
                 TransactionResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
 
                 mav.addObject("response", hostedCheckoutResponse);
                 mav.setViewName("receipt");
-            }
-            else {
+            } else {
                 mav.setViewName("error");
                 logger.info("The payment was unsuccessful");
                 mav.addObject("cause", "Payment was unsuccessful");
                 mav.addObject("message", "There was a problem completing your transaction.");
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
@@ -276,19 +287,20 @@ public class WebController {
 
     /**
      * This method processes the API request for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
+     *
      * @param operation indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
      * @param sessionId used to retrieve session created in hostedSession.js
      * @return ModelAndView for api response page or error page
      */
     @GetMapping("/process/{operation}/{sessionId}")
-    public ModelAndView processHostedSession(@PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId) {
+    public ModelAndView processHostedSession(@PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
             // Retrieve session
-            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
-            ApiClient sessionConnection = new ApiClient();
+            String url = ClientUtil.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+            RESTApiClient sessionConnection = new RESTApiClient();
             String sessionResponse = sessionConnection.getTransaction(url, config);
 
             // Parse session response into CheckoutSession object
@@ -298,10 +310,10 @@ public class WebController {
             ApiRequest request = ClientUtil.createApiRequest(operation);
             request.setSessionId(session.getId());
             String jsonPayload = ClientUtil.buildJSONPayload(request);
-            String requestUrl = ClientUtil.getRequestUrl(config, request);
+            String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.REST, config, request);
 
             // Perform API operation
-            ApiClient apiConnection = new ApiClient();
+            RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
             // Send info on transaction to view
@@ -316,8 +328,7 @@ public class WebController {
             mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
@@ -328,6 +339,7 @@ public class WebController {
 
     /**
      * This method processes the API request for server-to-server operations. These are operations that would not commonly be invoked via a user interacting with the browser, but a system event (CAPTURE, REFUND, VOID).
+     *
      * @param request contains info on how to construct API call
      * @return ModelAndView for api response page or error page
      */
@@ -336,13 +348,13 @@ public class WebController {
 
         ModelAndView mav = new ModelAndView();
 
-        String requestUrl = ClientUtil.getRequestUrl(config, request);
+        String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.REST, config, request);
         String jsonPayload = ClientUtil.buildJSONPayload(request);
 
         String resp = "";
 
         try {
-            ApiClient connection = new ApiClient();
+            RESTApiClient connection = new RESTApiClient();
             if (request.getApiMethod().equals("PUT")) {
                 resp = connection.sendTransaction(jsonPayload, requestUrl, config);
             } else if (request.getApiMethod().equals("GET")) {
@@ -369,6 +381,7 @@ public class WebController {
 
     /**
      * This method calls the INTIATE_BROWSER_PAYMENT operation, which returns a URL to the provider's website. The user is redirected to this URL, where the purchase is completed.
+     *
      * @param request contains info on how to construct API call
      * @return ModelAndView - either redirects to appropriate provider website or returns error page
      */
@@ -376,11 +389,11 @@ public class WebController {
     public ModelAndView processBrowserPayment(ApiRequest request) {
         ModelAndView mav = new ModelAndView();
 
-        String requestUrl = ClientUtil.getRequestUrl(config, request);
+        String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.REST, config, request);
         String jsonPayload = ClientUtil.buildJSONPayload(request);
 
         try {
-            ApiClient connection = new ApiClient();
+            RESTApiClient connection = new RESTApiClient();
             String resp = connection.sendTransaction(jsonPayload, requestUrl, config);
             // Redirect to provider's website
             mav.setViewName("redirect:" + ClientUtil.getBrowserPaymentRedirectUrl(resp));
@@ -395,8 +408,9 @@ public class WebController {
     /**
      * This method handles the callback from the payment provider (PayPal, UnionPay, etc). It looks up the transaction based on the transaction ID and order ID and displays
      * either a receipt page or an error page.
+     *
      * @param transactionId used to retrieve transaction
-     * @param orderId used to construct API endpoint
+     * @param orderId       used to construct API endpoint
      * @return ModelAndView for PayPal or UnionPay SecurePay receipt page or error page
      */
     @GetMapping("/browserPaymentReceipt")
@@ -407,20 +421,19 @@ public class WebController {
         ApiRequest apiReq = new ApiRequest();
         apiReq.setTransactionId(transactionId);
         apiReq.setOrderId(orderId);
-        String requestUrl = ClientUtil.getRequestUrl(config, apiReq);
+        String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.REST, config, apiReq);
 
         String data = "";
         try {
             // Retrieve transaction
-            ApiClient connection = new ApiClient();
+            RESTApiClient connection = new RESTApiClient();
             String resp = connection.getTransaction(requestUrl, config);
             BrowserPaymentResponse browserPaymentResponse = ClientUtil.parseBrowserPaymentResponse(resp);
 
-            if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString()) && browserPaymentResponse.getInteractionStatus().equals(ApiResponses.COMPLETED.toString())) {
+            if (browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString()) && browserPaymentResponse.getInteractionStatus().equals(ApiResponses.COMPLETED.toString())) {
                 mav.addObject("response", browserPaymentResponse);
                 mav.setViewName("receipt");
-            }
-            else {
+            } else {
                 mav.setViewName("error");
                 mav.addObject("cause", browserPaymentResponse.getApiResult());
                 mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
@@ -437,21 +450,22 @@ public class WebController {
     /**
      * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into secureIdPayerAuthenticationForm.html.
      * Otherwise, it displays an error.
-     * @param request needed to store 3DSecure ID and session ID in HttpSession
-     * @param operation indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
-     * @param sessionId store in HttpSession to to retrieve after returning from issuer authentication form
+     *
+     * @param request     needed to store 3DSecure ID and session ID in HttpSession
+     * @param operation   indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
+     * @param sessionId   store in HttpSession to to retrieve after returning from issuer authentication form
      * @param redirectUrl indicates where the user should be redirected to after completing issuer authentication
      * @return ModelAndView - displays issuer authentication form or error page
      */
     @GetMapping("/check3dsEnrollment/{operation}/{sessionId}")
-    public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value="operation") String operation, @PathVariable(value="sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
+    public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
             // Retrieve session
-            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
-            ApiClient sessionConnection = new ApiClient();
+            String url = ClientUtil.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+            RESTApiClient sessionConnection = new RESTApiClient();
             String sessionResponse = sessionConnection.getTransaction(url, config);
 
             // Parse session response into CheckoutSession object
@@ -470,25 +484,23 @@ public class WebController {
             HttpSession httpSession = request.getSession();
             httpSession.setAttribute("secureId", secureId);
             httpSession.setAttribute("sessionId", session.getId());
-            String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
+            String requestUrl = ClientUtil.getSecureIdRequest(ApiProtocol.REST, config, secureId);
 
             // Perform API operation
-            ApiClient apiConnection = new ApiClient();
+            RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
             SecureId secureIdObject = ClientUtil.parse3DSecureResponse(apiResponse);
 
-            if(secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
+            if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("secureIdPayerAuthenticationForm");
                 mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
-            }
-            else {
+            } else {
                 mav.setViewName("error");
                 mav.addObject("cause", secureIdObject.getStatus());
                 mav.addObject("message", "Card not enrolled in 3DS.");
             }
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
@@ -501,6 +513,7 @@ public class WebController {
     /**
      * This method completes the 3DS process after the enrollment check. It calls PROCESS_ACS_RESULT, which returns either a successful or failed authentication response.
      * If the response is successful, complete the operation (PAY, AUTHORIZE, etc) or shows an error page.
+     *
      * @param request needed to retrieve 3DSecure ID and session ID to complete 3DS transaction
      * @return ModelAndView - displays api response page or error page
      */
@@ -524,23 +537,23 @@ public class WebController {
             session.removeAttribute("sessionId");
 
             // Process Access Control Server (ACS) result
-            String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
-            ApiClient connection = new ApiClient();
+            String requestUrl = ClientUtil.getSecureIdRequest(ApiProtocol.REST, config, secureId);
+            RESTApiClient connection = new RESTApiClient();
 
             String data = ClientUtil.buildJSONPayload(req);
             String resp = connection.postTransaction(data, requestUrl, config);
             SecureId secureIdObject = ClientUtil.parse3DSecureResponse(resp);
 
-            if(!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
+            if (!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
                 ApiRequest apiReq = ClientUtil.createApiRequest("AUTHORIZE");
                 apiReq.setSessionId(sessionId);
                 apiReq.setSecureId(secureId);
                 String payload = ClientUtil.buildJSONPayload(apiReq);
-                String reqUrl = ClientUtil.getRequestUrl(config, apiReq);
+                String reqUrl = ClientUtil.getRequestUrl(ApiProtocol.REST, config, apiReq);
 
                 // Perform API operation
-                ApiClient apiConnection = new ApiClient();
+                RESTApiClient apiConnection = new RESTApiClient();
                 String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
 
                 ObjectMapper mapper = new ObjectMapper();
@@ -553,14 +566,12 @@ public class WebController {
                 mav.addObject("method", apiReq.getApiMethod());
                 mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
                 mav.addObject("requestUrl", reqUrl);
-            }
-            else {
+            } else {
                 mav.setViewName("error");
                 mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
                 mav.addObject("message", "3DS authentication failed. Please try again with another card.");
             }
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
