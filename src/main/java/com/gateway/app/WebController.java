@@ -42,6 +42,15 @@ public class WebController {
     }
 
     /**
+     * Display PAY operation page for NVP mode
+     * @return ModelAndView for pay.html
+     */
+    @GetMapping("/pay")
+    public ModelAndView showPayThroughNVP() {
+        return createModel("payThroughNVP");
+    }
+
+    /**
      * Display VERIFY operation page
      * @return ModelAndView for verify.html
      */

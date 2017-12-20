@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'pay')}">
+<body>
+<script type="text/javascript">
+    var JavaSample = {
+        operation: function() {
+            return "PAY";
+        },
+        endpoint: function() {
+            return "/processNVP/";
+        },
+        params: function() {
+            return "";
+        }
+    };
+</script>
+<!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
+<style id="antiClickjack">body{display:none !important;}</style>
+<!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
+<script th:src="@{${config.apiBaseURL} + '/form/version/'+ ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>Pay using NVP (Name Value Pair)</h3>
+                <div class="alert alert-warning" role="alert">
+                    <p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
+                </div>
+                <p>Please enter your payment details:</p>
+                <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
+                <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
+                <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
+                <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
+                <button class="btn btn-primary" id="payButton" onclick="pay();">Pay</button>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+<script src="/scripts/hostedSession.js"></script>
+</body>
+</html>
