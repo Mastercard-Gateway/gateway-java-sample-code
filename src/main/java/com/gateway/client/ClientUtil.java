@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClientUtil {
 
@@ -53,15 +55,22 @@ public class ClientUtil {
      *
      * @param apiProtocol REST or NVP
      * @param config      contains frequently used information like Merchant ID, API password, etc.
-     * @param request     contains information needed to create the API request
      * @return url
      */
     public static String getRequestUrl(ApiProtocol apiProtocol, Config config, ApiRequest request) {
-        String url = getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
-        if (notNullOrEmpty(request.getTransactionId())) {
-            url += "/transaction/" + request.getTransactionId();
+        switch (apiProtocol) {
+            case REST:
+                String url = getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
+                if (notNullOrEmpty(request.getTransactionId())) {
+                    url += "/transaction/" + request.getTransactionId();
+                }
+                return url;
+            case NVP:
+                return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion();
+            default:
+                throwUnsupportedProtocolException();
         }
-        return url;
+        return null;
     }
 
     private static String getApiBaseURL(String gatewayHost, ApiProtocol apiProtocol) {
@@ -70,7 +79,13 @@ public class ClientUtil {
                 return gatewayHost + "/api/rest";
             case NVP:
                 return gatewayHost + "/api/nvp";
+            default:
+                throwUnsupportedProtocolException();
         }
+        return null;
+    }
+
+    private static void throwUnsupportedProtocolException() {
         throw new IllegalArgumentException("Unsupported API protocol!");
     }
 
@@ -88,23 +103,29 @@ public class ClientUtil {
     /**
      * Constructs API endpoint for session-based requests with an existing session ID
      *
-     *
      * @param apiProtocol REST or NVP
-     * @param config    contains frequently used information like Merchant ID, API password, etc.
-     * @param sessionId used to target a specific session
+     * @param config      contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId   used to target a specific session
      * @return url
      */
     public static String getSessionRequestUrl(ApiProtocol apiProtocol, Config config, String sessionId) {
-        return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
+        switch (apiProtocol) {
+            case REST:
+                return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
+            case NVP:
+                return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion();
+            default:
+                throwUnsupportedProtocolException();
+        }
+        return null;
     }
 
     /**
      * Constructs API endpoint for 3DS requests
      *
-     *
      * @param apiProtocol REST or NVP
-     * @param config   contains frequently used information like Merchant ID, API password, etc.
-     * @param secureId used to target a specific secureId
+     * @param config      contains frequently used information like Merchant ID, API password, etc.
+     * @param secureId    used to target a specific secureId
      * @return url
      */
     public static String getSecureIdRequest(ApiProtocol apiProtocol, Config config, String secureId) {
@@ -199,6 +220,29 @@ public class ClientUtil {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         return gson.toJson(data);
+    }
+
+    /**
+     * Constructs the API payload based on properties of ApiRequest
+     *
+     * @param request contains info on what data the payload should include (order ID, amount, currency, etc) depending on the operation (PAY, AUTHORIZE, CAPTURE, etc)
+     * @return JSON string
+     */
+    public static Map<String, String> buildMap(ApiRequest request) {
+        Map<String, String> keyValueMap = new HashMap<>();
+
+        keyValueMap.put("apiOperation", "PAY");
+        keyValueMap.put("order.id", request.getOrderId());
+        keyValueMap.put("order.amount", request.getOrderAmount());
+        keyValueMap.put("order.currency", request.getOrderCurrency());
+        keyValueMap.put("transaction.id", request.getTransactionId());
+        keyValueMap.put("session.id", request.getSessionId());
+
+        keyValueMap.put("sourceOfFunds.type", "CARD");
+        keyValueMap.put("sourceOfFunds.provided.card.expiry.month", request.getExpiryMonth());
+        keyValueMap.put("sourceOfFunds.provided.card.expiry.year", request.getExpiryYear());
+
+        return keyValueMap;
     }
 
     /**

@@ -6,12 +6,10 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Service client class for making API requests using Name Value Pair (NVP) protocol
@@ -21,49 +19,16 @@ public final class NVPApiClient {
 
 
     private static final String UTF8_ENCODING = "UTF-8";
-    private static final String CONTENT_TYPE = "application/json";
+    private static final String FORM_URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=UTF-8";
+    private static final String CONTENT_TYPE_HEADER = "Content-type";
 
-    /**
-     * Performs a PUT operation (required for the following API operations: AUTHORIZE, CAPTURE, PAY, REFUND, UPDATE_AUTHORIZATION, VERIFY, VOID, CHECK_3DS_ENROLLMENT, INITIATE_BROWSER_PAYMENT)
-     *
-     * @param data       JSON payload
-     * @param requestUrl API endpoint
-     * @param config     contains frequently used information like Merchant ID, API password, etc.
-     * @return body
-     * @throws Exception
-     */
-    public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
 
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
-
-        PutMethod putMethod = new PutMethod(requestUrl);
-
-        putMethod.setDoAuthentication(true);
-
-        // Set the charset to UTF-8
-        StringRequestEntity entity = new StringRequestEntity(data, CONTENT_TYPE, UTF8_ENCODING);
-        putMethod.setRequestEntity(entity);
-
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
-        String body = null;
-
-        try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, putMethod);
-            body = putMethod.getResponseBodyAsString();
-        } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
-            throw new Exception(ioe);
-        } finally {
-            putMethod.releaseConnection();
+    private void populateData(PostMethod postMethod, Map<String, String> data) {
+        for (String key : data.keySet()) {
+            if (data.get(key) != null) {
+                postMethod.addParameter(key, data.get(key));
+            }
         }
-
-        return body;
     }
 
     /**
@@ -75,20 +40,20 @@ public final class NVPApiClient {
      * @return body
      * @throws Exception
      */
-    public String postTransaction(String data, String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
+    public String postData(Map<String, String> data, String requestUrl, Config config) throws Exception {
 
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
+
+        HttpClient httpClient = new HttpClient();
 
         PostMethod postMethod = new PostMethod(requestUrl);
 
         postMethod.setDoAuthentication(true);
 
-        // Set the charset to UTF-8
-        StringRequestEntity entity = new StringRequestEntity(data, "application/json", UTF8_ENCODING);
-        postMethod.setRequestEntity(entity);
+        postMethod.addRequestHeader(CONTENT_TYPE_HEADER, FORM_URL_ENCODED_CONTENT_TYPE);
+
+        populateMerchantData(postMethod, config);
+
+        populateData(postMethod, data);
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
@@ -97,8 +62,12 @@ public final class NVPApiClient {
 
         try {
             // send the transaction
+            System.out.println("####### Executing POST ..." + postMethod);
             httpClient.executeMethod(hostConfig, postMethod);
+
             body = postMethod.getResponseBodyAsString();
+
+            System.out.println("####### Response body = " + body);
         } catch (IOException ioe) {
             // we can replace a specific exception that suits your application
             throw new Exception(ioe);
@@ -109,42 +78,10 @@ public final class NVPApiClient {
         return body;
     }
 
-    /**
-     * Performs a GET operation (required for the following API operations: Retrieve session, Retrieve transaction, Retrieve order)
-     *
-     * @param requestUrl API endpoint
-     * @param config     contains frequently used information like Merchant ID, API password, etc.
-     * @return body
-     * @throws Exception
-     */
-    public String getTransaction(String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
-
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
-
-        GetMethod getMethod = new GetMethod(requestUrl);
-
-        getMethod.setDoAuthentication(true);
-
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
-        String body = null;
-
-        try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, getMethod);
-            body = getMethod.getResponseBodyAsString();
-        } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
-            throw new Exception(ioe);
-        } finally {
-            getMethod.releaseConnection();
-        }
-
-        return body;
+    private void populateMerchantData(PostMethod postMethod, Config config) {
+        postMethod.addParameter("merchant", config.getMerchantId());
+        postMethod.addParameter("apiUsername", "merchant." + config.getMerchantId());
+        postMethod.addParameter("apiPassword", config.getApiPassword());
     }
 
     /**
