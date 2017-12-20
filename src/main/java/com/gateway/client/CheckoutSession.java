@@ -31,4 +31,5 @@ public class CheckoutSession {
     public void setSuccessIndicator(String successIndicator) {
         this.successIndicator = successIndicator;
     }
+
 }

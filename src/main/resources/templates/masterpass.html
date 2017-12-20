@@ -1,44 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'masterpass')}">
-<body>
-<script src="https://masterpass.com/lightbox/Switch/integration/MasterPass.client.js"></script>
-<script type="text/javascript">
-    // INITIALIZE and INVOKE THE MASTERPASS LIGHTBOX
-    MasterPass.client.checkout({
-        "version":"v6",
-        "successCallback": onSuccessfulCheckout,
-        "cancelCallback": onCancel,
-        "failureCallback": onFailure,
-        // USE PARAMETERS FROM THE OPEN WALLET RESPONSE
-        "requestToken": "<wallet.masterpass.requestToken>",
-        "merchantCheckoutId": "<wallet.masterpass.merchantCheckoutId>",
-        "allowedCardTypes": "<wallet.masterpass.allowedCardTypes>"
-    });
 
-    // RETRIEVE PARAMETERS FROM THE LIGHTBOX INTERACTION
-    function onSuccessfulCheckout(data) {
-        document.getElementById('oauthToken').value=data.oauth_token;
-        document.getElementById('oauthVerifier').value=data.oauth_verifier;
-        document.getElementById('checkoutUrl').value=data.checkout_resource_url;
-    }
-    function onCancel() {
-        // do something to tell you the cardholder cancelled
-        alert('cancelled');
-    }
-    function onFailure() {
-        // do something to tell you things have gone wrong
-        alert('failure');
-    }
-</script>
+<body>
 <div class="col-9">
     <div class="row">
-        <div class="contents col-12">
-            <div class="col-md-7">
-                <h3>Masterpass</h3>
-
+        <form action="#" class="col-12 form-horizontal" th:action="@{/processMasterpass}" th:object="${apiRequest}" method="post">
+            <h3>Masterpass</h3>
+            <div class="alert alert-warning" role="alert">
+                <p>This page is for demonstration purposes only, to collect information like order amount and currency in order to generate the Masterpass button. In practical use this would be collected behind the scenes.</p>
+                <p>View the full Masterpass documentation <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/masterPassOnline.html'}" target="_blank">here</a>.</p>
             </div>
-        </div>
+            <fieldset>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="wallet-provider">Wallet Provider</label>
+                    <div class="col-md-7">
+                        <input id="wallet-provider" th:field="*{walletProvider}" value="MASTERPASS_ONLINE" type="text" placeholder="" class="form-control input-md" readonly/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="origin-url">Origin URL (where Masterpass will redirect after transaction is complete)</label>
+                    <div class="col-md-7">
+                        <input id="origin-url" th:field="*{originUrl}" type="text" placeholder="" class="form-control input-md" readonly/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-amount">Amount</label>
+                    <div class="col-md-7">
+                        <input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-currency">Currency</label>
+                    <div class="col-md-7">
+                        <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="process"></label>
+                    <div class="col-md-7">
+                        <button id="process" name="process" class="btn btn-primary">Generate Masterpass button</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
     </div> <!-- row -->
 </div>
+
 </body>
 </html>

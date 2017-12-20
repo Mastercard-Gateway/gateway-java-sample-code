@@ -60,7 +60,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest req = ClientUtil.createBrowserPaymentsRequest("PAY", "PAYPAL", request.getRequestURL().toString());
+            ApiRequest req = ClientUtil.createBrowserPaymentsRequest(request, "PAY", "PAYPAL");
             mav.setViewName("paypal");
             mav.addObject("apiRequest", req);
         }
@@ -84,7 +84,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest req = ClientUtil.createBrowserPaymentsRequest("PAY", "UNION_PAY", request.getRequestURL().toString());
+            ApiRequest req = ClientUtil.createBrowserPaymentsRequest(request, "AUTHORIZE", "UNION_PAY");
             mav.setViewName("unionpay");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
@@ -100,12 +100,84 @@ public class WebController {
     }
 
     /**
-     * Display page for Masterpass interaction
-     * @return ModelAndView for masterpass.html
+     * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
+     * @param request used to determine context for return URL
+     * @return
      */
     @GetMapping("/masterpass")
-    public ModelAndView showMasterpass() {
-        ModelAndView mav = new ModelAndView("masterpass");
+    public ModelAndView showMasterpass(HttpServletRequest request) {
+
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            mav.setViewName("masterpass");
+            ApiRequest req = new ApiRequest();
+            req.setOrderAmount("10.00");
+            req.setOrderCurrency("USD");
+            req.setWalletProvider("MASTERPASS_ONLINE");
+            req.setOriginUrl(ClientUtil.getCurrentContext(request) + "/masterpassResponse");
+            mav.addObject("apiRequest", req);
+            mav.addObject("config", config);
+        }
+        catch(Exception e) {
+            mav.setViewName("error");
+            logger.error("An error occurred", e);
+            mav.addObject("cause", e.getCause());
+            mav.addObject("message", e.getMessage());
+        }
+
+        return mav;
+    }
+
+    @GetMapping("/masterpassResponse")
+    public ModelAndView showMasterpassResponse(@RequestParam("oauth_token") String oauthToken, @RequestParam("oauth_verifier") String oauthVerifier,
+                                               @RequestParam("checkoutId") String checkoutId, @RequestParam("checkout_resource_url") String checkoutResourceUrl, @RequestParam("mpstatus") String mpstatus) {
+
+        ModelAndView mav = new ModelAndView("masterpassResponse");
+        mav.addObject("mpstatus", mpstatus);
+        mav.addObject("oauthVerifier", oauthVerifier);
+        mav.addObject("oauthToken", oauthToken);
+        mav.addObject("checkoutId", checkoutId);
+        mav.addObject("checkoutResourceUrl", checkoutResourceUrl);
+        return mav;
+    }
+
+    /**
+     * Create session and fetch Masterpass configuration details
+     * 1. Create session
+     * 2. Use OPEN_WALLET to get merchant's Masterpass configuration
+     * 3. Pass these values to client for use with Masterpass Javascript library
+     * @return ModelAndView for masterpassButton.html
+     */
+    @PostMapping("/processMasterpass")
+    public ModelAndView processMasterpass(ApiRequest request) {
+
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            ApiClient connection = new ApiClient();
+
+            // Create session to use with OPEN_WALLET operation
+            String sessionRequestUrl = ClientUtil.getSessionRequestUrl(config);
+            String sessionResponse = connection.postTransaction(sessionRequestUrl, config);
+            CheckoutSession checkoutSession = ClientUtil.parseSessionResponse(sessionResponse);
+
+            // Call OPEN_WALLET to retrieve Masterpass configuration
+            String walletRequestUrl = ClientUtil.getSessionRequestUrl(config, checkoutSession.getId());
+            String data = ClientUtil.buildJSONPayload(request);
+            String walletResponse = connection.postTransaction(data, walletRequestUrl, config);
+            WalletResponse wallet = ClientUtil.parseWalletResponse(walletResponse, "masterpass");
+
+            mav.setViewName("masterpassButton");
+            mav.addObject("wallet", wallet);
+            mav.addObject("config", config);
+            mav.addObject("checkoutSession", checkoutSession);
+        } catch (Exception e) {
+            mav.setViewName("error");
+            logger.error("An error occurred", e);
+            mav.addObject("cause", e.getCause());
+            mav.addObject("message", e.getMessage());
+        }
         return mav;
     }
 

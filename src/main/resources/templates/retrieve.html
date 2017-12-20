@@ -7,9 +7,8 @@
         <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
             <h3>Retrieve Transaction</h3>
             <div class="alert alert-warning" role="alert">
-                A valid transaction ID and order ID are needed to retrieve a transaction.
-                <br/><br/>
-                To get these values, run the Pay process, then enter the values from the response.
+                <p>A valid transaction ID and order ID are needed to retrieve a transaction.</p>
+                <p>To get these values, run the Pay process, then enter the values from the response.</p>
             </div>
             <fieldset>
                 <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />

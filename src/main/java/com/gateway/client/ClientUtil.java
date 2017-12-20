@@ -9,6 +9,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -96,7 +97,6 @@ public class ClientUtil {
      * @return JSON string
      */
     public static String buildJSONPayload(ApiRequest request) {
-        JsonObject order = new JsonObject();
 
         JsonObject secureId = new JsonObject();
         if(notNullOrEmpty(request.getPaymentAuthResponse())) {
@@ -109,12 +109,23 @@ public class ClientUtil {
             secureId.add("authenticationRedirect", authenticationRedirect);
         }
 
-        if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
+        JsonObject order = new JsonObject();
+        if (notNullOrEmpty(request.getApiOperation()) && request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
             // Need to add order ID in the request body for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
         }
         if (notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
+
+        JsonObject wallet = new JsonObject();
+        if (notNullOrEmpty(request.getWalletProvider())) {
+            order.addProperty("walletProvider", request.getWalletProvider());
+            if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
+                JsonObject masterpass = new JsonObject();
+                if(notNullOrEmpty(request.getOriginUrl())) masterpass.addProperty("originUrl", request.getOriginUrl());
+                wallet.add("masterpass", masterpass);
+            }
+        }
 
         JsonObject transaction = new JsonObject();
         if (notNullOrEmpty(request.getTransactionAmount()))
@@ -150,7 +161,7 @@ public class ClientUtil {
         }
 
         JsonObject interaction = new JsonObject();
-        if (notNullOrEmpty(request.getReturnUrl())) {
+        if (notNullOrEmpty(request.getReturnUrl()) && notNullOrEmpty(request.getApiOperation())) {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
             if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
                 interaction.addProperty("returnUrl", request.getReturnUrl());
@@ -167,6 +178,7 @@ public class ClientUtil {
         if (notNullOrEmpty(request.getApiOperation())) data.addProperty("apiOperation", request.getApiOperation());
         if (notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
+        if (!wallet.entrySet().isEmpty()) data.add("wallet", wallet);
         if (!transaction.entrySet().isEmpty()) data.add("transaction", transaction);
         if (!sourceOfFunds.entrySet().isEmpty()) data.add("sourceOfFunds", sourceOfFunds);
         if (!browserPayment.entrySet().isEmpty()) data.add("browserPayment", browserPayment);
@@ -180,30 +192,27 @@ public class ClientUtil {
     }
 
     /**
-     *
+     * @param request needed to determine the current context
      * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
      * @param source provider for the browser payment (PayPal, UnionPay SecurePay, etc)
-     * @param requestUrl needed to determine redirect URL
      * @return ApiRequest
      * @throws MalformedURLException
      */
-    public static ApiRequest createBrowserPaymentsRequest(String operation, String source, String requestUrl) throws MalformedURLException {
-        ApiRequest req = new ApiRequest();
-        req.setApiOperation("INITIATE_BROWSER_PAYMENT");
-        req.setTransactionId(ClientUtil.randomNumber());
-        req.setOrderId(ClientUtil.randomNumber());
-        req.setBrowserPaymentOperation(operation);
-        req.setSourceType(source);
+    public static ApiRequest createBrowserPaymentsRequest(HttpServletRequest request, String operation, String source) throws Exception {
         try {
-            URL url = new URL(requestUrl);
-            String returnUrlBase = url.getProtocol() + "://" + url.getAuthority();
-            req.setReturnUrl(returnUrlBase + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
+            ApiRequest req = new ApiRequest();
+            req.setApiOperation("INITIATE_BROWSER_PAYMENT");
+            req.setTransactionId(ClientUtil.randomNumber());
+            req.setOrderId(ClientUtil.randomNumber());
+            req.setBrowserPaymentOperation(operation);
+            req.setSourceType(source);
+            req.setReturnUrl(getCurrentContext(request) + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
+            return req;
         }
-        catch (MalformedURLException e) {
-            logger.error("Unable to parse return URL", e);
+        catch(Exception e) {
+            logger.error("Unable to create browser payment request", e);
             throw e;
         }
-        return req;
     }
 
     /**
@@ -323,6 +332,36 @@ public class ClientUtil {
     }
 
     /**
+     * Parses JSON response from wallet transaction into WalletResponse object
+     * @param response response from API
+     * @param provider wallet provider
+     * @return WalletResponse
+     */
+    public static WalletResponse parseWalletResponse(String response, String provider) {
+
+        try {
+            WalletResponse wallet = new WalletResponse();
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject orderJson = json.get("order").getAsJsonObject();
+            JsonObject walletJson = json.get("wallet").getAsJsonObject();
+            JsonObject providerObj = walletJson.get(provider).getAsJsonObject();
+
+            wallet.setAllowedCardTypes(providerObj.get("allowedCardTypes").getAsString());
+            wallet.setMerchantCheckoutId(providerObj.get("merchantCheckoutId").getAsString());
+            wallet.setOriginUrl(providerObj.get("originUrl").getAsString());
+            wallet.setRequestToken(providerObj.get("requestToken").getAsString());
+            wallet.setOrderAmount(orderJson.get("amount").getAsString());
+            wallet.setOrderCurrency(orderJson.get("currency").getAsString());
+
+            return wallet;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse Masterpass response", e);
+            throw e;
+        }
+    }
+
+    /**
      * Retrieve redirect URL from browser payment response
      * @param response response from API
      * @return redirect URL
@@ -341,6 +380,21 @@ public class ClientUtil {
     }
 
     /**
+     * This helper method gets the current context so that an appropriate return URL can be constructed
+     * @return current context string
+     */
+    public static String getCurrentContext(HttpServletRequest request) throws MalformedURLException {
+        try {
+            URL url = new URL(request.getRequestURL().toString());
+            return url.getProtocol() + "://" + url.getAuthority();
+        }
+        catch (MalformedURLException e) {
+            logger.error("Unable to parse return URL", e);
+            throw e;
+        }
+    }
+
+    /**
      * Generates a random 10-digit alphanumeric number to use as a unique identifier (order ID and transaction ID, for instance)
      * @return random identifier
      */
@@ -348,6 +402,11 @@ public class ClientUtil {
         return RandomStringUtils.random(10, true, true);
     }
 
+    /**
+     * Helper method to determine if a value is null or blank
+     * @param value
+     * @return boolean
+     */
     private static boolean notNullOrEmpty(String value) {
         return (value != null && !value.equals(""));
     }

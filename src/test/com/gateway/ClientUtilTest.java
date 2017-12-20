@@ -254,6 +254,21 @@ public class ClientUtilTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    @Test
+    public void parseWalletRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setWalletProvider("MASTERPASS_ONLINE");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setOriginUrl("http://www.mysite.com/receipt");
+
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"wallet\":{\"masterpass\":{\"originUrl\":\"http://www.mysite.com/receipt\"}}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
     private String prettifyJson(String data) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(data).getAsJsonObject();
