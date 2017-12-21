@@ -1,14 +1,25 @@
 package com.gateway.app;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AppConfiguration {
 
+    @Value("${gateway.merchant.id}")
+    private String merchantId;
+
+    @Value("${gateway.api.password}")
+    private String apiPassword;
+
+    @Value("${gateway.base.url}")
+    private String baseURL;
+
+
     @Bean
     public Config buildConfig() {
-        Config config = new Config(getEnv("GATEWAY_MERCHANT_ID"), getEnv("GATEWAY_API_PASSWORD"), getEnv("GATEWAY_BASE_URL"));
+        Config config = new Config(merchantId, apiPassword, baseURL);
 
 
         String api_version = getEnv("GATEWAY_API_VERSION");
