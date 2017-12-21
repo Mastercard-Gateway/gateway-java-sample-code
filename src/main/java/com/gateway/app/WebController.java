@@ -14,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -342,31 +341,31 @@ public class WebController {
     }
 
     /**
-     * This method processes the API request for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
+     * This method processes the API request using NVP (Name-Value Pair) protocol for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
      *
-     * @param operation indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
-     * @param sessionId used to retrieve session created in hostedSession.js
      * @return ModelAndView for api response page or error page
      */
-    @GetMapping("/processNVP/{operation}/{sessionId}")
-    public ModelAndView processNVPHostedSession(@PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId) {
+    @PostMapping("/processPayThroughNVP")
+    public ModelAndView processNVPHostedSession(HttpServletRequest request) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest request = ClientUtil.createApiRequest(operation);
-            request.setSessionId(sessionId);
+            ApiRequest apiRequest = ClientUtil.createApiRequest(request.getParameter("operation"));
+            apiRequest.setApiMethod("POST");
+            apiRequest.setSessionId(request.getParameter("session-id"));
 
-            String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.NVP, config, request);
-            Map<String, String> dataMap = ClientUtil.buildMap(request);
+            String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.NVP, config, apiRequest);
+            Map<String, String> dataMap = ClientUtil.buildMap(apiRequest);
 
             NVPApiClient connection = new NVPApiClient();
             String response = connection.postData(dataMap, requestUrl, config);
             mav.setViewName("apiResponse");
             mav.addObject("resp", response);
-            mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getApiMethod());
+            mav.addObject("operation", apiRequest.getApiOperation());
+            mav.addObject("method", apiRequest.getApiMethod());
             mav.addObject("request", dataMap);
+            mav.addObject("apiRequest", dataMap);
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
             mav.setViewName("error");
@@ -409,37 +408,6 @@ public class WebController {
             mav.addObject("operation", request.getApiOperation());
             mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", requestUrl);
-        } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
-        }
-        return mav;
-    }
-
-    /**
-     * This method processes the API request for server-to-server operations. These are operations that would not commonly be invoked via a user interacting with the browser, but a system event (CAPTURE, REFUND, VOID).
-     *
-     * @param request contains info on how to construct API call
-     * @return ModelAndView for api response page or error page
-     */
-    @PostMapping("/processNVP")
-    public ModelAndView processNVP(ApiRequest request) {
-
-        ModelAndView mav = new ModelAndView();
-
-        String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.NVP, config, request);
-        Map<String, String> dataMap = ClientUtil.buildMap(request);
-
-        try {
-            NVPApiClient connection = new NVPApiClient();
-            String response = connection.postData(dataMap, requestUrl, config);
-            mav.setViewName("apiResponse");
-            mav.addObject("resp", response);
-            mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getApiMethod());
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
             mav.setViewName("error");

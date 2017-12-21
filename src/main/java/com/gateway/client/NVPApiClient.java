@@ -4,8 +4,6 @@ import com.gateway.app.Config;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NTCredentials;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import java.io.IOException;
@@ -18,7 +16,6 @@ import java.util.Map;
 public final class NVPApiClient {
 
 
-    private static final String UTF8_ENCODING = "UTF-8";
     private static final String FORM_URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=UTF-8";
     private static final String CONTENT_TYPE_HEADER = "Content-type";
 
@@ -51,7 +48,9 @@ public final class NVPApiClient {
 
         postMethod.addRequestHeader(CONTENT_TYPE_HEADER, FORM_URL_ENCODED_CONTENT_TYPE);
 
-        populateMerchantData(postMethod, config);
+        populateAuthenticationData(postMethod, config);
+
+        data.put("merchant", config.getMerchantId());
 
         populateData(postMethod, data);
 
@@ -61,15 +60,14 @@ public final class NVPApiClient {
         String body = null;
 
         try {
-            // send the transaction
-            System.out.println("####### Executing POST ..." + postMethod);
+            //make POST call
+            System.out.println("Making POST call...");
             httpClient.executeMethod(hostConfig, postMethod);
 
             body = postMethod.getResponseBodyAsString();
 
-            System.out.println("####### Response body = " + body);
+            System.out.println("Response body = " + body);
         } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
             throw new Exception(ioe);
         } finally {
             postMethod.releaseConnection();
@@ -78,8 +76,7 @@ public final class NVPApiClient {
         return body;
     }
 
-    private void populateMerchantData(PostMethod postMethod, Config config) {
-        postMethod.addParameter("merchant", config.getMerchantId());
+    private void populateAuthenticationData(PostMethod postMethod, Config config) {
         postMethod.addParameter("apiUsername", "merchant." + config.getMerchantId());
         postMethod.addParameter("apiPassword", config.getApiPassword());
     }

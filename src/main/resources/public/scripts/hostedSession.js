@@ -18,10 +18,10 @@ PaymentSession.configure({
     //SPECIFY YOUR MITIGATION OPTION HERE
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
-        initialized: function(response) {
+        initialized: function (response) {
             // HANDLE INITIALIZATION RESPONSE
         },
-        formSessionUpdate: function(response) {
+        formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
             if (response.status) {
                 if ("ok" == response.status) {
@@ -37,9 +37,17 @@ PaymentSession.configure({
                         console.log("The user entered a MasterCard credit card.")
                     }
 
-                    //process operation
-                    window.location.href = JavaSample.endpoint() + JavaSample.operation() + "/" + response.session.id + JavaSample.params();
-                } else if ("fields_in_error" == response.status)  {
+                    if (JavaSample.protocol === "NVP") {
+                        //Make a POST call
+                        var $form = $("#formPay");
+                        $('#session-id').val(response.session.id);
+                        $form.submit();
+                    }
+                    else {
+                        //process operation
+                        window.location.href = JavaSample.endpoint() + JavaSample.operation() + "/" + response.session.id + JavaSample.params();
+                    }
+                } else if ("fields_in_error" == response.status) {
 
                     console.log("Session update failed with field errors.");
                     if (response.errors.cardNumber) {
@@ -54,9 +62,9 @@ PaymentSession.configure({
                     if (response.errors.securityCode) {
                         console.log("Security code invalid.");
                     }
-                } else if ("request_timeout" == response.status)  {
+                } else if ("request_timeout" == response.status) {
                     console.log("Session update failed with request timeout: " + response.errors.message);
-                } else if ("system_error" == response.status)  {
+                } else if ("system_error" == response.status) {
                     console.log("Session update failed with system error: " + response.errors.message);
                 }
             } else {

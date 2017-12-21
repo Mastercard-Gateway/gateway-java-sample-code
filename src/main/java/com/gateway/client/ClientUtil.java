@@ -223,7 +223,7 @@ public class ClientUtil {
     }
 
     /**
-     * Constructs the API payload based on properties of ApiRequest
+     * Constructs the API payload request map based on properties of ApiRequest
      *
      * @param request contains info on what data the payload should include (order ID, amount, currency, etc) depending on the operation (PAY, AUTHORIZE, CAPTURE, etc)
      * @return JSON string
@@ -239,9 +239,6 @@ public class ClientUtil {
         keyValueMap.put("session.id", request.getSessionId());
 
         keyValueMap.put("sourceOfFunds.type", "CARD");
-        keyValueMap.put("sourceOfFunds.provided.card.expiry.month", request.getExpiryMonth());
-        keyValueMap.put("sourceOfFunds.provided.card.expiry.year", request.getExpiryYear());
-
         return keyValueMap;
     }
 
