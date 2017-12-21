@@ -14,7 +14,8 @@ This is a sample application to help developers start building Java applications
 
 ## Steps for running locally
 1. Download code
-1. Run "mvn clean spring-boot:run"
+1. Run "mvn clean install"
+1. Run "java -jar target/gateway-java-sample-code-1.0.jar --gateway.merchant.id="YOUR_MERCHANT_ID" --gateway.api.password="YOUR_API_PASSWORD" --gateway.base.url="YOUR_GATEWAY_BASE_URL"
 1. Navigate to http://localhost:5000 to test locally
 
 ## Disclaimer
