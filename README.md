@@ -18,7 +18,7 @@ This is a sample application to help developers start building Java applications
 1. Navigate to http://localhost:5000 to test locally
 
 ## Disclaimer
-This software is intended for **TEST** / **REFERENCE** purposes **ONLY** and is not intended to be used in a production environment.
+This software is intended for **TEST/REFERENCE** purposes **ONLY** and is not intended to be used in a production environment.
 
 PLEASE NOTE: **Heroku** is not affiliated with, maintained by or endorsed by Mastercard. The use of this code is at your own risk.
 
