@@ -4,13 +4,12 @@ This is a sample application to help developers start building Java applications
 ## Prerequisites 
 1. Java 8
 1. Maven
-1. Test account with MPGS Gateway system
+1. Registered account with MPGS Gateway system
 
-## Steps for testing with Heroku
-1. Obtain an account with your Gateway provider
-1. Register with [Heroku](https://www.heroku.com)
-1. Update the .env file at the root level of the project with your merchant ID, API password, and gateway URL.
-1. Deploy to Heroku using the following steps:
+## Steps for running in Heroku
+1. Register with [Heroku](https://www.heroku.com) (if you don't have an account already). A free account will be enough. 
+1. Click here to -> [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+1. Fill in the details such as Merchant Id, API Password & Gateway Base URL
 
 ## Steps for running locally
 1. Download code
