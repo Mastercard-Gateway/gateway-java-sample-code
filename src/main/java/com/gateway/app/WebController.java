@@ -353,7 +353,12 @@ public class WebController {
         try {
             ApiRequest apiRequest = ClientUtil.createApiRequest(request.getParameter("operation"));
             apiRequest.setApiMethod("POST");
-            apiRequest.setSessionId(request.getParameter("session-id"));
+
+            String sessionId = request.getParameter("session-id");
+
+            System.out.println("sessionId = " + sessionId);
+
+            apiRequest.setSessionId(sessionId);
 
             String requestUrl = ClientUtil.getRequestUrl(ApiProtocol.NVP, config, apiRequest);
             Map<String, String> dataMap = ClientUtil.buildMap(apiRequest);
