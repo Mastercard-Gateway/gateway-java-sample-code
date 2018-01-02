@@ -62,7 +62,7 @@ public final class ApiClient {
     }
 
     /**
-     * Performs a POST operation with a body (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION)
+     * Performs a POST operation with a body (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION, UPDATE_SESSION_FROM_WALLET)
      * @param data JSON payload
      * @param requestUrl API endpoint
      * @param config contains frequently used information like Merchant ID, API password, etc.

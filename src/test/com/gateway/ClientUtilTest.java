@@ -260,7 +260,22 @@ public class ClientUtilTest {
         request.setWalletProvider("MASTERPASS_ONLINE");
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
-        request.setOriginUrl("http://www.mysite.com/receipt");
+        request.setMasterpassOriginUrl("http://www.mysite.com/receipt");
+
+        String result = ClientUtil.buildJSONPayload(request);
+
+        String data = "{\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"wallet\":{\"masterpass\":{\"originUrl\":\"http://www.mysite.com/receipt\"}}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseGetWalletDetailsRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setWalletProvider("UPDATE_SESSION_FROM_WALLET");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setMasterpassOriginUrl("http://www.mysite.com/receipt");
 
         String result = ClientUtil.buildJSONPayload(request);
 
