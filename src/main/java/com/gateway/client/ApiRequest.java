@@ -27,10 +27,6 @@ public class ApiRequest {
 
     private String walletProvider;
     private String masterpassOriginUrl;
-    private String masterpassOAuthToken;
-    private String masterpassOAuthVerifier;
-    private String masterpassCheckoutUrl;
-
 
     public String getOrderId() {
         return orderId;
@@ -214,29 +210,5 @@ public class ApiRequest {
 
     public void setWalletProvider(String walletProvider) {
         this.walletProvider = walletProvider;
-    }
-
-    public String getMasterpassOAuthToken() {
-        return masterpassOAuthToken;
-    }
-
-    public void setMasterpassOAuthToken(String masterpassOAuthToken) {
-        this.masterpassOAuthToken = masterpassOAuthToken;
-    }
-
-    public String getMasterpassOAuthVerifier() {
-        return masterpassOAuthVerifier;
-    }
-
-    public void setMasterpassOAuthVerifier(String masterpassOAuthVerifier) {
-        this.masterpassOAuthVerifier = masterpassOAuthVerifier;
-    }
-
-    public String getMasterpassCheckoutUrl() {
-        return masterpassCheckoutUrl;
-    }
-
-    public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
-        this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
 }

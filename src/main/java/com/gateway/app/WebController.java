@@ -192,18 +192,17 @@ public class WebController {
         String sessionId = (String) session.getAttribute("sessionId");
 
         try {
+            // Retrieve payment details from wallet using session ID
             ApiRequest req = new ApiRequest();
-            req.setApiOperation("UPDATE_WALLET_FROM_SESSION");
             req.setWalletProvider("MASTERPASS_ONLINE");
-            req.setMasterpassCheckoutUrl(checkoutResourceUrl);
-            req.setMasterpassOAuthToken(oauthToken);
-            req.setMasterpassOAuthVerifier(oauthVerifier);
 
             String url = ClientUtil.getSessionRequestUrl(config, sessionId);
             String data = ClientUtil.buildJSONPayload(req);
 
             ApiClient connection = new ApiClient();
             String response = connection.postTransaction(data, url, config);
+
+            // Make a payment using the session
 
             mav.setViewName("masterpassResponse");
         }

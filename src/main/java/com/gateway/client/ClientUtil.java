@@ -123,10 +123,7 @@ public class ClientUtil {
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
                 if(notNullOrEmpty(request.getMasterpassOriginUrl())) masterpass.addProperty("originUrl", request.getMasterpassOriginUrl());
-                if(notNullOrEmpty(request.getMasterpassOAuthToken())) masterpass.addProperty("oauthToken", request.getMasterpassOAuthToken());
-                if(notNullOrEmpty(request.getMasterpassOAuthVerifier())) masterpass.addProperty("oauthVerifier", request.getMasterpassOAuthVerifier());
-                if(notNullOrEmpty(request.getMasterpassCheckoutUrl())) masterpass.addProperty("checkoutUrl", request.getMasterpassCheckoutUrl());
-                wallet.add("masterpass", masterpass);
+                if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
 
