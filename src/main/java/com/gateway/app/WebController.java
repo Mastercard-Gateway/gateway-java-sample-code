@@ -199,8 +199,7 @@ public class WebController {
     @GetMapping("/secureId")
     public ModelAndView showSecureId() {
         ModelAndView mav = new ModelAndView("secureId");
-        mav.addObject("merchantId", config.getMerchantId());
-        mav.addObject("baseUrl", config.getApiBaseURL());
+        mav.addObject("config", config);
         mav.addObject("redirectUrlEndpoint", "process3ds");
         return mav;
     }
