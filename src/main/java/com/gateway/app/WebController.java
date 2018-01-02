@@ -206,11 +206,6 @@ public class WebController {
             String response = connection.postTransaction(data, url, config);
 
             mav.setViewName("masterpassResponse");
-            mav.addObject("mpstatus", mpstatus);
-            mav.addObject("oauthVerifier", oauthVerifier);
-            mav.addObject("oauthToken", oauthToken);
-            mav.addObject("checkoutId", checkoutId);
-            mav.addObject("checkoutResourceUrl", checkoutResourceUrl);
         }
         catch(Exception e) {
             mav.setViewName("error");

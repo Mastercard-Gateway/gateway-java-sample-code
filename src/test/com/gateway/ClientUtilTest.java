@@ -38,6 +38,12 @@ public class ClientUtilTest {
     }
 
     @Test
+    public void getSessionRequestUrlWithSessionId() throws Exception {
+        String result = ClientUtil.getSessionRequestUrl(config, "SESSIONID");
+        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
+    }
+
+    @Test
     public void parseAuthorizeRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("AUTHORIZE");
@@ -272,14 +278,15 @@ public class ClientUtilTest {
     @Test
     public void parseGetWalletDetailsRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setWalletProvider("UPDATE_SESSION_FROM_WALLET");
-        request.setOrderAmount("10.00");
-        request.setOrderCurrency("USD");
-        request.setMasterpassOriginUrl("http://www.mysite.com/receipt");
+        request.setApiOperation("UPDATE_SESSION_FROM_WALLET");
+        request.setWalletProvider("MASTERPASS_ONLINE");
+        request.setMasterpassOAuthToken("OAUTH_TOKEN");
+        request.setMasterpassOAuthVerifier("OAUTH_VERIFIER");
+        request.setMasterpassCheckoutUrl("https://www.masterpasscheckouturl.com");
 
         String result = ClientUtil.buildJSONPayload(request);
 
-        String data = "{\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"wallet\":{\"masterpass\":{\"originUrl\":\"http://www.mysite.com/receipt\"}}}";
+        String data = "{\"apiOperation\":\"UPDATE_SESSION_FROM_WALLET\",\"order\":{\"walletProvider\":\"MASTERPASS_ONLINE\"},\"wallet\":{\"masterpass\":{\"oauthToken\":\"OAUTH_TOKEN\",\"oauthVerifier\":\"OAUTH_VERIFIER\",\"checkoutUrl\":\"https://www.masterpasscheckouturl.com\"}}}";
 
         assertEquals(prettifyJson(data), result);
     }
