@@ -74,6 +74,13 @@ public class ApiService {
         return null;
     }
 
+    /**
+     * Returns the base URL for the API call (either REST or NVP)
+     *
+     * @param gatewayHost
+     * @param apiProtocol
+     * @return base url or throw exception
+     */
     private static String getApiBaseURL(String gatewayHost, ApiProtocol apiProtocol) {
         switch (apiProtocol) {
             case REST:
@@ -255,6 +262,8 @@ public class ApiService {
     }
 
     /**
+     * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
+     *
      * @param request needed to determine the current context
      * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
      * @param source provider for the browser payment (PayPal, UnionPay SecurePay, etc)
@@ -397,6 +406,7 @@ public class ApiService {
 
     /**
      * Parses JSON response from wallet transaction into WalletResponse object
+     *
      * @param response response from API
      * @param provider wallet provider
      * @return WalletResponse
@@ -425,6 +435,12 @@ public class ApiService {
         }
     }
 
+    /**
+     * Checks if the API response contains an error
+     *
+     * @param response from the API call
+     * @return either throw an exception or return null
+     */
     public static ApiException checkForErrorResponse(String response) {
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
@@ -462,6 +478,7 @@ public class ApiService {
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed
+     *
      * @return current context string
      */
     public static String getCurrentContext(HttpServletRequest request) throws MalformedURLException {
@@ -486,6 +503,7 @@ public class ApiService {
 
     /**
      * Helper method to determine if a value is null or blank
+     *
      * @param value
      * @return boolean
      */

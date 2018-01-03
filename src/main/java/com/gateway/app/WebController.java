@@ -644,7 +644,7 @@ public class WebController {
             // Parse session response into CheckoutSession object
             CheckoutSession session = ApiService.parseSessionResponse(sessionResponse);
 
-            // Construct API request
+            // Construct UPDATE_SESSION_FROM_WALLET API request
             ApiRequest req = ApiService.createApiRequest(operation);
             req.setSessionId(session.getId());
             req.setSecureIdResponseUrl(redirectUrl);
