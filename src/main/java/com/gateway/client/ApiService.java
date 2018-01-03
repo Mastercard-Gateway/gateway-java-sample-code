@@ -436,6 +436,22 @@ public class ApiService {
     }
 
     /**
+     * Retrieve a Gateway session using the RETRIEVE_SESSION API
+     * @return
+     */
+    public static CheckoutSession retrieveSession(Config config, String sessionId) {
+        String url = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+        RESTApiClient sessionConnection = new RESTApiClient();
+        try {
+
+        } catch (Exception e) {
+
+        }
+        String sessionResponse = sessionConnection.getTransaction(url, config);
+        return parseSessionResponse(sessionResponse);
+    }
+
+    /**
      * Checks if the API response contains an error
      *
      * @param response from the API call

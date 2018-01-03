@@ -427,13 +427,7 @@ public class WebController {
 
         try {
             // Retrieve session
-            String url = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
-            RESTApiClient sessionConnection = new RESTApiClient();
-
-            String sessionResponse = sessionConnection.getTransaction(url, config);
-
-            // Parse session response into CheckoutSession object
-            CheckoutSession session = ApiService.parseSessionResponse(sessionResponse);
+            CheckoutSession session = ApiService.retrieveSession(config, sessionId);
 
             // Construct API request
             ApiRequest request = ApiService.createApiRequest(operation);
