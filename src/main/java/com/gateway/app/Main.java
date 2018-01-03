@@ -35,7 +35,7 @@ public class Main {
 
     @RequestMapping("/")
     ModelAndView index() {
-        return new ModelAndView("redirect:/authorize");
+        return new ModelAndView("redirect:/pay");
     }
 
     private static void initWebhooksNotificationsFolder() {

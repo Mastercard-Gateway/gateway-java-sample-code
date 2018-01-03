@@ -13,7 +13,11 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import java.io.IOException;
 
-public final class ApiClient {
+/**
+ * Service client class for making API requests using REST protocol using JSON
+ */
+
+public final class RESTApiClient {
 
 
     private static final String UTF8_ENCODING = "UTF-8";
@@ -21,9 +25,10 @@ public final class ApiClient {
 
     /**
      * Performs a PUT operation (required for the following API operations: AUTHORIZE, CAPTURE, PAY, REFUND, UPDATE_AUTHORIZATION, VERIFY, VOID, CHECK_3DS_ENROLLMENT, INITIATE_BROWSER_PAYMENT)
-     * @param data JSON payload
+     *
+     * @param data       JSON payload
      * @param requestUrl API endpoint
-     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param config     contains frequently used information like Merchant ID, API password, etc.
      * @return body
      * @throws Exception
      */
@@ -62,10 +67,16 @@ public final class ApiClient {
     }
 
     /**
+<<<<<<< HEAD:src/main/java/com/gateway/client/RESTApiClient.java
      * Performs a POST operation (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION)
+     *
+     * @param data       JSON payload
+=======
+     * Performs a POST operation with a body (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION, UPDATE_SESSION_FROM_WALLET)
      * @param data JSON payload
+>>>>>>> masterpass:src/main/java/com/gateway/client/ApiClient.java
      * @param requestUrl API endpoint
-     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param config     contains frequently used information like Merchant ID, API password, etc.
      * @return body
      * @throws Exception
      */
@@ -104,9 +115,47 @@ public final class ApiClient {
     }
 
     /**
-     * Performs a GET operation (required for the following API operations: Retrieve session, Retrieve transaction, Retrieve order)
+     * Performs a POST operation without a body (required for creating a generic gateway session)
      * @param requestUrl API endpoint
      * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return body
+     * @throws Exception
+     */
+    public String postTransaction(String requestUrl, Config config) throws Exception {
+        HttpClient httpClient = new HttpClient();
+
+        // Set the API Username and Password in the header authentication field.
+        httpClient.getState().setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
+
+        PostMethod postMethod = new PostMethod(requestUrl);
+
+        postMethod.setDoAuthentication(true);
+
+        HostConfiguration hostConfig = new HostConfiguration();
+        hostConfig.setHost(config.getGatewayHost());
+        configureProxy(httpClient, config);
+        String body = null;
+
+        try {
+            // send the transaction
+            httpClient.executeMethod(hostConfig, postMethod);
+            body = postMethod.getResponseBodyAsString();
+        } catch (IOException ioe) {
+            // we can replace a specific exception that suits your application
+            throw new Exception(ioe);
+        } finally {
+            postMethod.releaseConnection();
+        }
+
+        return body;
+    }
+
+    /**
+     * Performs a GET operation (required for the following API operations: Retrieve session, Retrieve transaction, Retrieve order)
+     *
+     * @param requestUrl API endpoint
+     * @param config     contains frequently used information like Merchant ID, API password, etc.
      * @return body
      * @throws Exception
      */
@@ -142,8 +191,9 @@ public final class ApiClient {
 
     /**
      * Check if proxy config is defined; if so configure the host and http client to tunnel through
+     *
      * @param httpClient
-     * @param config object that contains frequently used information like Merchant ID, API password, etc.
+     * @param config     object that contains frequently used information like Merchant ID, API password, etc.
      * @return void
      */
     private void configureProxy(HttpClient httpClient, Config config) {

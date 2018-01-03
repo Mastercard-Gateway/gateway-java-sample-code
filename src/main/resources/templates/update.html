@@ -7,9 +7,8 @@
         <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
             <h3>Update Authorization</h3>
             <div class="alert alert-warning" role="alert">
-                A valid order ID from an existing authorization is required to update an authorization.
-                <br/><br/>
-                To create an order ID, run the Authorize process first, then enter the order ID from the response below.
+                <p>A valid order ID from an existing authorization is required to update an authorization.</p>
+                <p>To create an order ID, run the Authorize process first, then enter the order ID from the response below.</p>
             </div>
             <fieldset>
                 <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />

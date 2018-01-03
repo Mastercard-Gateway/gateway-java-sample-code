@@ -20,7 +20,6 @@ public class Config {
 
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
-    public static int DEFAULT_API_VERSION = 45;
 
     public Config(String merchantId, String apiPassword, String apiBaseURL) {
         this.merchantId = merchantId;
@@ -31,7 +30,7 @@ public class Config {
             throw new IllegalArgumentException("Merchant ID, Api Password & Api Base URL are required arguments!");
         }
 
-        this.gatewayHost = this.apiBaseURL + "/api/rest";
+        this.gatewayHost = this.apiBaseURL;
         this.apiUsername = "merchant." + this.merchantId;
     }
 
