@@ -19,10 +19,14 @@ public class ApiRequest {
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
     private String apiMethod = "PUT";
+
     private String sessionId;
     private String secureId;
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
+
+    private String walletProvider;
+    private String masterpassOriginUrl;
 
     public String getOrderId() {
         return orderId;
@@ -136,6 +140,14 @@ public class ApiRequest {
         this.returnUrl = returnUrl;
     }
 
+    public String getMasterpassOriginUrl() {
+        return masterpassOriginUrl;
+    }
+
+    public void setMasterpassOriginUrl(String originUrl) {
+        this.masterpassOriginUrl = originUrl;
+    }
+
     public String getBrowserPaymentOperation() {
         return browserPaymentOperation;
     }
@@ -190,5 +202,13 @@ public class ApiRequest {
 
     public void setPaymentAuthResponse(String paymentAuthResponse) {
         this.paymentAuthResponse = paymentAuthResponse;
+    }
+
+    public String getWalletProvider() {
+        return walletProvider;
+    }
+
+    public void setWalletProvider(String walletProvider) {
+        this.walletProvider = walletProvider;
     }
 }

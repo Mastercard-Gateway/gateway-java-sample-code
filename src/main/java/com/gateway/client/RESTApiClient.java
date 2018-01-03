@@ -67,9 +67,14 @@ public final class RESTApiClient {
     }
 
     /**
+<<<<<<< HEAD:src/main/java/com/gateway/client/RESTApiClient.java
      * Performs a POST operation (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION)
      *
      * @param data       JSON payload
+=======
+     * Performs a POST operation with a body (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION, UPDATE_SESSION_FROM_WALLET)
+     * @param data JSON payload
+>>>>>>> masterpass:src/main/java/com/gateway/client/ApiClient.java
      * @param requestUrl API endpoint
      * @param config     contains frequently used information like Merchant ID, API password, etc.
      * @return body
@@ -89,6 +94,43 @@ public final class RESTApiClient {
         // Set the charset to UTF-8
         StringRequestEntity entity = new StringRequestEntity(data, "application/json", UTF8_ENCODING);
         postMethod.setRequestEntity(entity);
+
+        HostConfiguration hostConfig = new HostConfiguration();
+        hostConfig.setHost(config.getGatewayHost());
+        configureProxy(httpClient, config);
+        String body = null;
+
+        try {
+            // send the transaction
+            httpClient.executeMethod(hostConfig, postMethod);
+            body = postMethod.getResponseBodyAsString();
+        } catch (IOException ioe) {
+            // we can replace a specific exception that suits your application
+            throw new Exception(ioe);
+        } finally {
+            postMethod.releaseConnection();
+        }
+
+        return body;
+    }
+
+    /**
+     * Performs a POST operation without a body (required for creating a generic gateway session)
+     * @param requestUrl API endpoint
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return body
+     * @throws Exception
+     */
+    public String postTransaction(String requestUrl, Config config) throws Exception {
+        HttpClient httpClient = new HttpClient();
+
+        // Set the API Username and Password in the header authentication field.
+        httpClient.getState().setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
+
+        PostMethod postMethod = new PostMethod(requestUrl);
+
+        postMethod.setDoAuthentication(true);
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
