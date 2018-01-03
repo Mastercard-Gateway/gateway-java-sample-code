@@ -60,7 +60,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest req = ClientUtil.createBrowserPaymentsRequest(request, "PAY", "PAYPAL");
+            ApiRequest req = ApiService.createBrowserPaymentsRequest(request, "PAY", "PAYPAL");
             mav.setViewName("paypal");
             mav.addObject("apiRequest", req);
         }
@@ -84,7 +84,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest req = ClientUtil.createBrowserPaymentsRequest(request, "AUTHORIZE", "UNION_PAY");
+            ApiRequest req = ApiService.createBrowserPaymentsRequest(request, "AUTHORIZE", "UNION_PAY");
             mav.setViewName("unionpay");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
@@ -115,7 +115,7 @@ public class WebController {
             req.setOrderAmount("10.00");
             req.setOrderCurrency("USD");
             req.setWalletProvider("MASTERPASS_ONLINE");
-            req.setMasterpassOriginUrl(ClientUtil.getCurrentContext(request) + "/masterpassResponse");
+            req.setMasterpassOriginUrl(ApiService.getCurrentContext(request) + "/masterpassResponse");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
         }
@@ -145,15 +145,15 @@ public class WebController {
             ApiClient connection = new ApiClient();
 
             // Create session to use with OPEN_WALLET operation
-            String sessionRequestUrl = ClientUtil.getSessionRequestUrl(config);
+            String sessionRequestUrl = ApiService.getSessionRequestUrl(config);
             String sessionResponse = connection.postTransaction(sessionRequestUrl, config);
-            CheckoutSession checkoutSession = ClientUtil.parseSessionResponse(sessionResponse);
+            CheckoutSession checkoutSession = ApiService.parseSessionResponse(sessionResponse);
 
             // Call OPEN_WALLET to retrieve Masterpass configuration
-            String walletRequestUrl = ClientUtil.getSessionRequestUrl(config, checkoutSession.getId());
-            String data = ClientUtil.buildJSONPayload(request);
+            String walletRequestUrl = ApiService.getSessionRequestUrl(config, checkoutSession.getId());
+            String data = ApiService.buildJSONPayload(request);
             String walletResponse = connection.postTransaction(data, walletRequestUrl, config);
-            WalletResponse wallet = ClientUtil.parseWalletResponse(walletResponse, "masterpass");
+            WalletResponse wallet = ApiService.parseWalletResponse(walletResponse, "masterpass");
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = httpServletRequest.getSession();
@@ -196,15 +196,38 @@ public class WebController {
             ApiRequest req = new ApiRequest();
             req.setWalletProvider("MASTERPASS_ONLINE");
 
-            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
-            String data = ClientUtil.buildJSONPayload(req);
+            String url = ApiService.getSessionRequestUrl(config, sessionId);
+            String data = ApiService.buildJSONPayload(req);
 
             ApiClient connection = new ApiClient();
             String response = connection.postTransaction(data, url, config);
 
             // Make a payment using the session
+            // Construct API request
+            ApiRequest apiReq = ApiService.createApiRequest("PAY");
+            apiReq.setSessionId(sessionId);
+            apiReq.setSourceType("CARD");
+            String payload = ApiService.buildJSONPayload(apiReq);
+            String reqUrl = ApiService.getRequestUrl(config, apiReq);
+
+            // Perform API operation
+            ApiClient apiConnection = new ApiClient();
+            String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+
+            ApiException exception = ApiService.checkForErrorResponse(apiResponse);
+            if(exception != null) {
+                throw exception;
+            }
 
             mav.setViewName("masterpassResponse");
+        }
+        catch(ApiException e) {
+            mav.setViewName("error");
+            logger.error("An error occurred", e);
+            mav.addObject("errorCode", e.getErrorCode());
+            mav.addObject("explanation", e.getExplanation());
+            mav.addObject("field", e.getField());
+            mav.addObject("validationType", e.getValidationType());
         }
         catch(Exception e) {
             mav.setViewName("error");
@@ -222,7 +245,7 @@ public class WebController {
     @GetMapping("/capture")
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
-        ApiRequest req = ClientUtil.createApiRequest("CAPTURE");
+        ApiRequest req = ApiService.createApiRequest("CAPTURE");
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -234,7 +257,7 @@ public class WebController {
     @GetMapping("/refund")
     public ModelAndView showRefund() {
         ModelAndView mav = new ModelAndView("refund");
-        ApiRequest req = ClientUtil.createApiRequest("REFUND");
+        ApiRequest req = ApiService.createApiRequest("REFUND");
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -246,7 +269,7 @@ public class WebController {
     @GetMapping("/retrieve")
     public ModelAndView showRetrieve() {
         ModelAndView mav = new ModelAndView("retrieve");
-        ApiRequest req = ClientUtil.createApiRequest("RETRIEVE_TRANSACTION");
+        ApiRequest req = ApiService.createApiRequest("RETRIEVE_TRANSACTION");
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -258,8 +281,8 @@ public class WebController {
     @GetMapping("/update")
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
-        ApiRequest req = ClientUtil.createApiRequest("UPDATE_AUTHORIZATION");
-        req.setTransactionId(ClientUtil.randomNumber());
+        ApiRequest req = ApiService.createApiRequest("UPDATE_AUTHORIZATION");
+        req.setTransactionId(ApiService.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -271,8 +294,8 @@ public class WebController {
     @GetMapping("/void")
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
-        ApiRequest req = ClientUtil.createApiRequest("VOID");
-        req.setTransactionId(ClientUtil.randomNumber());
+        ApiRequest req = ApiService.createApiRequest("VOID");
+        req.setTransactionId(ApiService.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -300,18 +323,18 @@ public class WebController {
 
         ApiRequest req = new ApiRequest();
         req.setApiOperation("CREATE_CHECKOUT_SESSION");
-        req.setOrderId(ClientUtil.randomNumber());
+        req.setOrderId(ApiService.randomNumber());
         req.setOrderCurrency("USD");
 
-        String requestUrl = ClientUtil.getSessionRequestUrl(config);
+        String requestUrl = ApiService.getSessionRequestUrl(config);
 
-        String data = ClientUtil.buildJSONPayload(req);
+        String data = ApiService.buildJSONPayload(req);
 
         try {
             ApiClient connection = new ApiClient();
             String resp = connection.postTransaction(data, requestUrl, config);
 
-            CheckoutSession checkoutSession = ClientUtil.parseSessionResponse(resp);
+            CheckoutSession checkoutSession = ApiService.parseSessionResponse(resp);
 
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
@@ -344,11 +367,11 @@ public class WebController {
                 req.setApiOperation("RETRIEVE_ORDER");
                 req.setOrderId(orderId);
 
-                String requestUrl = ClientUtil.getRequestUrl(config, req);
+                String requestUrl = ApiService.getRequestUrl(config, req);
 
                 ApiClient connection = new ApiClient();
                 String resp = connection.getTransaction(requestUrl, config);
-                TransactionResponse hostedCheckoutResponse = ClientUtil.parseHostedCheckoutResponse(resp);
+                TransactionResponse hostedCheckoutResponse = ApiService.parseHostedCheckoutResponse(resp);
 
                 mav.addObject("response", hostedCheckoutResponse);
                 mav.setViewName("receipt");
@@ -383,18 +406,18 @@ public class WebController {
 
         try {
             // Retrieve session
-            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
+            String url = ApiService.getSessionRequestUrl(config, sessionId);
             ApiClient sessionConnection = new ApiClient();
             String sessionResponse = sessionConnection.getTransaction(url, config);
 
             // Parse session response into CheckoutSession object
-            CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
+            CheckoutSession session = ApiService.parseSessionResponse(sessionResponse);
 
             // Construct API request
-            ApiRequest request = ClientUtil.createApiRequest(operation);
+            ApiRequest request = ApiService.createApiRequest(operation);
             request.setSessionId(session.getId());
-            String jsonPayload = ClientUtil.buildJSONPayload(request);
-            String requestUrl = ClientUtil.getRequestUrl(config, request);
+            String jsonPayload = ApiService.buildJSONPayload(request);
+            String requestUrl = ApiService.getRequestUrl(config, request);
 
             // Perform API operation
             ApiClient apiConnection = new ApiClient();
@@ -432,8 +455,8 @@ public class WebController {
 
         ModelAndView mav = new ModelAndView();
 
-        String requestUrl = ClientUtil.getRequestUrl(config, request);
-        String jsonPayload = ClientUtil.buildJSONPayload(request);
+        String requestUrl = ApiService.getRequestUrl(config, request);
+        String jsonPayload = ApiService.buildJSONPayload(request);
 
         String resp = "";
 
@@ -472,14 +495,14 @@ public class WebController {
     public ModelAndView processBrowserPayment(ApiRequest request) {
         ModelAndView mav = new ModelAndView();
 
-        String requestUrl = ClientUtil.getRequestUrl(config, request);
-        String jsonPayload = ClientUtil.buildJSONPayload(request);
+        String requestUrl = ApiService.getRequestUrl(config, request);
+        String jsonPayload = ApiService.buildJSONPayload(request);
 
         try {
             ApiClient connection = new ApiClient();
             String resp = connection.sendTransaction(jsonPayload, requestUrl, config);
             // Redirect to provider's website
-            mav.setViewName("redirect:" + ClientUtil.getBrowserPaymentRedirectUrl(resp));
+            mav.setViewName("redirect:" + ApiService.getBrowserPaymentRedirectUrl(resp));
         } catch (Exception e) {
             mav.setViewName("error");
             mav.addObject("cause", e.getCause());
@@ -503,14 +526,14 @@ public class WebController {
         ApiRequest apiReq = new ApiRequest();
         apiReq.setTransactionId(transactionId);
         apiReq.setOrderId(orderId);
-        String requestUrl = ClientUtil.getRequestUrl(config, apiReq);
+        String requestUrl = ApiService.getRequestUrl(config, apiReq);
 
         String data = "";
         try {
             // Retrieve transaction
             ApiClient connection = new ApiClient();
             String resp = connection.getTransaction(requestUrl, config);
-            BrowserPaymentResponse browserPaymentResponse = ClientUtil.parseBrowserPaymentResponse(resp);
+            BrowserPaymentResponse browserPaymentResponse = ApiService.parseBrowserPaymentResponse(resp);
 
             if(browserPaymentResponse.getApiResult().equals(ApiResponses.SUCCESS.toString()) && browserPaymentResponse.getInteractionStatus().equals(ApiResponses.COMPLETED.toString())) {
                 mav.addObject("response", browserPaymentResponse);
@@ -546,33 +569,33 @@ public class WebController {
 
         try {
             // Retrieve session
-            String url = ClientUtil.getSessionRequestUrl(config, sessionId);
+            String url = ApiService.getSessionRequestUrl(config, sessionId);
             ApiClient sessionConnection = new ApiClient();
             String sessionResponse = sessionConnection.getTransaction(url, config);
 
             // Parse session response into CheckoutSession object
-            CheckoutSession session = ClientUtil.parseSessionResponse(sessionResponse);
+            CheckoutSession session = ApiService.parseSessionResponse(sessionResponse);
 
             // Construct API request
-            ApiRequest req = ClientUtil.createApiRequest(operation);
+            ApiRequest req = ApiService.createApiRequest(operation);
             req.setSessionId(session.getId());
             req.setSecureIdResponseUrl(redirectUrl);
-            String jsonPayload = ClientUtil.buildJSONPayload(req);
+            String jsonPayload = ApiService.buildJSONPayload(req);
 
             // Create a unique identifier to use for 3DSecure
-            String secureId = ClientUtil.randomNumber();
+            String secureId = ApiService.randomNumber();
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = request.getSession();
             httpSession.setAttribute("secureId", secureId);
             httpSession.setAttribute("sessionId", session.getId());
-            String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
+            String requestUrl = ApiService.getSecureIdRequest(config, secureId);
 
             // Perform API operation
             ApiClient apiConnection = new ApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
-            SecureId secureIdObject = ClientUtil.parse3DSecureResponse(apiResponse);
+            SecureId secureIdObject = ApiService.parse3DSecureResponse(apiResponse);
 
             if(secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("secureIdPayerAuthenticationForm");
@@ -620,20 +643,20 @@ public class WebController {
             session.removeAttribute("sessionId");
 
             // Process Access Control Server (ACS) result
-            String requestUrl = ClientUtil.getSecureIdRequest(config, secureId);
+            String requestUrl = ApiService.getSecureIdRequest(config, secureId);
             ApiClient connection = new ApiClient();
 
-            String data = ClientUtil.buildJSONPayload(req);
+            String data = ApiService.buildJSONPayload(req);
             String resp = connection.postTransaction(data, requestUrl, config);
-            SecureId secureIdObject = ClientUtil.parse3DSecureResponse(resp);
+            SecureId secureIdObject = ApiService.parse3DSecureResponse(resp);
 
             if(!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
-                ApiRequest apiReq = ClientUtil.createApiRequest("AUTHORIZE");
+                ApiRequest apiReq = ApiService.createApiRequest("AUTHORIZE");
                 apiReq.setSessionId(sessionId);
                 apiReq.setSecureId(secureId);
-                String payload = ClientUtil.buildJSONPayload(apiReq);
-                String reqUrl = ClientUtil.getRequestUrl(config, apiReq);
+                String payload = ApiService.buildJSONPayload(apiReq);
+                String reqUrl = ApiService.getRequestUrl(config, apiReq);
 
                 // Perform API operation
                 ApiClient apiConnection = new ApiClient();
@@ -670,5 +693,4 @@ public class WebController {
         mav.addObject("config", config);
         return mav;
     }
-
 }

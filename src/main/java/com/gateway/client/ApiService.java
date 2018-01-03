@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ClientUtil {
+public class ApiService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClientUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
 
     /**
      * Constructs an object used to complete the API. Contains information about which operation to target and what info is needed in the request body.
@@ -27,8 +27,8 @@ public class ClientUtil {
         req.setApiOperation(apiOperation);
         req.setOrderAmount("5000");
         req.setOrderCurrency("USD");
-        req.setOrderId(ClientUtil.randomNumber());
-        req.setTransactionId(ClientUtil.randomNumber());
+        req.setOrderId(ApiService.randomNumber());
+        req.setTransactionId(ApiService.randomNumber());
         if(apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
             req.setTransactionCurrency("USD");
             req.setTransactionAmount("5000");
@@ -202,8 +202,8 @@ public class ClientUtil {
         try {
             ApiRequest req = new ApiRequest();
             req.setApiOperation("INITIATE_BROWSER_PAYMENT");
-            req.setTransactionId(ClientUtil.randomNumber());
-            req.setOrderId(ClientUtil.randomNumber());
+            req.setTransactionId(ApiService.randomNumber());
+            req.setOrderId(ApiService.randomNumber());
             req.setBrowserPaymentOperation(operation);
             req.setSourceType(source);
             req.setReturnUrl(getCurrentContext(request) + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
@@ -358,6 +358,23 @@ public class ClientUtil {
         catch(Exception e) {
             logger.error("Unable to parse Masterpass response", e);
             throw e;
+        }
+    }
+
+    public static ApiException checkForErrorResponse(String response) {
+
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        JsonObject errorJson = json.get("error").getAsJsonObject();
+
+        if(errorJson != null) {
+            ApiException apiException = new ApiException();
+            apiException.setErrorCode(errorJson.get("cause").getAsString());
+            apiException.setExplanation(errorJson.get("explanation").getAsString());
+            apiException.setField(errorJson.get("field").getAsString());
+            apiException.setValidationType(errorJson.get("validationType").getAsString());
+            return apiException;
+        } else {
+            return null;
         }
     }
 

@@ -5,7 +5,7 @@
 <div class="col-9">
     <div class="row">
         <form action="#" class="col-12 form-horizontal" th:action="@{/processMasterpass}" th:object="${apiRequest}" method="post">
-            <h3>Masterpass</h3>
+            <h3>Pay with Masterpass</h3>
             <div class="alert alert-warning" role="alert">
                 <p>This page is for demonstration purposes only, to collect information like order amount and currency in order to generate the Masterpass button. In practical use this would be collected behind the scenes.</p>
                 <p>View the full Masterpass documentation <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/masterPassOnline.html'}" target="_blank">here</a>.</p>
