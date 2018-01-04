@@ -25,23 +25,41 @@
                 <h3>Pay</h3>
                 <div class="alert alert-warning" role="alert">
                     <p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
+                    <p>You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
-                <p>Please enter your payment details:</p>
-                <div class="input-block">
-                    <label for='card-number'>Card number:</label>
-                    <input type="text" id="card-number" class="input-field" value="" readonly>
+                <div class="mb-4">
+                    <h6>Payment details</h6>
+                    <div class="input-block">
+                        <label for='card-number'>Card number:</label>
+                        <input type="text" id="card-number" class="input-field" value="" readonly>
+                    </div>
+                    <div class="input-block">
+                        <label for='expiry-month'>Expiry month:</label>
+                        <input type="text" id="expiry-month" class="input-field" value="">
+                    </div>
+                    <div class="input-block">
+                        <label for='expiry-year'>Expiry year:</label>
+                        <input type="text" id="expiry-year" class="input-field" value="">
+                    </div>
+                    <div class="input-block">
+                        <label for='security-code'>Security code:</label>
+                        <input type="text" id="security-code" class="input-field" value="" readonly>
+                    </div>
                 </div>
-                <div class="input-block">
-                    <label for='expiry-month'>Expiry month:</label>
-                    <input type="text" id="expiry-month" class="input-field" value="">
-                </div>
-                <div class="input-block">
-                    <label for='expiry-year'>Expiry year:</label>
-                    <input type="text" id="expiry-year" class="input-field" value="">
-                </div>
-                <div class="input-block">
-                    <label for='security-code'>Security code:</label>
-                    <input type="text" id="security-code" class="input-field" value="" readonly>
+                <div>
+                    <h6>Order details</h6>
+                    <div class="input-block">
+                        <label for='order-id'>Order ID:</label>
+                        <input type="text" id="order-id" class="input-field" value="" readonly>
+                    </div>
+                    <div class="input-block">
+                        <label for='order-amount'>Order amount:</label>
+                        <input type="text" id="order-amount" class="input-field" value="" readonly>
+                    </div>
+                    <div class="input-block">
+                        <label for='description'>Description:</label>
+                        <input type="text" id="description" class="input-field" value="" readonly>
+                    </div>
                 </div>
                 <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay</button>
             </div>

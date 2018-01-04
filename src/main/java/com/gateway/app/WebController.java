@@ -428,13 +428,10 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            // Retrieve session
-            CheckoutSession session = ApiService.retrieveSession(config, sessionId);
-
             // Construct API request
             ApiRequest request = ApiService.createApiRequest(operation);
             //README: Question to Ellen - Do we need to retrieve the session again? It seems we just need from session is its id, which we already have? right?
-            request.setSessionId(session.getId());
+            request.setSessionId(sessionId);
             String jsonPayload = ApiService.buildJSONPayload(request);
             String requestUrl = ApiService.getRequestUrl(ApiProtocol.REST, config, request);
 

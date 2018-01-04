@@ -45,6 +45,7 @@ PaymentSession.configure({
                     }
                     else {
                         //process operation
+                        // TODO need to do post here instead
                         window.location.href = JavaSample.endpoint() + JavaSample.operation() + "/" + response.session.id + JavaSample.params();
                     }
                 } else if ("fields_in_error" == response.status) {
