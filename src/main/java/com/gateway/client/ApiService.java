@@ -22,7 +22,7 @@ public class ApiService {
     /**
      * Constructs an object used to complete the API. Contains information about which operation to target and what info is needed in the request body.
      *
-     * @param apiOperation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
+     * @param apiOperation  indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
      * @return ApiRequest
      */
     public static ApiRequest createApiRequest(String apiOperation) {
@@ -54,8 +54,8 @@ public class ApiService {
     /**
      * Constructs API endpoint
      *
-     * @param apiProtocol REST or NVP
-     * @param config      contains frequently used information like Merchant ID, API password, etc.
+     * @param apiProtocol   REST or NVP
+     * @param config        contains frequently used information like Merchant ID, API password, etc.
      * @return url
      */
     public static String getRequestUrl(ApiProtocol apiProtocol, Config config, ApiRequest request) {
@@ -199,6 +199,7 @@ public class ApiService {
 
         JsonObject sourceOfFunds = new JsonObject();
         if (notNullOrEmpty(request.getSourceType())) sourceOfFunds.addProperty("type", request.getSourceType());
+        if (notNullOrEmpty(request.getSourceToken())) sourceOfFunds.addProperty("token", request.getSourceToken());
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
         JsonObject browserPayment = new JsonObject();
@@ -264,9 +265,9 @@ public class ApiService {
     /**
      * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
      *
-     * @param request needed to determine the current context
+     * @param request   needed to determine the current context
      * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
-     * @param source provider for the browser payment (PayPal, UnionPay SecurePay, etc)
+     * @param source    provider for the browser payment (PayPal, UnionPay SecurePay, etc)
      * @return ApiRequest
      * @throws MalformedURLException
      */
@@ -437,18 +438,27 @@ public class ApiService {
 
     /**
      * Retrieve a Gateway session using the RETRIEVE_SESSION API
-     * @return
+     * @param config    contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId used to target a specific session
+     * @return parsed session or throw exception
      */
-    public static CheckoutSession retrieveSession(Config config, String sessionId) {
+    public static CheckoutSession retrieveSession(Config config, String sessionId) throws Exception {
         String url = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
         RESTApiClient sessionConnection = new RESTApiClient();
         try {
-
+            String sessionResponse = sessionConnection.getTransaction(url, config);
+            return parseSessionResponse(sessionResponse);
         } catch (Exception e) {
-
+            logger.error("Unable to retrieve session", e);
+            throw e;
         }
-        String sessionResponse = sessionConnection.getTransaction(url, config);
-        return parseSessionResponse(sessionResponse);
+    }
+
+    public static String getMasterpassToken(String response) {
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+        JsonObject walletJson = json.get("wallet").getAsJsonObject();
+        JsonObject masterpassJson = walletJson.get("masterpass").getAsJsonObject();
+        return masterpassJson.get("requestToken").getAsString();
     }
 
     /**
@@ -463,11 +473,11 @@ public class ApiService {
         JsonObject errorJson = json.get("error").getAsJsonObject();
 
         if(errorJson != null) {
-            ApiException apiException = new ApiException();
-            apiException.setErrorCode(errorJson.get("cause").getAsString());
-            apiException.setExplanation(errorJson.get("explanation").getAsString());
-            apiException.setField(errorJson.get("field").getAsString());
-            apiException.setValidationType(errorJson.get("validationType").getAsString());
+            ApiException apiException = new ApiException("The API returned an error");
+            if(errorJson.has("cause")) apiException.setErrorCode(errorJson.get("cause").getAsString());
+            if(errorJson.has("explanation")) apiException.setExplanation(errorJson.get("explanation").getAsString());
+            if(errorJson.has("field")) apiException.setField(errorJson.get("field").getAsString());
+            if(errorJson.has("validationType")) apiException.setValidationType(errorJson.get("validationType").getAsString());
             return apiException;
         } else {
             return null;

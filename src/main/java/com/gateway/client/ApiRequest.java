@@ -6,6 +6,7 @@ public class ApiRequest {
     private String transactionId;
     private String apiOperation;
     private String sourceType;
+    private String sourceToken;
     private String cardNumber;
     private String expiryMonth;
     private String expiryYear;
@@ -27,6 +28,14 @@ public class ApiRequest {
 
     private String walletProvider;
     private String masterpassOriginUrl;
+
+    public String getSourceToken() {
+        return sourceToken;
+    }
+
+    public void setSourceToken(String sourceToken) {
+        this.sourceToken = sourceToken;
+    }
 
     public String getOrderId() {
         return orderId;

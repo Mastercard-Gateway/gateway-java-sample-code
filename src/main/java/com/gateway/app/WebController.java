@@ -206,7 +206,7 @@ public class WebController {
         String sessionId = (String) session.getAttribute("sessionId");
 
         try {
-            // Retrieve payment details from wallet using session ID
+            // UPDATE_WALLET_FROM_SESSION - Retrieve payment details from wallet using session ID
             ApiRequest req = new ApiRequest();
             req.setWalletProvider("MASTERPASS_ONLINE");
 
@@ -216,11 +216,13 @@ public class WebController {
             RESTApiClient connection = new RESTApiClient();
             String response = connection.postTransaction(data, url, config);
 
+            String token = ApiService.getMasterpassToken(response);
+
             // Make a payment using the session
             // Construct API request
             ApiRequest apiReq = ApiService.createApiRequest("PAY");
             apiReq.setSessionId(sessionId);
-            apiReq.setSourceType("CARD");
+            apiReq.setSourceToken(token);
             String payload = ApiService.buildJSONPayload(apiReq);
             String reqUrl = ApiService.getRequestUrl(ApiProtocol.REST, config, apiReq);
 
@@ -237,7 +239,7 @@ public class WebController {
         }
         catch(ApiException e) {
             mav.setViewName("error");
-            logger.error("An error occurred", e);
+            logger.error(e.getMessage());
             mav.addObject("errorCode", e.getErrorCode());
             mav.addObject("explanation", e.getExplanation());
             mav.addObject("field", e.getField());
@@ -630,13 +632,7 @@ public class WebController {
 
         try {
             // Retrieve session
-            String url = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
-            RESTApiClient sessionConnection = new RESTApiClient();
-
-            String sessionResponse = sessionConnection.getTransaction(url, config);
-
-            // Parse session response into CheckoutSession object
-            CheckoutSession session = ApiService.parseSessionResponse(sessionResponse);
+            CheckoutSession session = ApiService.retrieveSession(config, sessionId);
 
             // Construct UPDATE_SESSION_FROM_WALLET API request
             ApiRequest req = ApiService.createApiRequest(operation);

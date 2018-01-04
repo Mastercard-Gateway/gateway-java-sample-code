@@ -7,6 +7,10 @@ public class ApiException extends Exception {
     private String field;
     private String validationType;
 
+    public ApiException(String message) {
+        super(message);
+    }
+
     public String getErrorCode() {
         return errorCode;
     }
