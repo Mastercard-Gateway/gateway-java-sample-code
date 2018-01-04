@@ -27,10 +27,22 @@
                     <p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
                 </div>
                 <p>Please enter your payment details:</p>
-                <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
-                <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
-                <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
-                <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
+                <div class="input-block">
+                    <label for='card-number'>Card number:</label>
+                    <input type="text" id="card-number" class="input-field" value="" readonly>
+                </div>
+                <div class="input-block">
+                    <label for='expiry-month'>Expiry month:</label>
+                    <input type="text" id="expiry-month" class="input-field" value="">
+                </div>
+                <div class="input-block">
+                    <label for='expiry-year'>Expiry year:</label>
+                    <input type="text" id="expiry-year" class="input-field" value="">
+                </div>
+                <div class="input-block">
+                    <label for='security-code'>Security code:</label>
+                    <input type="text" id="security-code" class="input-field" value="" readonly>
+                </div>
                 <button class="btn btn-primary" id="payButton" onclick="pay();">Pay</button>
             </div>
         </div>
