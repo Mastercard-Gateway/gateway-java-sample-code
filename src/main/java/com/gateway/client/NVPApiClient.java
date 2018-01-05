@@ -3,7 +3,6 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.methods.PostMethod;
 
 import java.io.IOException;
@@ -56,7 +55,6 @@ public final class NVPApiClient {
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
         String body = null;
 
         try {
@@ -79,31 +77,5 @@ public final class NVPApiClient {
     private void populateAuthenticationData(PostMethod postMethod, Config config) {
         postMethod.addParameter("apiUsername", "merchant." + config.getMerchantId());
         postMethod.addParameter("apiPassword", config.getApiPassword());
-    }
-
-    /**
-     * Check if proxy config is defined; if so configure the host and http client to tunnel through
-     *
-     * @param httpClient
-     * @param config     object that contains frequently used information like Merchant ID, API password, etc.
-     * @return void
-     */
-    private void configureProxy(HttpClient httpClient, Config config) {
-        // If proxy server is defined, set the host configuration.
-        if (config.getProxyServer() != null) {
-            HostConfiguration hostConfig = httpClient.getHostConfiguration();
-            hostConfig.setHost(config.getGatewayHost());
-            hostConfig.setProxy(config.getProxyServer(), config.getProxyPort());
-
-        }
-        // If proxy authentication is defined, set proxy credentials
-        if (config.getProxyUsername() != null) {
-            NTCredentials proxyCredentials =
-                    new NTCredentials(config.getProxyUsername(),
-                            config.getProxyPassword(), config.getGatewayHost(),
-                            config.getNtDomain());
-            httpClient.getState().setProxyCredentials(config.getProxyAuthType(),
-                    config.getProxyServer(), proxyCredentials);
-        }
     }
 }
