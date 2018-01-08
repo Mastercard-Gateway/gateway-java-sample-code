@@ -13,7 +13,7 @@
         endpoint: function() {
             return "/check3dsEnrollment/";
         },
-        params: function() {
+        redirectUrl: function() {
             return encodeURI("?redirectUrl=" + window.location.protocol + "//" + window.location.host + "/" + redirectUrlEndpoint);
         }
     };

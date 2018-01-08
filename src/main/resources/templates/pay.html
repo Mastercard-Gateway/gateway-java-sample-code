@@ -7,10 +7,10 @@
             return "PAY";
         },
         endpoint: function() {
-            return "/process/";
+            return "processHostedSession";
         },
-        params: function() {
-            return "";
+        redirectUrl: function() {
+            return null;
         }
     };
 </script>
@@ -50,18 +50,26 @@
                     <h6>Order details</h6>
                     <div class="input-block">
                         <label for='order-id'>Order ID:</label>
-                        <input type="text" id="order-id" class="input-field" value="" readonly>
+                        <input type="text" id="order-id" class="input-field" th:value="${request.orderId}">
                     </div>
                     <div class="input-block">
                         <label for='order-amount'>Order amount:</label>
-                        <input type="text" id="order-amount" class="input-field" value="" readonly>
+                        <input type="text" id="order-amount" class="input-field" th:value="${request.orderAmount}" maxlength="14">
                     </div>
                     <div class="input-block">
-                        <label for='description'>Description:</label>
-                        <input type="text" id="description" class="input-field" value="" readonly>
+                        <label for='order-currency'>Order currency:</label>
+                        <input type="text" id="order-currency" class="input-field" th:value="${request.orderCurrency}" maxlength="3">
+                    </div>
+                    <div class="input-block">
+                        <label for='order-description'>Description:</label>
+                        <input type="text" id="order-description" style="width: 325px;" class="input-field" th:value="${request.orderDescription}" maxlength="127">
+                    </div>
+                    <div class="input-block">
+                        <label for='transaction-id'>Transaction ID:</label>
+                        <input type="text" id="transaction-id" class="input-field" th:value="${request.transactionId}">
                     </div>
                 </div>
-                <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay</button>
+                <button type="submit" class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay</button>
             </div>
         </div>
     </div> <!-- row -->

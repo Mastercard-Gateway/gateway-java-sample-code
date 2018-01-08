@@ -2,18 +2,18 @@ package com.gateway.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -31,7 +31,7 @@ public class WebController {
      */
     @GetMapping("/authorize")
     public ModelAndView showAuthorize() {
-        return createModel("authorize");
+        return createHostedSessionModel("authorize");
     }
 
     /**
@@ -41,7 +41,7 @@ public class WebController {
      */
     @GetMapping("/pay")
     public ModelAndView showPay() {
-        return createModel("pay");
+        return createHostedSessionModel("pay");
     }
 
     /**
@@ -51,7 +51,7 @@ public class WebController {
      */
     @GetMapping("/payThroughNVP")
     public ModelAndView showPayThroughNVP() {
-        return createModel("payThroughNVP");
+        return createHostedSessionModel("payThroughNVP");
     }
 
     /**
@@ -61,7 +61,7 @@ public class WebController {
      */
     @GetMapping("/verify")
     public ModelAndView showVerify() {
-        return createModel("verify");
+        return createHostedSessionModel("verify");
     }
 
     /**
@@ -206,7 +206,7 @@ public class WebController {
         String sessionId = (String) session.getAttribute("sessionId");
 
         try {
-            // UPDATE_WALLET_FROM_SESSION - Retrieve payment details from wallet using session ID
+            // UPDATE_SESSION_FROM_WALLET - Retrieve payment details from wallet using session ID
             ApiRequest req = new ApiRequest();
             req.setWalletProvider("MASTERPASS_ONLINE");
 
@@ -216,13 +216,10 @@ public class WebController {
             RESTApiClient connection = new RESTApiClient();
             String response = connection.postTransaction(data, url, config);
 
-            String token = ApiService.getMasterpassToken(response);
-
             // Make a payment using the session
             // Construct API request
             ApiRequest apiReq = ApiService.createApiRequest("PAY");
             apiReq.setSessionId(sessionId);
-            apiReq.setSourceToken(token);
             String payload = ApiService.buildJSONPayload(apiReq);
             String reqUrl = ApiService.getRequestUrl(ApiProtocol.REST, config, apiReq);
 
@@ -418,28 +415,23 @@ public class WebController {
     /**
      * This method processes the API request for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
      *
-     * @param operation indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
-     * @param sessionId used to retrieve session created in hostedSession.js
-     * @return ModelAndView for api response page or error page
+     * @param apiRequest needed to retrieve various data to complete API operation
+     * @return ModelAndView for API response page or error page
      */
-    @GetMapping("/process/{operation}/{sessionId}")
-    public ModelAndView processHostedSession(@PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId) {
+    @PostMapping("/processHostedSession")
+    public ModelAndView processHostedSession(@RequestBody ApiRequest apiRequest) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
-            // Construct API request
-            ApiRequest request = ApiService.createApiRequest(operation);
-            //README: Question to Ellen - Do we need to retrieve the session again? It seems we just need from session is its id, which we already have? right?
-            request.setSessionId(sessionId);
-            String jsonPayload = ApiService.buildJSONPayload(request);
-            String requestUrl = ApiService.getRequestUrl(ApiProtocol.REST, config, request);
+            String jsonPayload = ApiService.buildJSONPayload(apiRequest);
+            String requestUrl = ApiService.getRequestUrl(ApiProtocol.REST, config, apiRequest);
 
             // Perform API operation
             RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
-            // Send info on transaction to view
+            // Format request/response for easy viewing
             ObjectMapper mapper = new ObjectMapper();
             Object prettyResp = mapper.readValue(apiResponse, Object.class);
             Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
@@ -447,8 +439,8 @@ public class WebController {
             mav.setViewName("apiResponse");
             mav.addObject("config", config);
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getApiMethod());
+            mav.addObject("operation", apiRequest.getApiOperation());
+            mav.addObject("method", apiRequest.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
@@ -466,19 +458,12 @@ public class WebController {
      * @return ModelAndView for api response page or error page
      */
     @PostMapping("/processPayThroughNVP")
-    public ModelAndView processNVPHostedSession(HttpServletRequest request) {
+    public ModelAndView processNVPHostedSession(@RequestBody ApiRequest apiRequest) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest apiRequest = ApiService.createApiRequest(request.getParameter("operation"));
             apiRequest.setApiMethod("POST");
-
-            String sessionId = request.getParameter("session-id");
-
-            System.out.println("sessionId = " + sessionId);
-
-            apiRequest.setSessionId(sessionId);
 
             String requestUrl = ApiService.getRequestUrl(ApiProtocol.NVP, config, apiRequest);
             Map<String, String> dataMap = ApiService.buildMap(apiRequest);
@@ -490,7 +475,6 @@ public class WebController {
             mav.addObject("operation", apiRequest.getApiOperation());
             mav.addObject("method", apiRequest.getApiMethod());
             mav.addObject("request", dataMap);
-            mav.addObject("apiRequest", dataMap);
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
             mav.setViewName("error");
@@ -742,9 +726,20 @@ public class WebController {
         return mav;
     }
 
-    private ModelAndView createModel(String viewName) {
+    private ModelAndView createHostedSessionModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);
+
+        // Add some prefilled data - can be changed by user
+        ApiRequest request = new ApiRequest();
+        request.setOrderId(ApiService.randomNumber());
+        request.setTransactionId(ApiService.randomNumber());
+        request.setOrderAmount("50.00");
+        request.setOrderCurrency("USD");
+        request.setOrderDescription("Wonderful product that you should buy!");
+
+        mav.addObject("request", request);
         mav.addObject("config", config);
+
         return mav;
     }
 }

@@ -37,17 +37,27 @@ PaymentSession.configure({
                         console.log("The user entered a MasterCard credit card.")
                     }
 
-                    if (JavaSample.protocol === "NVP") {
-                        //Make a POST call
-                        var $form = $("#formPay");
-                        $('#session-id').val(response.session.id);
-                        $form.submit();
-                    }
-                    else {
-                        //process operation
-                        // TODO need to do post here instead
-                        window.location.href = JavaSample.endpoint() + JavaSample.operation() + "/" + response.session.id + JavaSample.params();
-                    }
+                    var data = {
+                        apiOperation: JavaSample.operation(),
+                        sessionId: response.session.id,
+                        transactionId: $('#transaction-id').val(),
+                        orderId: $('#order-id').val(),
+                        orderAmount: $('#order-amount').val(),
+                        orderCurrency: $('#order-currency').val(),
+                        orderDescription: $('#order-description').val(),
+                        redirectUrl: JavaSample.redirectUrl()
+                    };
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', JavaSample.endpoint(), true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState == XMLHttpRequest.DONE) {
+                            document.documentElement.innerHTML =this.response;
+                        }
+                    };
+                    xhr.send(JSON.stringify(data));
+
                 } else if ("fields_in_error" == response.status) {
 
                     console.log("Session update failed with field errors.");

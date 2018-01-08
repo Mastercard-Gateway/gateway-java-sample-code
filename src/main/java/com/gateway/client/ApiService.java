@@ -454,13 +454,6 @@ public class ApiService {
         }
     }
 
-    public static String getMasterpassToken(String response) {
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject walletJson = json.get("wallet").getAsJsonObject();
-        JsonObject masterpassJson = walletJson.get("masterpass").getAsJsonObject();
-        return masterpassJson.get("requestToken").getAsString();
-    }
-
     /**
      * Checks if the API response contains an error
      *

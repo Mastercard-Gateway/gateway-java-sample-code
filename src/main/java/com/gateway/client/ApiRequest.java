@@ -12,8 +12,9 @@ public class ApiRequest {
     private String expiryYear;
     private String securityCode;
     private String orderAmount;
-    private String transactionAmount;
     private String orderCurrency;
+    private String orderDescription;
+    private String transactionAmount;
     private String transactionCurrency;
     private String targetTransactionId;
     private String returnUrl;
@@ -123,6 +124,14 @@ public class ApiRequest {
 
     public void setOrderCurrency(String orderCurrency) {
         this.orderCurrency = orderCurrency;
+    }
+
+    public String getOrderDescription() {
+        return orderDescription;
+    }
+
+    public void setOrderDescription(String orderDescription) {
+        this.orderDescription = orderDescription;
     }
 
     public String getTransactionCurrency() {

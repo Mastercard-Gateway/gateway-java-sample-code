@@ -129,3 +129,6 @@ input {
     margin-right: 10px;
     margin-bottom: 0;
 }
+.input-field {
+    padding: 5px;
+}
