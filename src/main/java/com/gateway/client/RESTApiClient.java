@@ -1,6 +1,8 @@
 package com.gateway.client;
 
 import com.gateway.app.Config;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -50,30 +52,6 @@ public final class RESTApiClient {
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
         return executeHTTPMethod(httpClient, putMethod, hostConfig);
-    }
-
-    /**
-     * Execute HTTP method for the HTTP client and Host configuration
-     *
-     * @param httpClient
-     * @param httpMethod
-     * @param hostConfig
-     * @return
-     * @throws Exception
-     */
-    private String executeHTTPMethod(HttpClient httpClient, HttpMethod httpMethod, HostConfiguration hostConfig) throws Exception {
-        String body;
-        try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, httpMethod);
-            body = httpMethod.getResponseBodyAsString();
-        } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
-            throw new Exception(ioe);
-        } finally {
-            httpMethod.releaseConnection();
-        }
-        return body;
     }
 
     /**
@@ -150,5 +128,55 @@ public final class RESTApiClient {
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
         return executeHTTPMethod(httpClient, getMethod, hostConfig);
+    }
+
+    /**
+     * Execute HTTP method for the HTTP client and Host configuration
+     *
+     * @param httpClient
+     * @param httpMethod
+     * @param hostConfig
+     * @return
+     * @throws Exception
+     */
+    private String executeHTTPMethod(HttpClient httpClient, HttpMethod httpMethod, HostConfiguration hostConfig) throws Exception {
+        String body;
+        try {
+            // send the transaction
+            httpClient.executeMethod(hostConfig, httpMethod);
+            body = httpMethod.getResponseBodyAsString();
+            checkForErrorResponse(body);
+        }
+        catch (ApiException apiException) {
+            throw apiException;
+        }
+        catch (IOException ioe) {
+            // we can replace a specific exception that suits your application
+            throw new Exception(ioe);
+        } finally {
+            httpMethod.releaseConnection();
+        }
+        return body;
+    }
+
+    /**
+     * Checks if the API response contains an error
+     *
+     * @param response from the API call
+     * @return either throw an exception or return null
+     */
+    private static void checkForErrorResponse(String response) throws ApiException {
+
+        JsonObject json = new Gson().fromJson(response, JsonObject.class);
+
+        if (json.has("error")) {
+            JsonObject errorJson = json.get("error").getAsJsonObject();
+            ApiException apiException = new ApiException("The API returned an error");
+            if(errorJson.has("cause")) apiException.setErrorCode(errorJson.get("cause").getAsString());
+            if(errorJson.has("explanation")) apiException.setExplanation(errorJson.get("explanation").getAsString());
+            if(errorJson.has("field")) apiException.setField(errorJson.get("field").getAsString());
+            if(errorJson.has("validationType")) apiException.setValidationType(errorJson.get("validationType").getAsString());
+            throw apiException;
+        }
     }
 }
