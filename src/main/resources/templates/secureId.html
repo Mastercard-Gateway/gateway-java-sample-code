@@ -22,10 +22,11 @@
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
-                <h3>Authorize with 3DS</h3>
+                <h3>Pay with 3DS</h3>
                 <div class="alert alert-warning" role="alert">
+                    <p><strong>NOTE:</strong> You can also do an authorization using 3D Secure, depending on your merchant settings.</p>
+                    <p>Here are the processes that occur for this transaction:</p>
                     <ol>
-                        <p>Here are the processes that occur for this transaction:</p>
                         <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Checkout%20Session.html'}" target="_blank">CREATE_CHECKOUT_SESSION</a> operation to collect sensitive card data.</li>
                         <li><a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20%20Check%203DS%20Enrollment.html'}" target="_blank">Check</a> if the card is enrolled in 3D Secure. If the card is enrolled, the call will return the HTML of the authentication form of the issuer, to which you will redirect the user. This example uses a simulator.</li>
                         <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}" target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.</li>
@@ -74,7 +75,7 @@
                         <input type="text" id="transaction-id" class="input-field" th:value="${request.transactionId}">
                     </div>
                 </div>
-                <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Authorize with 3DS</button>
+                <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay with 3DS</button>
             </div>
         </div>
     </div> <!-- row -->

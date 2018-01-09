@@ -10,7 +10,7 @@
             return "processPayThroughNVP";
         },
         protocol: "NVP",
-        redirectUrl: function () {
+        secureIdResponseUrl: function () {
             return null;
         }
     };
@@ -27,7 +27,8 @@
             <div class="col-md-12">
                 <h3>Pay with NVP (name-value pair) protocol</h3>
                 <div class="alert alert-warning" role="alert">
-                    <p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
+                    <p><strong>NOTE:</strong> You can also do an authorization via NVP, depending on your merchant settings.</p>
+                    <p>In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
                     <p>You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
                 <div class="mb-4">

@@ -31,8 +31,8 @@ public class ApiService {
         req.setOrderId(ApiService.randomNumber());
         req.setTransactionId(ApiService.randomNumber());
         if (apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND")) {
-            req.setTransactionCurrency("USD");
-            req.setTransactionAmount("5000");
+            //req.setTransactionCurrency("USD");
+            //req.setTransactionAmount("5000");
             req.setOrderId(null);
         }
         if (apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
@@ -278,6 +278,9 @@ public class ApiService {
             req.setApiOperation("INITIATE_BROWSER_PAYMENT");
             req.setTransactionId(ApiService.randomNumber());
             req.setOrderId(ApiService.randomNumber());
+            req.setOrderAmount("50.00");
+            req.setOrderCurrency("USD");
+            req.setOrderDescription("Wonderful product that you should buy!");
             req.setBrowserPaymentOperation(operation);
             req.setSourceType(source);
             req.setReturnUrl(getCurrentContext(request) + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
