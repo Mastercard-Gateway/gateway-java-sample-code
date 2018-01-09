@@ -3,8 +3,11 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import com.google.gson.*;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ui.Model;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
@@ -383,7 +386,6 @@ public class ApiService {
             TransactionResponse resp = new TransactionResponse();
 
             JsonObject json = new Gson().fromJson(response, JsonObject.class);
-            JsonObject transactionJson = json.get("transaction").getAsJsonObject();
             JsonObject orderJson = json.get("order").getAsJsonObject();
             JsonObject responseJson = json.getAsJsonObject("response").getAsJsonObject();
 
@@ -395,7 +397,7 @@ public class ApiService {
 
             return resp;
         } catch (Exception e) {
-            logger.error("Unable to parse Hosted Checkout response due to ", e);
+            logger.error("Unable to parse Masterpass response", e);
             throw e;
         }
 
@@ -486,29 +488,6 @@ public class ApiService {
     }
 
     /**
-     * Checks if the API response contains an error
-     *
-     * @param response from the API call
-     * @return either throw an exception or return null
-     */
-    public static ApiException checkForErrorResponse(String response) {
-
-        JsonObject json = new Gson().fromJson(response, JsonObject.class);
-
-        if (json.has("error")) {
-            JsonObject errorJson = json.get("error").getAsJsonObject();
-            ApiException apiException = new ApiException("The API returned an error");
-            if(errorJson.has("cause")) apiException.setErrorCode(errorJson.get("cause").getAsString());
-            if(errorJson.has("explanation")) apiException.setExplanation(errorJson.get("explanation").getAsString());
-            if(errorJson.has("field")) apiException.setField(errorJson.get("field").getAsString());
-            if(errorJson.has("validationType")) apiException.setValidationType(errorJson.get("validationType").getAsString());
-            return apiException;
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Retrieve redirect URL from browser payment response
      *
      * @param response response from API
@@ -540,6 +519,38 @@ public class ApiService {
             logger.error("Unable to parse return URL", e);
             throw e;
         }
+    }
+
+    /**
+     * Constructs the view model for an API error response
+     *
+     * @param mav model from controller
+     * @param e ApiException
+     * @return mav
+     */
+    public static ModelAndView constructApiErrorResponse(ModelAndView mav, ApiException e) {
+        mav.setViewName("error");
+        logger.error(e.getMessage());
+        mav.addObject("errorCode", e.getErrorCode());
+        mav.addObject("explanation", e.getExplanation());
+        mav.addObject("field", e.getField());
+        mav.addObject("validationType", e.getValidationType());
+        return mav;
+    }
+
+    /**
+     * Constructs the view model for a general error response
+     *
+     * @param mav model from controller
+     * @param e Exception
+     * @return mav
+     */
+    public static ModelAndView constructGeneralErrorResponse(ModelAndView mav, Exception e) {
+        mav.setViewName("error");
+        logger.error("An error occurred", e);
+        mav.addObject("cause", e.getCause());
+        mav.addObject("message", e.getMessage());
+        return mav;
     }
 
     /**
