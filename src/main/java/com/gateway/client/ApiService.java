@@ -1,10 +1,7 @@
 package com.gateway.client;
 
 import com.gateway.app.Config;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,6 +170,9 @@ public class ApiService {
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
                 if(notNullOrEmpty(request.getMasterpassOriginUrl())) masterpass.addProperty("originUrl", request.getMasterpassOriginUrl());
+                if(notNullOrEmpty(request.getMasterpassOauthToken())) masterpass.addProperty("oauthToken", request.getMasterpassOauthToken());
+                if(notNullOrEmpty(request.getMasterpassOauthVerifier())) masterpass.addProperty("oauthVerifier", request.getMasterpassOauthVerifier());
+                if(notNullOrEmpty(request.getMasterpassCheckoutUrl())) masterpass.addProperty("checkoutUrl", request.getMasterpassCheckoutUrl());
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
@@ -371,6 +371,37 @@ public class ApiService {
     }
 
     /**
+     * Parses JSON response from Masterpass transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    public static TransactionResponse parseMasterpassResponse(String response) {
+
+        try {
+
+            TransactionResponse resp = new TransactionResponse();
+
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject transactionJson = json.get("transaction").getAsJsonObject();
+            JsonObject orderJson = json.get("order").getAsJsonObject();
+            JsonObject responseJson = json.getAsJsonObject("response").getAsJsonObject();
+
+            resp.setApiResult(json.get("result").getAsString());
+            resp.setGatewayCode(responseJson.get("gatewayCode").getAsString());
+            resp.setOrderAmount(orderJson.get("amount").getAsString());
+            resp.setOrderCurrency(orderJson.get("currency").getAsString());
+            resp.setOrderId(orderJson.get("id").getAsString());
+
+            return resp;
+        } catch (Exception e) {
+            logger.error("Unable to parse Hosted Checkout response due to ", e);
+            throw e;
+        }
+
+    }
+
+    /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object
      *
      * @param response response from API
@@ -463,9 +494,9 @@ public class ApiService {
     public static ApiException checkForErrorResponse(String response) {
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject errorJson = json.get("error").getAsJsonObject();
 
-        if(errorJson != null) {
+        if (json.has("error")) {
+            JsonObject errorJson = json.get("error").getAsJsonObject();
             ApiException apiException = new ApiException("The API returned an error");
             if(errorJson.has("cause")) apiException.setErrorCode(errorJson.get("cause").getAsString());
             if(errorJson.has("explanation")) apiException.setExplanation(errorJson.get("explanation").getAsString());

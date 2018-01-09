@@ -37,6 +37,7 @@ PaymentSession.configure({
                         console.log("The user entered a MasterCard credit card.")
                     }
 
+                    // Submit fields
                     var data = {
                         apiOperation: JavaSample.operation(),
                         sessionId: response.session.id,
@@ -45,7 +46,7 @@ PaymentSession.configure({
                         orderAmount: $('#order-amount').val(),
                         orderCurrency: $('#order-currency').val(),
                         orderDescription: $('#order-description').val(),
-                        redirectUrl: JavaSample.redirectUrl()
+                        secureIdResponseUrl: JavaSample.secureIdResponseUrl()
                     };
 
                     var xhr = new XMLHttpRequest();

@@ -163,6 +163,8 @@ public class WebController {
             String sessionResponse = connection.postTransaction(sessionRequestUrl, config);
             CheckoutSession checkoutSession = ApiService.parseSessionResponse(sessionResponse);
 
+            // TODO Update session with order information (description, id, amount, etc)
+
             // Call OPEN_WALLET to retrieve Masterpass configuration
             String walletRequestUrl = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, checkoutSession.getId());
             String data = ApiService.buildJSONPayload(request);
@@ -208,7 +210,11 @@ public class WebController {
         try {
             // UPDATE_SESSION_FROM_WALLET - Retrieve payment details from wallet using session ID
             ApiRequest req = new ApiRequest();
+            req.setApiOperation("UPDATE_SESSION_FROM_WALLET");
             req.setWalletProvider("MASTERPASS_ONLINE");
+            req.setMasterpassOauthToken(oauthToken);
+            req.setMasterpassOauthVerifier(oauthVerifier);
+            req.setMasterpassCheckoutUrl(checkoutResourceUrl);
 
             String url = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
             String data = ApiService.buildJSONPayload(req);
@@ -230,9 +236,11 @@ public class WebController {
             ApiException exception = ApiService.checkForErrorResponse(apiResponse);
             if(exception != null) {
                 throw exception;
+            } else {
+                TransactionResponse masterpassResponse = ApiService.parseMasterpassResponse(apiResponse);
+                mav.setViewName("receipt");
+                mav.addObject("response", masterpassResponse);
             }
-
-            mav.setViewName("masterpassResponse");
         }
         catch(ApiException e) {
             mav.setViewName("error");
@@ -325,10 +333,7 @@ public class WebController {
      */
     @GetMapping("/secureId")
     public ModelAndView showSecureId() {
-        ModelAndView mav = new ModelAndView("secureId");
-        mav.addObject("config", config);
-        mav.addObject("redirectUrlEndpoint", "process3ds");
-        return mav;
+        return createHostedSessionModel("secureId");
     }
 
     /**
@@ -601,25 +606,20 @@ public class WebController {
      * Otherwise, it displays an error.
      *
      * @param request     needed to store 3DSecure ID and session ID in HttpSession
-     * @param operation   indicates which API operation is to be invoked (PAY, AUTHORIZE, VERIFY)
-     * @param sessionId   store in HttpSession to to retrieve after returning from issuer authentication form
-     * @param redirectUrl indicates where the user should be redirected to after completing issuer authentication
+     * @param apiRequest needed to retrieve various data to complete API operation
      * @return ModelAndView - displays issuer authentication form or error page
      */
-    @GetMapping("/check3dsEnrollment/{operation}/{sessionId}")
-    public ModelAndView check3dsEnrollment(HttpServletRequest request, @PathVariable(value = "operation") String operation, @PathVariable(value = "sessionId") String sessionId, @RequestParam("redirectUrl") String redirectUrl) {
+    @PostMapping("/check3dsEnrollment")
+    public ModelAndView check3dsEnrollment(HttpServletRequest request, @RequestBody ApiRequest apiRequest) {
 
         ModelAndView mav = new ModelAndView();
 
         try {
             // Retrieve session
-            CheckoutSession session = ApiService.retrieveSession(config, sessionId);
+            CheckoutSession session = ApiService.retrieveSession(config, apiRequest.getSessionId());
 
             // Construct UPDATE_SESSION_FROM_WALLET API request
-            ApiRequest req = ApiService.createApiRequest(operation);
-            req.setSessionId(session.getId());
-            req.setSecureIdResponseUrl(redirectUrl);
-            String jsonPayload = ApiService.buildJSONPayload(req);
+            String jsonPayload = ApiService.buildJSONPayload(apiRequest);
 
             // Create a unique identifier to use for 3DSecure
             String secureId = ApiService.randomNumber();
@@ -635,17 +635,32 @@ public class WebController {
             RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
-            SecureId secureIdObject = ApiService.parse3DSecureResponse(apiResponse);
-
-            if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
-                mav.setViewName("secureIdPayerAuthenticationForm");
-                mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
-            } else {
-                mav.setViewName("error");
-                mav.addObject("cause", secureIdObject.getStatus());
-                mav.addObject("message", "Card not enrolled in 3DS.");
+            ApiException exception = ApiService.checkForErrorResponse(apiResponse);
+            if(exception != null) {
+                throw exception;
             }
-        } catch (Exception e) {
+            else {
+                SecureId secureIdObject = ApiService.parse3DSecureResponse(apiResponse);
+
+                if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
+                    mav.setViewName("secureIdPayerAuthenticationForm");
+                    mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
+                } else {
+                    mav.setViewName("error");
+                    mav.addObject("cause", secureIdObject.getStatus());
+                    mav.addObject("message", "Card not enrolled in 3DS.");
+                }
+            }
+        }
+        catch(ApiException e) {
+            mav.setViewName("error");
+            logger.error(e.getMessage());
+            mav.addObject("errorCode", e.getErrorCode());
+            mav.addObject("explanation", e.getExplanation());
+            mav.addObject("field", e.getField());
+            mav.addObject("validationType", e.getValidationType());
+        }
+        catch (Exception e) {
             mav.setViewName("error");
             logger.error("An error occurred", e);
             mav.addObject("cause", e.getCause());
