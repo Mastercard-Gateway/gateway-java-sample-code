@@ -2,8 +2,6 @@ package com.gateway.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 import java.util.Map;
 
 @Controller

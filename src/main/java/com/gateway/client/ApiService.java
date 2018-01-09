@@ -3,10 +3,8 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import com.google.gson.*;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.tomcat.util.log.UserDataHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
