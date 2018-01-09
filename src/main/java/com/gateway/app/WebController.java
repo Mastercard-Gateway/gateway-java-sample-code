@@ -126,18 +126,17 @@ public class WebController {
         try {
             mav.setViewName("masterpass");
             ApiRequest req = new ApiRequest();
-            req.setOrderAmount("10.00");
+            req.setOrderId(ApiService.randomNumber());
+            req.setOrderAmount("50.00");
             req.setOrderCurrency("USD");
+            req.setOrderDescription("Wonderful product that you should buy!");
             req.setWalletProvider("MASTERPASS_ONLINE");
             req.setMasterpassOriginUrl(ApiService.getCurrentContext(request) + "/masterpassResponse");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
         }
         catch(Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -163,12 +162,19 @@ public class WebController {
             String sessionResponse = connection.postTransaction(sessionRequestUrl, config);
             CheckoutSession checkoutSession = ApiService.parseSessionResponse(sessionResponse);
 
-            // TODO Update session with order information (description, id, amount, etc)
+            // Call UPDATE_SESSION to add order information to session
+            String updateSessionRequestUrl = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, checkoutSession.getId());
+            ApiRequest updateSessionRequest = new ApiRequest();
+            updateSessionRequest.setOrderAmount(request.getOrderAmount());
+            updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
+            updateSessionRequest.setOrderId(request.getOrderId());
+            String updateSessionPayload = ApiService.buildJSONPayload(updateSessionRequest);
+            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
 
             // Call OPEN_WALLET to retrieve Masterpass configuration
             String walletRequestUrl = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, checkoutSession.getId());
-            String data = ApiService.buildJSONPayload(request);
-            String walletResponse = connection.postTransaction(data, walletRequestUrl, config);
+            String openWalletPayload = ApiService.buildJSONPayload(request);
+            String walletResponse = connection.postTransaction(openWalletPayload, walletRequestUrl, config);
             WalletResponse wallet = ApiService.parseWalletResponse(walletResponse, "masterpass");
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
@@ -180,10 +186,7 @@ public class WebController {
             mav.addObject("config", config);
             mav.addObject("checkoutSession", checkoutSession);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -233,28 +236,16 @@ public class WebController {
             RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
 
-            ApiException exception = ApiService.checkForErrorResponse(apiResponse);
-            if(exception != null) {
-                throw exception;
-            } else {
-                TransactionResponse masterpassResponse = ApiService.parseMasterpassResponse(apiResponse);
-                mav.setViewName("receipt");
-                mav.addObject("response", masterpassResponse);
-            }
+            TransactionResponse masterpassResponse = ApiService.parseMasterpassResponse(apiResponse);
+            mav.setViewName("receipt");
+            mav.addObject("response", masterpassResponse);
+
         }
         catch(ApiException e) {
-            mav.setViewName("error");
-            logger.error(e.getMessage());
-            mav.addObject("errorCode", e.getErrorCode());
-            mav.addObject("explanation", e.getExplanation());
-            mav.addObject("field", e.getField());
-            mav.addObject("validationType", e.getValidationType());
+            ApiService.constructApiErrorResponse(mav, e);
         }
         catch(Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -366,10 +357,7 @@ public class WebController {
             mav.addObject("orderId", req.getOrderId());
             mav.addObject("checkoutSession", checkoutSession);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -408,10 +396,7 @@ public class WebController {
                 mav.addObject("message", "There was a problem completing your transaction.");
             }
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -449,10 +434,7 @@ public class WebController {
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -482,10 +464,7 @@ public class WebController {
             mav.addObject("request", dataMap);
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -524,10 +503,7 @@ public class WebController {
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -551,9 +527,7 @@ public class WebController {
             // Redirect to provider's website
             mav.setViewName("redirect:" + ApiService.getBrowserPaymentRedirectUrl(resp));
         } catch (Exception e) {
-            mav.setViewName("error");
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -593,10 +567,7 @@ public class WebController {
                 mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
             }
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause().toString());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -635,36 +606,22 @@ public class WebController {
             RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
-            ApiException exception = ApiService.checkForErrorResponse(apiResponse);
-            if(exception != null) {
-                throw exception;
-            }
-            else {
-                SecureId secureIdObject = ApiService.parse3DSecureResponse(apiResponse);
+            SecureId secureIdObject = ApiService.parse3DSecureResponse(apiResponse);
 
-                if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
-                    mav.setViewName("secureIdPayerAuthenticationForm");
-                    mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
-                } else {
-                    mav.setViewName("error");
-                    mav.addObject("cause", secureIdObject.getStatus());
-                    mav.addObject("message", "Card not enrolled in 3DS.");
-                }
+            if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
+                mav.setViewName("secureIdPayerAuthenticationForm");
+                mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
+            } else {
+                mav.setViewName("error");
+                mav.addObject("cause", secureIdObject.getStatus());
+                mav.addObject("message", "Card not enrolled in 3DS.");
             }
         }
         catch(ApiException e) {
-            mav.setViewName("error");
-            logger.error(e.getMessage());
-            mav.addObject("errorCode", e.getErrorCode());
-            mav.addObject("explanation", e.getExplanation());
-            mav.addObject("field", e.getField());
-            mav.addObject("validationType", e.getValidationType());
+            ApiService.constructApiErrorResponse(mav, e);
         }
         catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -733,10 +690,7 @@ public class WebController {
                 mav.addObject("message", "3DS authentication failed. Please try again with another card.");
             }
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }

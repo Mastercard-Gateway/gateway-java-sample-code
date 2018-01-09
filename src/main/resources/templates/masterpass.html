@@ -35,6 +35,13 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                    <div class="col-md-7">
+                        <input id="order-id" th:field="*{orderId}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-md-7 control-label" for="order-amount">Amount</label>
                     <div class="col-md-7">
                         <input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>
@@ -45,13 +52,6 @@
                     <label class="col-md-7 control-label" for="order-currency">Currency</label>
                     <div class="col-md-7">
                         <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
-
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-7 control-label" for="order-description">Description</label>
-                    <div class="col-md-7">
-                        <input id="order-description" th:field="*{orderDescription}" type="text" placeholder="" class="form-control input-md" required=""/>
 
                     </div>
                 </div>
