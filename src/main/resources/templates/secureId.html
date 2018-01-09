@@ -26,10 +26,10 @@
                 <div class="alert alert-warning" role="alert">
                     <ol>
                         <p>Here are the processes that occur for this transaction:</p>
-                        <li>Create Hosted Session for the card details</li>
-                        <li>Check for 3DS enrollment using Hosted Session</li>
-                        <li>Redirect the user to the ACS simulator (in a real-life scenario this would be the issuer's authentication form)</li>
-                        <li>Complete the payment or authorization using the session ID and the 3D Secure ID</li>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Checkout%20Session.html'}" target="_blank">CREATE_CHECKOUT_SESSION</a> operation to collect sensitive card data.</li>
+                        <li><a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20%20Check%203DS%20Enrollment.html'}" target="_blank">Check</a> if the card is enrolled in 3D Secure. If the card is enrolled, the call will return the HTML of the authentication form of the issuer, to which you will redirect the user. This example uses a simulator.</li>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}" target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.</li>
+                        <li>Use session.id and 3DSecureId to complete the transaction using <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html'}" target="_blank">PAY</a> or <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html'}" target="_blank">AUTHORIZE</a>.</li>
                     </ol>
                 </div>
                 <div class="mb-4">
