@@ -2,31 +2,52 @@ package com.gateway.client;
 
 public class ApiRequest {
 
-    private String orderId;
-    private String transactionId;
     private String apiOperation;
+    private String apiMethod = "PUT";
     private String sourceType;
+    private String sourceToken;
+
+    // Order details
+    private String orderId;
+    private String orderAmount;
+    private String orderCurrency;
+    private String orderDescription;
+    private String transactionId;
+    private String targetTransactionId;
+    private String transactionAmount;
+    private String transactionCurrency;
+
+    // Card data
     private String cardNumber;
     private String expiryMonth;
     private String expiryYear;
     private String securityCode;
-    private String orderAmount;
-    private String transactionAmount;
-    private String orderCurrency;
-    private String transactionCurrency;
-    private String targetTransactionId;
+
+    // Browser payments properties
     private String returnUrl;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
-    private String apiMethod = "PUT";
 
+    // 3DS properties
     private String sessionId;
     private String secureId;
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
+    // Wallet properties
     private String walletProvider;
     private String masterpassOriginUrl;
+    private String masterpassOauthToken;
+    private String masterpassOauthVerifier;
+    private String masterpassCheckoutUrl;
+
+    public String getSourceToken() {
+        return sourceToken;
+    }
+
+    public void setSourceToken(String sourceToken) {
+        this.sourceToken = sourceToken;
+    }
 
     public String getOrderId() {
         return orderId;
@@ -114,6 +135,14 @@ public class ApiRequest {
 
     public void setOrderCurrency(String orderCurrency) {
         this.orderCurrency = orderCurrency;
+    }
+
+    public String getOrderDescription() {
+        return orderDescription;
+    }
+
+    public void setOrderDescription(String orderDescription) {
+        this.orderDescription = orderDescription;
     }
 
     public String getTransactionCurrency() {
@@ -210,5 +239,29 @@ public class ApiRequest {
 
     public void setWalletProvider(String walletProvider) {
         this.walletProvider = walletProvider;
+    }
+
+    public String getMasterpassOauthToken() {
+        return masterpassOauthToken;
+    }
+
+    public void setMasterpassOauthToken(String masterpassOauthToken) {
+        this.masterpassOauthToken = masterpassOauthToken;
+    }
+
+    public String getMasterpassOauthVerifier() {
+        return masterpassOauthVerifier;
+    }
+
+    public void setMasterpassOauthVerifier(String masterpassOauthVerifier) {
+        this.masterpassOauthVerifier = masterpassOauthVerifier;
+    }
+
+    public String getMasterpassCheckoutUrl() {
+        return masterpassCheckoutUrl;
+    }
+
+    public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
+        this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
 }

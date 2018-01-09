@@ -1,10 +1,7 @@
 package com.gateway.client;
 
 import com.gateway.app.Config;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +19,7 @@ public class ApiService {
     /**
      * Constructs an object used to complete the API. Contains information about which operation to target and what info is needed in the request body.
      *
-     * @param apiOperation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
+     * @param apiOperation  indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
      * @return ApiRequest
      */
     public static ApiRequest createApiRequest(String apiOperation) {
@@ -54,8 +51,8 @@ public class ApiService {
     /**
      * Constructs API endpoint
      *
-     * @param apiProtocol REST or NVP
-     * @param config      contains frequently used information like Merchant ID, API password, etc.
+     * @param apiProtocol   REST or NVP
+     * @param config        contains frequently used information like Merchant ID, API password, etc.
      * @return url
      */
     public static String getRequestUrl(ApiProtocol apiProtocol, Config config, ApiRequest request) {
@@ -74,6 +71,13 @@ public class ApiService {
         return null;
     }
 
+    /**
+     * Returns the base URL for the API call (either REST or NVP)
+     *
+     * @param gatewayHost
+     * @param apiProtocol
+     * @return base url or throw exception
+     */
     private static String getApiBaseURL(String gatewayHost, ApiProtocol apiProtocol) {
         switch (apiProtocol) {
             case REST:
@@ -166,6 +170,9 @@ public class ApiService {
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
                 if(notNullOrEmpty(request.getMasterpassOriginUrl())) masterpass.addProperty("originUrl", request.getMasterpassOriginUrl());
+                if(notNullOrEmpty(request.getMasterpassOauthToken())) masterpass.addProperty("oauthToken", request.getMasterpassOauthToken());
+                if(notNullOrEmpty(request.getMasterpassOauthVerifier())) masterpass.addProperty("oauthVerifier", request.getMasterpassOauthVerifier());
+                if(notNullOrEmpty(request.getMasterpassCheckoutUrl())) masterpass.addProperty("checkoutUrl", request.getMasterpassCheckoutUrl());
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
@@ -192,6 +199,7 @@ public class ApiService {
 
         JsonObject sourceOfFunds = new JsonObject();
         if (notNullOrEmpty(request.getSourceType())) sourceOfFunds.addProperty("type", request.getSourceType());
+        if (notNullOrEmpty(request.getSourceToken())) sourceOfFunds.addProperty("token", request.getSourceToken());
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
         JsonObject browserPayment = new JsonObject();
@@ -255,9 +263,11 @@ public class ApiService {
     }
 
     /**
-     * @param request needed to determine the current context
+     * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
+     *
+     * @param request   needed to determine the current context
      * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
-     * @param source provider for the browser payment (PayPal, UnionPay SecurePay, etc)
+     * @param source    provider for the browser payment (PayPal, UnionPay SecurePay, etc)
      * @return ApiRequest
      * @throws MalformedURLException
      */
@@ -361,6 +371,37 @@ public class ApiService {
     }
 
     /**
+     * Parses JSON response from Masterpass transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    public static TransactionResponse parseMasterpassResponse(String response) {
+
+        try {
+
+            TransactionResponse resp = new TransactionResponse();
+
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            JsonObject transactionJson = json.get("transaction").getAsJsonObject();
+            JsonObject orderJson = json.get("order").getAsJsonObject();
+            JsonObject responseJson = json.getAsJsonObject("response").getAsJsonObject();
+
+            resp.setApiResult(json.get("result").getAsString());
+            resp.setGatewayCode(responseJson.get("gatewayCode").getAsString());
+            resp.setOrderAmount(orderJson.get("amount").getAsString());
+            resp.setOrderCurrency(orderJson.get("currency").getAsString());
+            resp.setOrderId(orderJson.get("id").getAsString());
+
+            return resp;
+        } catch (Exception e) {
+            logger.error("Unable to parse Hosted Checkout response due to ", e);
+            throw e;
+        }
+
+    }
+
+    /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object
      *
      * @param response response from API
@@ -397,6 +438,7 @@ public class ApiService {
 
     /**
      * Parses JSON response from wallet transaction into WalletResponse object
+     *
      * @param response response from API
      * @param provider wallet provider
      * @return WalletResponse
@@ -425,17 +467,41 @@ public class ApiService {
         }
     }
 
+    /**
+     * Retrieve a Gateway session using the RETRIEVE_SESSION API
+     * @param config    contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId used to target a specific session
+     * @return parsed session or throw exception
+     */
+    public static CheckoutSession retrieveSession(Config config, String sessionId) throws Exception {
+        String url = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+        RESTApiClient sessionConnection = new RESTApiClient();
+        try {
+            String sessionResponse = sessionConnection.getTransaction(url, config);
+            return parseSessionResponse(sessionResponse);
+        } catch (Exception e) {
+            logger.error("Unable to retrieve session", e);
+            throw e;
+        }
+    }
+
+    /**
+     * Checks if the API response contains an error
+     *
+     * @param response from the API call
+     * @return either throw an exception or return null
+     */
     public static ApiException checkForErrorResponse(String response) {
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
-        JsonObject errorJson = json.get("error").getAsJsonObject();
 
-        if(errorJson != null) {
-            ApiException apiException = new ApiException();
-            apiException.setErrorCode(errorJson.get("cause").getAsString());
-            apiException.setExplanation(errorJson.get("explanation").getAsString());
-            apiException.setField(errorJson.get("field").getAsString());
-            apiException.setValidationType(errorJson.get("validationType").getAsString());
+        if (json.has("error")) {
+            JsonObject errorJson = json.get("error").getAsJsonObject();
+            ApiException apiException = new ApiException("The API returned an error");
+            if(errorJson.has("cause")) apiException.setErrorCode(errorJson.get("cause").getAsString());
+            if(errorJson.has("explanation")) apiException.setExplanation(errorJson.get("explanation").getAsString());
+            if(errorJson.has("field")) apiException.setField(errorJson.get("field").getAsString());
+            if(errorJson.has("validationType")) apiException.setValidationType(errorJson.get("validationType").getAsString());
             return apiException;
         } else {
             return null;
@@ -462,6 +528,7 @@ public class ApiService {
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed
+     *
      * @return current context string
      */
     public static String getCurrentContext(HttpServletRequest request) throws MalformedURLException {
@@ -486,6 +553,7 @@ public class ApiService {
 
     /**
      * Helper method to determine if a value is null or blank
+     *
      * @param value
      * @return boolean
      */

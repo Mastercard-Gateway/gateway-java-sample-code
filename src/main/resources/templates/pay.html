@@ -7,10 +7,10 @@
             return "PAY";
         },
         endpoint: function() {
-            return "/process/";
+            return "processHostedSession";
         },
-        params: function() {
-            return "";
+        secureIdResponseUrl: function() {
+            return null;
         }
     };
 </script>
@@ -25,13 +25,51 @@
                 <h3>Pay</h3>
                 <div class="alert alert-warning" role="alert">
                     <p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
+                    <p>You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
-                <p>Please enter your payment details:</p>
-                <p>Card Number: <input type="text" id="card-number" class="input-field" value="" readonly></p>
-                <p>Expiry Month:<input type="text" id="expiry-month" class="input-field" value=""></p>
-                <p>Expiry Year:<input type="text" id="expiry-year" class="input-field" value=""></p>
-                <p>Security Code:<input type="text" id="security-code" class="input-field" value="" readonly></p>
-                <button class="btn btn-primary" id="payButton" onclick="pay();">Pay</button>
+                <div class="mb-4">
+                    <h6>Payment details</h6>
+                    <div class="input-block">
+                        <label for='card-number'>Card number:</label>
+                        <input type="text" id="card-number" class="input-field" value="" readonly>
+                    </div>
+                    <div class="input-block">
+                        <label for='expiry-month'>Expiry month:</label>
+                        <input type="text" id="expiry-month" class="input-field" value="">
+                    </div>
+                    <div class="input-block">
+                        <label for='expiry-year'>Expiry year:</label>
+                        <input type="text" id="expiry-year" class="input-field" value="">
+                    </div>
+                    <div class="input-block">
+                        <label for='security-code'>Security code:</label>
+                        <input type="text" id="security-code" class="input-field" value="" readonly>
+                    </div>
+                </div>
+                <div>
+                    <h6>Order details</h6>
+                    <div class="input-block">
+                        <label for='order-id'>Order ID:</label>
+                        <input type="text" id="order-id" class="input-field" th:value="${request.orderId}">
+                    </div>
+                    <div class="input-block">
+                        <label for='order-amount'>Order amount:</label>
+                        <input type="text" id="order-amount" class="input-field" th:value="${request.orderAmount}" maxlength="14">
+                    </div>
+                    <div class="input-block">
+                        <label for='order-currency'>Order currency:</label>
+                        <input type="text" id="order-currency" class="input-field" th:value="${request.orderCurrency}" maxlength="3">
+                    </div>
+                    <div class="input-block">
+                        <label for='order-description'>Description:</label>
+                        <input type="text" id="order-description" style="width: 325px;" class="input-field" th:value="${request.orderDescription}" maxlength="127">
+                    </div>
+                    <div class="input-block">
+                        <label for='transaction-id'>Transaction ID:</label>
+                        <input type="text" id="transaction-id" class="input-field" th:value="${request.transactionId}">
+                    </div>
+                </div>
+                <button type="submit" class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay</button>
             </div>
         </div>
     </div> <!-- row -->
