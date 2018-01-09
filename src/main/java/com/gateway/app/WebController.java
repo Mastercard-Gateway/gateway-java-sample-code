@@ -79,10 +79,7 @@ public class WebController {
             mav.setViewName("paypal");
             mav.addObject("apiRequest", req);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -104,10 +101,7 @@ public class WebController {
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
         } catch (Exception e) {
-            mav.setViewName("error");
-            logger.error("An error occurred", e);
-            mav.addObject("cause", e.getCause());
-            mav.addObject("message", e.getMessage());
+            ApiService.constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -185,6 +179,8 @@ public class WebController {
             mav.addObject("wallet", wallet);
             mav.addObject("config", config);
             mav.addObject("checkoutSession", checkoutSession);
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -356,6 +352,8 @@ public class WebController {
             mav.addObject("config", config);
             mav.addObject("orderId", req.getOrderId());
             mav.addObject("checkoutSession", checkoutSession);
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -395,7 +393,11 @@ public class WebController {
                 mav.addObject("cause", "Payment was unsuccessful");
                 mav.addObject("message", "There was a problem completing your transaction.");
             }
-        } catch (Exception e) {
+        }
+        catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
+        }
+        catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
 
@@ -433,6 +435,8 @@ public class WebController {
             mav.addObject("method", apiRequest.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -463,6 +467,8 @@ public class WebController {
             mav.addObject("method", apiRequest.getApiMethod());
             mav.addObject("request", dataMap);
             mav.addObject("requestUrl", requestUrl);
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -502,6 +508,8 @@ public class WebController {
             mav.addObject("method", request.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -526,6 +534,8 @@ public class WebController {
             String resp = connection.sendTransaction(jsonPayload, requestUrl, config);
             // Redirect to provider's website
             mav.setViewName("redirect:" + ApiService.getBrowserPaymentRedirectUrl(resp));
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -566,6 +576,8 @@ public class WebController {
                 mav.addObject("cause", browserPaymentResponse.getApiResult());
                 mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
             }
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
@@ -689,6 +701,8 @@ public class WebController {
                 mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
                 mav.addObject("message", "3DS authentication failed. Please try again with another card.");
             }
+        } catch (ApiException e) {
+            ApiService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
