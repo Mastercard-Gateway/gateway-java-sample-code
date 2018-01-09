@@ -3,7 +3,7 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NTCredentials;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -49,34 +49,38 @@ public final class RESTApiClient {
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
-        String body = null;
+        return executeHTTPMethod(httpClient, putMethod, hostConfig);
+    }
 
+    /**
+     * Execute HTTP method for the HTTP client and Host configuration
+     *
+     * @param httpClient
+     * @param httpMethod
+     * @param hostConfig
+     * @return
+     * @throws Exception
+     */
+    private String executeHTTPMethod(HttpClient httpClient, HttpMethod httpMethod, HostConfiguration hostConfig) throws Exception {
+        String body;
         try {
             // send the transaction
-            httpClient.executeMethod(hostConfig, putMethod);
-            body = putMethod.getResponseBodyAsString();
+            httpClient.executeMethod(hostConfig, httpMethod);
+            body = httpMethod.getResponseBodyAsString();
         } catch (IOException ioe) {
             // we can replace a specific exception that suits your application
             throw new Exception(ioe);
         } finally {
-            putMethod.releaseConnection();
+            httpMethod.releaseConnection();
         }
-
         return body;
     }
 
     /**
-<<<<<<< HEAD:src/main/java/com/gateway/client/RESTApiClient.java
      * Performs a POST operation (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION)
      *
-     * @param data       JSON payload
-=======
-     * Performs a POST operation with a body (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION, UPDATE_SESSION_FROM_WALLET)
-     * @param data JSON payload
->>>>>>> masterpass:src/main/java/com/gateway/client/ApiClient.java
-     * @param requestUrl API endpoint
-     * @param config     contains frequently used information like Merchant ID, API password, etc.
+     * @param data   JSON payload
+     * @param config contains frequently used information like Merchant ID, API password, etc.
      * @return body
      * @throws Exception
      */
@@ -97,27 +101,14 @@ public final class RESTApiClient {
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
-        String body = null;
-
-        try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, postMethod);
-            body = postMethod.getResponseBodyAsString();
-        } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
-            throw new Exception(ioe);
-        } finally {
-            postMethod.releaseConnection();
-        }
-
-        return body;
+        return executeHTTPMethod(httpClient, postMethod, hostConfig);
     }
 
     /**
      * Performs a POST operation without a body (required for creating a generic gateway session)
+     *
      * @param requestUrl API endpoint
-     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param config     contains frequently used information like Merchant ID, API password, etc.
      * @return body
      * @throws Exception
      */
@@ -134,21 +125,7 @@ public final class RESTApiClient {
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
-        String body = null;
-
-        try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, postMethod);
-            body = postMethod.getResponseBodyAsString();
-        } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
-            throw new Exception(ioe);
-        } finally {
-            postMethod.releaseConnection();
-        }
-
-        return body;
+        return executeHTTPMethod(httpClient, postMethod, hostConfig);
     }
 
     /**
@@ -172,46 +149,6 @@ public final class RESTApiClient {
 
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(config.getGatewayHost());
-        configureProxy(httpClient, config);
-        String body = null;
-
-        try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, getMethod);
-            body = getMethod.getResponseBodyAsString();
-        } catch (IOException ioe) {
-            // we can replace a specific exception that suits your application
-            throw new Exception(ioe);
-        } finally {
-            getMethod.releaseConnection();
-        }
-
-        return body;
-    }
-
-    /**
-     * Check if proxy config is defined; if so configure the host and http client to tunnel through
-     *
-     * @param httpClient
-     * @param config     object that contains frequently used information like Merchant ID, API password, etc.
-     * @return void
-     */
-    private void configureProxy(HttpClient httpClient, Config config) {
-        // If proxy server is defined, set the host configuration.
-        if (config.getProxyServer() != null) {
-            HostConfiguration hostConfig = httpClient.getHostConfiguration();
-            hostConfig.setHost(config.getGatewayHost());
-            hostConfig.setProxy(config.getProxyServer(), config.getProxyPort());
-
-        }
-        // If proxy authentication is defined, set proxy credentials
-        if (config.getProxyUsername() != null) {
-            NTCredentials proxyCredentials =
-                    new NTCredentials(config.getProxyUsername(),
-                            config.getProxyPassword(), config.getGatewayHost(),
-                            config.getNtDomain());
-            httpClient.getState().setProxyCredentials(config.getProxyAuthType(),
-                    config.getProxyServer(), proxyCredentials);
-        }
+        return executeHTTPMethod(httpClient, getMethod, hostConfig);
     }
 }

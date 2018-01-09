@@ -120,3 +120,15 @@ input {
 #masterpass-button {
     cursor: pointer;
 }
+.input-block {
+    height: 50px;
+    display: flex;
+    align-items: center
+}
+.input-block label {
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+.input-field {
+    padding: 5px;
+}
