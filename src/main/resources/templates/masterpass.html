@@ -7,9 +7,10 @@
         <form action="#" class="col-12 form-horizontal" th:action="@{/processMasterpass}" th:object="${apiRequest}" method="post">
             <h3>Pay with Masterpass</h3>
             <div class="alert alert-warning" role="alert">
+                <p><strong>NOTE:</strong> You can also do an authorization via Masterpass, depending on your merchant settings.</p>
                 <p>This page is for demonstration purposes only, to collect information like order amount and currency in order to generate the Masterpass button. In practical use this would be collected behind the scenes.</p>
+                <p>Here are the steps to complete this transaction:</p>
                 <ol>
-                    <p>Here are the steps to complete this transaction:</p>
                     <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}" target="_blank">CREATE_SESSION</a> operation to create a session.</li>
                     <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}" target="_blank">UPDATE_SESSION</a> operation to update the session with information about the order (like amount, description, currency, etc).</li>
                     <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Wallet%3a%20Open%20Wallet.html'}" target="_blank">OPEN_WALLET</a> operation to initiate the Masterpass interaction.</li>

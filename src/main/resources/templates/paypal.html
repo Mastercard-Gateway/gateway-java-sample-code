@@ -6,16 +6,23 @@
         <form action="#" class="col-12 form-horizontal" th:action="@{/processBrowserPayment}" th:object="${apiRequest}" method="post">
             <h3>Pay with PayPal</h3>
             <div class="alert alert-warning" role="alert">
-                To access the browser payment simulator, copy and paste the redirectUrl from the response into a new browser window. Then complete the payment.
+                <p><strong>NOTE:</strong> You can also do an authorization via PayPal, depending on your merchant settings.</p>
+                <p>You can access full integration guidelines <a th:href="@{${config.apiBaseURL} + 'https://test-gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/PayPal.html'}" target="_blank">here</a>.<p/>
             </div>
             <fieldset>
-                <input type="hidden" th:field="*{orderId}" th:value="${orderId}" name="orderId" />
                 <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />
                 <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
                 <input type="hidden" th:field="*{apiMethod}" th:value="${apiMethod}" name="apiMethod" />
                 <input type="hidden" th:field="*{sourceType}" th:value="${sourceType}" name="sourceType" />
                 <input type="hidden" th:field="*{browserPaymentOperation}" th:value="${browserPaymentOperation}" name="browserPaymentOperation" />
                 <input type="hidden" th:field="*{returnUrl}" th:value="${returnUrl}" name="returnUrl" />
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                    <div class="col-md-7">
+                        <input id="order-id" th:field="*{orderId}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="order-amount">Amount</label>
                     <div class="col-md-7">
@@ -27,6 +34,13 @@
                     <label class="col-md-7 control-label" for="order-currency">Currency</label>
                     <div class="col-md-7">
                         <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-description">Description</label>
+                    <div class="col-md-7">
+                        <input id="order-description" th:field="*{orderDescription}" type="text" placeholder="" class="form-control input-md" required=""/>
 
                     </div>
                 </div>

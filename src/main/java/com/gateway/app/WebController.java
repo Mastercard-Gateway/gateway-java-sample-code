@@ -75,6 +75,7 @@ public class WebController {
             ApiRequest req = ApiService.createBrowserPaymentsRequest(request, "PAY", "PAYPAL");
             mav.setViewName("paypal");
             mav.addObject("apiRequest", req);
+            mav.addObject("config", config);
         } catch (Exception e) {
             ApiService.constructGeneralErrorResponse(mav, e);
         }
