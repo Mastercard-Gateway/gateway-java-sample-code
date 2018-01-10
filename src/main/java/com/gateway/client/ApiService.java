@@ -154,6 +154,7 @@ public class ApiService {
         JsonObject authenticationRedirect = new JsonObject();
         if (notNullOrEmpty(request.getSecureIdResponseUrl())) {
             authenticationRedirect.addProperty("responseUrl", request.getSecureIdResponseUrl());
+            authenticationRedirect.addProperty("pageGenerationMode", "CUSTOMIZED");
             secureId.add("authenticationRedirect", authenticationRedirect);
         }
 
@@ -328,11 +329,13 @@ public class ApiService {
             JsonObject json = new Gson().fromJson(response, JsonObject.class);
             JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
             JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
-            JsonObject jsonSimple = jsonAuth.get("simple").getAsJsonObject();
+            JsonObject jsonCustomized = jsonAuth.get("customized").getAsJsonObject();
 
             SecureId secureId = new SecureId();
             secureId.setStatus(json3ds.get("summaryStatus").getAsString());
-            secureId.setHtmlBodyContent(jsonSimple.get("htmlBodyContent").getAsString());
+            secureId.setAcsUrl(jsonCustomized.get("acsUrl").getAsString());
+            secureId.setPaReq(jsonCustomized.get("paReq").getAsString());
+            secureId.setMdValue(randomNumber());        //This is just a required unique ID to be able to connect the request to the response from ACS
 
             return secureId;
         } catch (Exception e) {
