@@ -84,6 +84,9 @@ input {
     border: 1px solid #CCCCCC !important;
     border-radius: 4px !important;
 }
+.alert-danger {
+    display: none;
+}
 .active {
     color: #FF6600;
 }

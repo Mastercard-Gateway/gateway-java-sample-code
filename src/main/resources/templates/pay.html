@@ -27,23 +27,26 @@
                     <p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>
                     <p>You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
+                <div id="error-alert" class="alert alert-danger" role="alert">
+                    <p>The following error(s) occurred:</p>
+                </div>
                 <div class="mb-4">
                     <h6>Payment details</h6>
                     <div class="input-block">
                         <label for='card-number'>Card number:</label>
-                        <input type="text" id="card-number" class="input-field" value="" readonly>
+                        <input type="text" id="card-number" class="input-field" value="" readonly required>
                     </div>
                     <div class="input-block">
                         <label for='expiry-month'>Expiry month:</label>
-                        <input type="text" id="expiry-month" class="input-field" value="">
+                        <input type="text" id="expiry-month" class="input-field" value="" required>
                     </div>
                     <div class="input-block">
                         <label for='expiry-year'>Expiry year:</label>
-                        <input type="text" id="expiry-year" class="input-field" value="">
+                        <input type="text" id="expiry-year" class="input-field" value="" required>
                     </div>
                     <div class="input-block">
                         <label for='security-code'>Security code:</label>
-                        <input type="text" id="security-code" class="input-field" value="" readonly>
+                        <input type="text" id="security-code" class="input-field" value="" readonly required>
                     </div>
                 </div>
                 <div>
