@@ -229,7 +229,7 @@ public class ApiServiceTest {
         request.setSecureIdResponseUrl("http://www.mysite.com/receipt");
         String result = ApiService.buildJSONPayload(request);
 
-        String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\"}}}";
+        String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\",\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
 
         assertEquals(prettifyJson(data), result);
     }
