@@ -4,8 +4,10 @@ public class SecureId {
 
     private String id;
     private String status;
-    private String redirectUrl;
-    private String htmlBodyContent;
+    private String responseUrl;
+    private String acsUrl;
+    private String paReq;
+    private String mdValue;
 
     public String getId() {
         return id;
@@ -23,19 +25,35 @@ public class SecureId {
         this.status = status;
     }
 
-    public String getRedirectUrl() {
-        return redirectUrl;
+    public String getResponseUrl() {
+        return responseUrl;
     }
 
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
+    public void setResponseUrl(String responseUrl) {
+        this.responseUrl = responseUrl;
     }
 
-    public String getHtmlBodyContent() {
-        return htmlBodyContent;
+    public String getAcsUrl() {
+        return acsUrl;
     }
 
-    public void setHtmlBodyContent(String htmlBodyContent) {
-        this.htmlBodyContent = htmlBodyContent;
+    public void setAcsUrl(String acsUrl) {
+        this.acsUrl = acsUrl;
+    }
+
+    public String getPaReq() {
+        return paReq;
+    }
+
+    public void setPaReq(String paReq) {
+        this.paReq = paReq;
+    }
+
+    public String getMdValue() {
+        return mdValue;
+    }
+
+    public void setMdValue(String mdValue) {
+        this.mdValue = mdValue;
     }
 }

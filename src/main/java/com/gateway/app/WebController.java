@@ -11,6 +11,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Controller
@@ -617,10 +619,12 @@ public class WebController {
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
             SecureId secureIdObject = ApiService.parse3DSecureResponse(apiResponse);
+            secureIdObject.setResponseUrl(ApiService.getCurrentContext(request) + "/process3ds");
 
             if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("secureIdPayerAuthenticationForm");
-                mav.addObject("authenticationHtml", secureIdObject.getHtmlBodyContent());
+                mav.addObject("secureId", secureIdObject);
+                mav.addObject("config", config);
             } else {
                 mav.setViewName("error");
                 mav.addObject("cause", secureIdObject.getStatus());
