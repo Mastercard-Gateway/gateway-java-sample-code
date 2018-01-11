@@ -22,6 +22,22 @@ public class Config {
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
 
     public Config(String merchantId, String apiPassword, String apiBaseURL) {
+
+        // [Snippet] howToConfigureSslCert - start
+        // If using certificate validation, modify the following configuration settings
+
+        // alternate trust store file
+        // leave as null if you use default java trust store
+        String trustStore = null;
+        // trust store password
+        String trustStorePassword = null;
+
+        if (trustStore != null) {
+            System.setProperty("javax.net.ssl.trustStore", trustStore);
+            System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+        }
+        // [Snippet] howToConfigureSslCert - end
+
         this.merchantId = merchantId;
         this.apiPassword = apiPassword;
         this.apiBaseURL = apiBaseURL;

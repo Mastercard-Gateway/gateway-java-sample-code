@@ -22,6 +22,12 @@ public class AppConfiguration {
     @Value("${webhooks.notification.secret}")
     private String webhooksNotificationSecret;
 
+    @Value("${javax.net.ssl.trustStore}")
+    private String trustStore;
+
+    @Value("${javax.net.ssl.trustStorePassword}")
+    private String trustStorePassword;
+
     @Bean
     public Config buildConfig() {
         Config config = new Config(merchantId, apiPassword, baseURL);
