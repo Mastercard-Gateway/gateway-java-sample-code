@@ -14,7 +14,6 @@ import java.util.Map;
 
 public final class NVPApiClient {
 
-
     private static final String FORM_URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=UTF-8";
     private static final String CONTENT_TYPE_HEADER = "Content-type";
 
@@ -59,12 +58,8 @@ public final class NVPApiClient {
 
         try {
             //make POST call
-            System.out.println("Making POST call...");
             httpClient.executeMethod(hostConfig, postMethod);
-
             body = postMethod.getResponseBodyAsString();
-
-            System.out.println("Response body = " + body);
         } catch (IOException ioe) {
             throw new Exception(ioe);
         } finally {

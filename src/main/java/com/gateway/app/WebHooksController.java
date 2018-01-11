@@ -4,6 +4,8 @@ import com.gateway.client.WebhookNotification;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,8 @@ import java.util.List;
 @Controller
 public class WebHooksController {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebHooksController.class);
+
 
     @Autowired
     private Config config;
@@ -33,7 +37,6 @@ public class WebHooksController {
 
     @GetMapping("/list-webhook-notifications")
     public @ResponseBody List<WebhookNotification> listWebhooks() throws IOException {
-        System.out.println("Listing Webhooks Notifications...");
 
         File notificationsFolder = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER);
 
@@ -48,7 +51,7 @@ public class WebHooksController {
                 notifications.add(notification);
             }
         } else {
-            System.out.println("No webhook notifications files found!");
+            logger.info("No webhook notifications files found!");
         }
         return notifications;
     }
@@ -56,10 +59,9 @@ public class WebHooksController {
     @PostMapping("/process-webhook")
     @ResponseStatus(HttpStatus.OK)
     public void processWebhook(@RequestBody String payload, @RequestHeader("X-Notification-Secret") String notificationSecret) throws IOException {
-        System.out.println("Processing Webhook Notications....");
 
         if (config.getWebhooksNotificationSecret() != null && notificationSecret != null && !config.getWebhooksNotificationSecret().equalsIgnoreCase(notificationSecret)) {
-            System.err.println("Web hooks notification secret doesn't match, so not processing the incoming request!");
+            logger.error("Web hooks notification secret doesn't match, so not processing the incoming request!");
             return;
         }
 
@@ -73,12 +75,12 @@ public class WebHooksController {
     private void writeWebhookNotification(String orderId, String transactionId, String orderStatus, String orderAmount) throws IOException {
         FileWriter fileWriter = null;
         try {
-            System.out.println("Webhook Notification - orderId = " + orderId + ", transactionId = " + transactionId + ", orderStatus = " + orderStatus + ", Amount = " + orderAmount);
+            logger.info("Webhook Notification - orderId = " + orderId + ", transactionId = " + transactionId + ", orderStatus = " + orderStatus + ", Amount = " + orderAmount);
 
             long timeInMillis = System.currentTimeMillis();
             File jsonFile = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER, "WebHookNotifications_" + timeInMillis + ".json");
 
-            System.out.println("Writing webhook notification file - " + jsonFile.getAbsolutePath() + "...");
+            logger.info("Writing webhook notification file - " + jsonFile.getAbsolutePath() + "...");
 
             fileWriter = new FileWriter(jsonFile);
             Gson gson = new GsonBuilder().create();
