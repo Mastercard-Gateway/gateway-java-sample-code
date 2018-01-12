@@ -19,7 +19,7 @@ public class ApiServiceTest {
 
     @Before
     public void setUp() {
-        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com");
+        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://www.test-gateway.com");
         config.setApiVersion(45);
     }
 
@@ -29,19 +29,19 @@ public class ApiServiceTest {
         request.setOrderId("DS9SJ3J39A");
         request.setTransactionId("H9JK29SM0J");
         String result = ApiService.getRequestUrl(ApiProtocol.REST, config, request);
-        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
+        assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
     }
 
     @Test
     public void getSessionRequestUrl() throws Exception {
         String result = ApiService.getSessionRequestUrl(ApiProtocol.REST, config);
-        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
+        assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
     }
 
     @Test
     public void getSessionRequestUrlWithSessionId() throws Exception {
         String result = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, "SESSIONID");
-        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
+        assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
     }
 
     @Test
