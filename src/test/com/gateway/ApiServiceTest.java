@@ -39,9 +39,15 @@ public class ApiServiceTest {
     }
 
     @Test
-    public void getSessionRequestUrlWithSessionId() throws Exception {
+    public void getSessionRequestUrlWithSessionId_REST() throws Exception {
         String result = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, "SESSIONID");
         assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
+    }
+
+    @Test
+    public void getSessionRequestUrlWithSessionId_NVP() throws Exception {
+        String result = ApiService.getSessionRequestUrl(ApiProtocol.NVP, config, "SESSIONID");
+        assertEquals("https://www.test-gateway.com/api/nvp/version/45", result);
     }
 
     @Test
