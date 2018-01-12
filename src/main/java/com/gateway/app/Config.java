@@ -8,12 +8,6 @@ public class Config {
     private int apiVersion;
     private String gatewayHost;
     private String apiUsername;
-    private String proxyServer;
-    private int proxyPort;
-    private String proxyUsername;
-    private String proxyPassword;
-    private String proxyAuthType;
-    private String ntDomain;
     private String trustStorePath;
     private String trustStorePassword;
     private String webhooksNotificationSecret;
@@ -72,30 +66,6 @@ public class Config {
 
     public String getApiUsername() {
         return apiUsername;
-    }
-
-    public String getProxyServer() {
-        return proxyServer;
-    }
-
-    public int getProxyPort() {
-        return proxyPort;
-    }
-
-    public String getProxyUsername() {
-        return proxyUsername;
-    }
-
-    public String getProxyPassword() {
-        return proxyPassword;
-    }
-
-    public String getProxyAuthType() {
-        return proxyAuthType;
-    }
-
-    public String getNtDomain() {
-        return ntDomain;
     }
 
     public String getTrustStorePath() {
