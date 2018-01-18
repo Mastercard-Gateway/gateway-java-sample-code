@@ -1,10 +1,12 @@
 package com.gateway.client;
 
 import com.gateway.app.Config;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -52,12 +54,12 @@ public final class NVPApiClient {
 
         try {
             //make POST call
-            httpClient.execute(httpPost);
-            body = postMethod.getResponseBodyAsString();
+            HttpResponse response = httpClient.execute(httpPost);
+            body = new BasicResponseHandler().handleResponse(response);
         } catch (IOException ioe) {
             throw new Exception(ioe);
         } finally {
-            httpClient.releaseConnection();
+            httpPost.releaseConnection();
         }
 
         return body;
