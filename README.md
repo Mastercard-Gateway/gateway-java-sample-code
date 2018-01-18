@@ -11,6 +11,11 @@ This is a sample application to help developers start building Java applications
 1. Click here to -> [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 1. Fill in the details such as Merchant Id, API Password & Gateway Base URL
 
+## Authentication
+1. You can authenticate in one of two ways:
+- Using your API key and password (available from the merchant portal). To do this, set the API password as an environment variable.
+- Using a certificate, which can be downloaded from the merchant portal. You will then need to convert the PEM file to a PKCS12. You can do this using the [OpenSSL tool](https://www.openssl.org/source/). Then pass the trust store path and password in as environment variables.
+
 ## Steps for running locally
 1. Download code
 1. Run *mvn clean install*

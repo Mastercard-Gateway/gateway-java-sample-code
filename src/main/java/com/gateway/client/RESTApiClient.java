@@ -3,17 +3,24 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.*;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.*;
+import org.apache.http.ssl.SSLContexts;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
 
 /**
  * Service client class for making API requests using REST protocol using JSON
@@ -21,9 +28,8 @@ import java.io.IOException;
 
 public final class RESTApiClient {
 
-
+    private static final Logger logger = LoggerFactory.getLogger(RESTApiClient.class);
     private static final String UTF8_ENCODING = "UTF-8";
-    private static final String CONTENT_TYPE = "application/json";
 
     /**
      * Performs a PUT operation (required for the following API operations: AUTHORIZE, CAPTURE, PAY, REFUND, UPDATE_AUTHORIZATION, VERIFY, VOID, CHECK_3DS_ENROLLMENT, INITIATE_BROWSER_PAYMENT)
@@ -35,51 +41,27 @@ public final class RESTApiClient {
      * @throws Exception
      */
     public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
 
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
+            HttpPut httpPut = new HttpPut(requestUrl);
+            httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
 
-        PutMethod putMethod = new PutMethod(requestUrl);
-
-        putMethod.setDoAuthentication(true);
-
-        // Set the charset to UTF-8
-        StringRequestEntity entity = new StringRequestEntity(data, CONTENT_TYPE, UTF8_ENCODING);
-        putMethod.setRequestEntity(entity);
-
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(config.getGatewayHost());
-        return executeHTTPMethod(httpClient, putMethod, hostConfig);
+            return executeHTTPMethod(httpPut, config);
     }
 
     /**
      * Performs a POST operation (required for the following API operations: PROCESS_ACS_RESULT, CREATE_CHECKOUT_SESSION)
      *
      * @param data   JSON payload
+     * @param requestUrl API endpoint
      * @param config contains frequently used information like Merchant ID, API password, etc.
      * @return body
      * @throws Exception
      */
     public String postTransaction(String data, String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
+        HttpPost httpPost = new HttpPost(requestUrl);
+        httpPost.setEntity(new StringEntity(data, UTF8_ENCODING));
 
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
-
-        PostMethod postMethod = new PostMethod(requestUrl);
-
-        postMethod.setDoAuthentication(true);
-
-        // Set the charset to UTF-8
-        StringRequestEntity entity = new StringRequestEntity(data, "application/json", UTF8_ENCODING);
-        postMethod.setRequestEntity(entity);
-
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(config.getGatewayHost());
-        return executeHTTPMethod(httpClient, postMethod, hostConfig);
+        return executeHTTPMethod(httpPost, config);
     }
 
     /**
@@ -91,19 +73,9 @@ public final class RESTApiClient {
      * @throws Exception
      */
     public String postTransaction(String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
+        HttpPost httpPost = new HttpPost(requestUrl);
 
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
-
-        PostMethod postMethod = new PostMethod(requestUrl);
-
-        postMethod.setDoAuthentication(true);
-
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(config.getGatewayHost());
-        return executeHTTPMethod(httpClient, postMethod, hostConfig);
+        return executeHTTPMethod(httpPost, config);
     }
 
     /**
@@ -115,36 +87,38 @@ public final class RESTApiClient {
      * @throws Exception
      */
     public String getTransaction(String requestUrl, Config config) throws Exception {
-        HttpClient httpClient = new HttpClient();
+        HttpGet httpGet = new HttpGet(requestUrl);
 
-        // Set the API Username and Password in the header authentication field.
-        httpClient.getState().setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
-
-        GetMethod getMethod = new GetMethod(requestUrl);
-
-        getMethod.setDoAuthentication(true);
-
-        HostConfiguration hostConfig = new HostConfiguration();
-        hostConfig.setHost(config.getGatewayHost());
-        return executeHTTPMethod(httpClient, getMethod, hostConfig);
+        return executeHTTPMethod(httpGet, config);
     }
 
     /**
      * Execute HTTP method for the HTTP client and Host configuration
      *
-     * @param httpClient
      * @param httpMethod
-     * @param hostConfig
      * @return
      * @throws Exception
      */
-    private String executeHTTPMethod(HttpClient httpClient, HttpMethod httpMethod, HostConfiguration hostConfig) throws Exception {
-        String body;
+    private String executeHTTPMethod(HttpRequestBase httpMethod, Config config) throws Exception {
+        String body = "";
         try {
-            // send the transaction
-            httpClient.executeMethod(hostConfig, httpMethod);
-            body = httpMethod.getResponseBodyAsString();
+            // Set the proper authentication type, username/password or certificate authentication
+            // Execute the request
+            if(config.getAuthenticationType().equals(Config.AuthenticationType.PASSWORD)) {
+                CloseableHttpClient httpClient = HttpClients.createDefault();
+                HttpClientContext httpClientContext = HttpClientContext.create();
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
+                httpClientContext.setCredentialsProvider(credentialsProvider);
+                HttpResponse response = httpClient.execute(httpMethod, httpClientContext);
+                body = new BasicResponseHandler().handleResponse(response);
+            }
+            else if(config.getAuthenticationType().equals(Config.AuthenticationType.CERTIFICATE)) {
+                SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(readStore(config), config.getKeyStorePassword().toCharArray()).build();
+                CloseableHttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).build();
+                HttpResponse response = httpClient.execute(httpMethod);
+                body = new BasicResponseHandler().handleResponse(response);
+            }
             checkForErrorResponse(body);
         }
         catch (ApiException apiException) {
@@ -165,7 +139,7 @@ public final class RESTApiClient {
      * @param response from the API call
      * @return either throw an exception or return null
      */
-    private static void checkForErrorResponse(String response) throws ApiException {
+    private void checkForErrorResponse(String response) throws ApiException {
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
 
@@ -177,6 +151,21 @@ public final class RESTApiClient {
             if(errorJson.has("field")) apiException.setField(errorJson.get("field").getAsString());
             if(errorJson.has("validationType")) apiException.setValidationType(errorJson.get("validationType").getAsString());
             throw apiException;
+        }
+    }
+
+    /**
+     * Read from keystore
+     *
+     * @param config
+     * @return
+     * @throws Exception
+     */
+    private KeyStore readStore(Config config) throws Exception {
+        try (InputStream keyStoreStream = this.getClass().getResourceAsStream(config.getKeyStore())) {
+            KeyStore keyStore = KeyStore.getInstance("JKS"); // or "PKCS12"
+            keyStore.load(keyStoreStream, config.getKeyStorePassword().toCharArray());
+            return keyStore;
         }
     }
 }

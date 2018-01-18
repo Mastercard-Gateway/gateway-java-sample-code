@@ -8,28 +8,36 @@ public class Config {
     private int apiVersion;
     private String gatewayHost;
     private String apiUsername;
-    private String proxyServer;
-    private int proxyPort;
-    private String proxyUsername;
-    private String proxyPassword;
-    private String proxyAuthType;
-    private String ntDomain;
-    private String trustStorePath;
-    private String trustStorePassword;
+    private String keyStore;
+    private String keyStorePassword;
     private String webhooksNotificationSecret;
-
+    private AuthenticationType authenticationType;
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
+    public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
     public Config(String merchantId, String apiPassword, String apiBaseURL) {
-        this.merchantId = merchantId;
-        this.apiPassword = apiPassword;
-        this.apiBaseURL = apiBaseURL;
 
-        if (merchantId == null || apiPassword == null || apiBaseURL == null) {
-            throw new IllegalArgumentException("Merchant ID, Api Password & Api Base URL are required arguments!");
+        if (merchantId == null || apiBaseURL == null) {
+            throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
         }
 
+        if (System.getProperty("javax.net.ssl.trustStore") == null && System.getProperty("javax.net.ssl.trustStorePassword") == null && apiPassword == null) {
+            throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
+        }
+
+        if (System.getProperty("javax.net.ssl.trustStore") != null && System.getProperty("javax.net.ssl.trustStorePassword") != null) {
+            this.keyStore = System.getProperty("javax.net.ssl.trustStore");
+            this.keyStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+            this.authenticationType = AuthenticationType.CERTIFICATE;
+        }
+        else if (apiPassword != null) {
+            this.apiPassword = apiPassword;
+            this.authenticationType = AuthenticationType.PASSWORD;
+        }
+
+        this.merchantId = merchantId;
+        this.apiBaseURL = apiBaseURL;
         this.gatewayHost = this.apiBaseURL;
         this.apiUsername = "merchant." + this.merchantId;
     }
@@ -58,36 +66,12 @@ public class Config {
         return apiUsername;
     }
 
-    public String getProxyServer() {
-        return proxyServer;
+    public String getKeyStore() {
+        return keyStore;
     }
 
-    public int getProxyPort() {
-        return proxyPort;
-    }
-
-    public String getProxyUsername() {
-        return proxyUsername;
-    }
-
-    public String getProxyPassword() {
-        return proxyPassword;
-    }
-
-    public String getProxyAuthType() {
-        return proxyAuthType;
-    }
-
-    public String getNtDomain() {
-        return ntDomain;
-    }
-
-    public String getTrustStorePath() {
-        return trustStorePath;
-    }
-
-    public String getTrustStorePassword() {
-        return trustStorePassword;
+    public String getKeyStorePassword() {
+        return keyStorePassword;
     }
 
     public String getWebhooksNotificationSecret() {
@@ -102,5 +86,7 @@ public class Config {
         this.apiVersion = apiVersion;
     }
 
-
+    public AuthenticationType getAuthenticationType() {
+        return authenticationType;
+    }
 }
