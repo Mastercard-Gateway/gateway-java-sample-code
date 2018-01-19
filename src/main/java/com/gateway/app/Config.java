@@ -8,38 +8,36 @@ public class Config {
     private int apiVersion;
     private String gatewayHost;
     private String apiUsername;
-    private String trustStorePath;
+    private String trustStore;
     private String trustStorePassword;
     private String webhooksNotificationSecret;
-
+    private AuthenticationType authenticationType;
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
+    public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
     public Config(String merchantId, String apiPassword, String apiBaseURL) {
 
-        // [Snippet] howToConfigureSslCert - start
-        // If using certificate validation, modify the following configuration settings
-
-        // alternate trust store file
-        // leave as null if you use default java trust store
-        String trustStore = null;
-        // trust store password
-        String trustStorePassword = null;
-
-        if (trustStore != null) {
-            System.setProperty("javax.net.ssl.trustStore", trustStore);
-            System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+        if (merchantId == null || apiBaseURL == null) {
+            throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
         }
-        // [Snippet] howToConfigureSslCert - end
+
+        if (System.getProperty("javax.net.ssl.trustStore") == null && System.getProperty("javax.net.ssl.trustStorePassword") == null && apiPassword == null) {
+            throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
+        }
+
+        if (System.getProperty("javax.net.ssl.trustStore") != null && System.getProperty("javax.net.ssl.trustStorePassword") != null) {
+            this.trustStore = System.getProperty("javax.net.ssl.trustStore");
+            this.trustStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+            this.authenticationType = AuthenticationType.CERTIFICATE;
+        }
+        else if (apiPassword != null) {
+            this.apiPassword = apiPassword;
+            this.authenticationType = AuthenticationType.PASSWORD;
+        }
 
         this.merchantId = merchantId;
-        this.apiPassword = apiPassword;
         this.apiBaseURL = apiBaseURL;
-
-        if (merchantId == null || apiPassword == null || apiBaseURL == null) {
-            throw new IllegalArgumentException("Merchant ID, Api Password & Api Base URL are required arguments!");
-        }
-
         this.gatewayHost = this.apiBaseURL;
         this.apiUsername = "merchant." + this.merchantId;
     }
@@ -68,8 +66,8 @@ public class Config {
         return apiUsername;
     }
 
-    public String getTrustStorePath() {
-        return trustStorePath;
+    public String getTrustStore() {
+        return trustStore;
     }
 
     public String getTrustStorePassword() {
@@ -88,5 +86,7 @@ public class Config {
         this.apiVersion = apiVersion;
     }
 
-
+    public AuthenticationType getAuthenticationType() {
+        return authenticationType;
+    }
 }

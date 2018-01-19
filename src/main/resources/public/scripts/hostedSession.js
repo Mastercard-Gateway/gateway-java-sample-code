@@ -88,6 +88,7 @@ PaymentSession.configure({
 });
 
 function pay() {
+    $("#loading-bar-spinner").show();
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
     PaymentSession.updateSessionFromForm('card');
 }
