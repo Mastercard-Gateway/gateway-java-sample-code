@@ -95,8 +95,8 @@ public final class RESTApiClient {
     /**
      * Execute HTTP method for the HTTP client and Host configuration
      *
-     * @param httpMethod
-     * @return
+     * @param httpMethod PUT, POST, or GET
+     * @return body from API response
      * @throws Exception
      */
     private String executeHTTPMethod(HttpRequestBase httpMethod, Config config) throws Exception {
@@ -137,7 +137,7 @@ public final class RESTApiClient {
      * Checks if the API response contains an error
      *
      * @param response from the API call
-     * @return either throw an exception or return null
+     * @throws ApiException
      */
     private void checkForErrorResponse(String response) throws ApiException {
 
@@ -157,8 +157,8 @@ public final class RESTApiClient {
     /**
      * Read from keystore
      *
-     * @param config
-     * @return
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return keystore
      * @throws Exception
      */
     private KeyStore readStore(Config config) throws Exception {
