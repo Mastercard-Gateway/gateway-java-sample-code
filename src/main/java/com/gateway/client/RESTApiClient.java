@@ -122,6 +122,7 @@ public final class RESTApiClient {
             checkForErrorResponse(body);
         }
         catch (ApiException apiException) {
+            logger.error("The API returned an error", apiException);
             throw apiException;
         }
         catch (IOException ioe) {
