@@ -4,20 +4,25 @@ import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.*;
 import org.apache.http.ssl.SSLContexts;
 
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -114,10 +119,42 @@ public final class RESTApiClient {
                 body = new BasicResponseHandler().handleResponse(response);
             }
             else if(config.getAuthenticationType().equals(Config.AuthenticationType.CERTIFICATE)) {
-                SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(readStore(config), config.getKeyStorePassword().toCharArray()).build();
-                CloseableHttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).build();
-                HttpResponse response = httpClient.execute(httpMethod);
-                body = new BasicResponseHandler().handleResponse(response);
+//                SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(readStore(config), config.getKeyStorePassword().toCharArray()).build();
+//                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
+//                CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+//                HttpResponse response = httpClient.execute(httpMethod);
+//                body = new BasicResponseHandler().handleResponse(response);
+                // Trust own CA and all self-signed certs
+                SSLContext sslcontext = SSLContexts.custom()
+                        .loadTrustMaterial(new File(config.getKeyStore()), config.getKeyStorePassword().toCharArray(),
+                                new TrustSelfSignedStrategy())
+                        .build();
+                // Allow TLSv1 protocol only
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                        sslcontext,
+                        new String[] { "TLSv1" },
+                        null,
+                        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+                CloseableHttpClient httpclient = HttpClients.custom()
+                        .setSSLSocketFactory(sslsf)
+                        .build();
+                try {
+
+                    System.out.println("Executing request " + httpMethod.getRequestLine());
+
+                    CloseableHttpResponse response = httpclient.execute(httpMethod);
+                    try {
+                        HttpEntity entity = response.getEntity();
+
+                        System.out.println("----------------------------------------");
+                        System.out.println(response.getStatusLine());
+                        EntityUtils.consume(entity);
+                    } finally {
+                        response.close();
+                    }
+                } finally {
+                    httpclient.close();
+                }
             }
             checkForErrorResponse(body);
         }
