@@ -22,13 +22,13 @@ public class Config {
             throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
         }
 
-        if (System.getProperty("javax.net.ssl.trustStore") == null && System.getProperty("javax.net.ssl.trustStorePassword") == null && apiPassword == null) {
+        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && apiPassword == null) {
             throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
         }
 
-        if (System.getProperty("javax.net.ssl.trustStore") != null && System.getProperty("javax.net.ssl.trustStorePassword") != null) {
-            this.keyStore = System.getProperty("javax.net.ssl.trustStore");
-            this.keyStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+        if (System.getProperty("javax.net.ssl.keyStore") != null && System.getProperty("javax.net.ssl.keyStorePassword") != null) {
+            this.keyStore = System.getProperty("javax.net.ssl.keyStore");
+            this.keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
             this.authenticationType = AuthenticationType.CERTIFICATE;
         }
         else if (apiPassword != null) {
