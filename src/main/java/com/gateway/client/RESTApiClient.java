@@ -23,9 +23,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.util.Enumeration;
 
 /**
  * Service client class for making API requests using REST protocol using JSON
@@ -108,53 +111,48 @@ public final class RESTApiClient {
         String body = "";
         try {
             // Set the proper authentication type, username/password or certificate authentication
-            // Execute the request
             if(config.getAuthenticationType().equals(Config.AuthenticationType.PASSWORD)) {
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpClientContext httpClientContext = HttpClientContext.create();
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+                // Load credentials
                 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
                 httpClientContext.setCredentialsProvider(credentialsProvider);
+
+                // Execute the request
                 HttpResponse response = httpClient.execute(httpMethod, httpClientContext);
                 body = new BasicResponseHandler().handleResponse(response);
             }
             else if(config.getAuthenticationType().equals(Config.AuthenticationType.CERTIFICATE)) {
-//                SSLContext sslContext = SSLContexts.custom().loadKeyMaterial(readStore(config), config.getKeyStorePassword().toCharArray()).build();
-//                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
-//                CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-//                HttpResponse response = httpClient.execute(httpMethod);
-//                body = new BasicResponseHandler().handleResponse(response);
-                // Trust own CA and all self-signed certs
-                SSLContext sslcontext = SSLContexts.custom()
-                        .loadTrustMaterial(new File(config.getKeyStore()), config.getKeyStorePassword().toCharArray(),
-                                new TrustSelfSignedStrategy())
-                        .build();
-                // Allow TLSv1 protocol only
-                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                        sslcontext,
-                        new String[] { "TLSv1" },
-                        null,
-                        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-                CloseableHttpClient httpclient = HttpClients.custom()
-                        .setSSLSocketFactory(sslsf)
-                        .build();
-                try {
+                KeyStore keyStore = KeyStore.getInstance("pkcs12");
 
-                    System.out.println("Executing request " + httpMethod.getRequestLine());
+                // Read keystore
+                InputStream keyStoreInput = new FileInputStream(config.getKeyStore());
+                keyStore.load(keyStoreInput, config.getKeyStorePassword().toCharArray());
 
-                    CloseableHttpResponse response = httpclient.execute(httpMethod);
-                    try {
-                        HttpEntity entity = response.getEntity();
+                Enumeration enumeration = keyStore.aliases();
+                while(enumeration.hasMoreElements()) {
+                    String alias = (String)enumeration.nextElement();
+                    System.out.println("alias name: " + alias);
+                    Certificate certificate = keyStore.getCertificate(alias);
+                    System.out.println(certificate.toString());
 
-                        System.out.println("----------------------------------------");
-                        System.out.println(response.getStatusLine());
-                        EntityUtils.consume(entity);
-                    } finally {
-                        response.close();
-                    }
-                } finally {
-                    httpclient.close();
                 }
+
+                System.out.println("Key store has " + keyStore.size() + " keys");
+
+                // Create SSL context
+                SSLContext sslContext = SSLContexts.custom()
+                        .loadKeyMaterial(keyStore, config.getKeyStorePassword().toCharArray())
+                        .build();
+
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
+                CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+
+                //Execute request
+                HttpResponse response = httpClient.execute(httpMethod);
+                body = new BasicResponseHandler().handleResponse(response);
             }
             checkForErrorResponse(body);
         }
