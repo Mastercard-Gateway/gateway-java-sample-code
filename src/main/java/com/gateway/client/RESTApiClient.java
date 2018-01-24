@@ -131,17 +131,6 @@ public final class RESTApiClient {
                 InputStream keyStoreInput = new FileInputStream(config.getKeyStore());
                 keyStore.load(keyStoreInput, config.getKeyStorePassword().toCharArray());
 
-                Enumeration enumeration = keyStore.aliases();
-                while(enumeration.hasMoreElements()) {
-                    String alias = (String)enumeration.nextElement();
-                    System.out.println("alias name: " + alias);
-                    Certificate certificate = keyStore.getCertificate(alias);
-                    System.out.println(certificate.toString());
-
-                }
-
-                System.out.println("Key store has " + keyStore.size() + " keys");
-
                 // Create SSL context
                 SSLContext sslContext = SSLContexts.custom()
                         .loadKeyMaterial(keyStore, config.getKeyStorePassword().toCharArray())

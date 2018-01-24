@@ -22,7 +22,7 @@ public class Config {
             throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
         }
 
-        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && apiPassword == null) {
+        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && (apiPassword == null || apiPassword.isEmpty())) {
             throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
         }
 

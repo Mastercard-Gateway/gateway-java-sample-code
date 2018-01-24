@@ -24,6 +24,7 @@ public class AppConfiguration {
 
     @Bean
     public Config buildConfig() {
+
         Config config = new Config(merchantId, apiPassword, baseURL);
 
         config.setApiVersion(Integer.parseInt(apiVersion));
