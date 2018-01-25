@@ -29,7 +29,7 @@ public final class RESTApiClient {
             HttpPut httpPut = new HttpPut(requestUrl);
             httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
 
-            return ApiService.executeHTTPMethod(httpPut, config);
+            return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
     }
 
     /**
@@ -45,7 +45,7 @@ public final class RESTApiClient {
         HttpPost httpPost = new HttpPost(requestUrl);
         httpPost.setEntity(new StringEntity(data, UTF8_ENCODING));
 
-        return ApiService.executeHTTPMethod(httpPost, config);
+        return ApiService.executeHTTPMethod(httpPost, config, ApiProtocol.REST);
     }
 
     /**
@@ -59,7 +59,7 @@ public final class RESTApiClient {
     public String postTransaction(String requestUrl, Config config) throws Exception {
         HttpPost httpPost = new HttpPost(requestUrl);
 
-        return ApiService.executeHTTPMethod(httpPost, config);
+        return ApiService.executeHTTPMethod(httpPost, config, ApiProtocol.REST);
     }
 
     /**
@@ -73,6 +73,6 @@ public final class RESTApiClient {
     public String getTransaction(String requestUrl, Config config) throws Exception {
         HttpGet httpGet = new HttpGet(requestUrl);
 
-        return ApiService.executeHTTPMethod(httpGet, config);
+        return ApiService.executeHTTPMethod(httpGet, config, ApiProtocol.REST);
     }
 }

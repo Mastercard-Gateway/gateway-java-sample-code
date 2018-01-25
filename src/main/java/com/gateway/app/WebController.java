@@ -9,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -450,7 +452,7 @@ public class WebController {
      * @return ModelAndView for api response page or error page
      */
     @PostMapping("/processPayThroughNVP")
-    public ModelAndView processNVPHostedSession(@RequestBody ApiRequest apiRequest) {
+    public ModelAndView processNVPHostedSession(@RequestBody ApiRequest apiRequest, ModelMap modelMap) {
 
         ModelAndView mav = new ModelAndView();
 
@@ -461,9 +463,10 @@ public class WebController {
             Map<String, String> dataMap = ApiRequestService.buildMap(apiRequest);
 
             NVPApiClient connection = new NVPApiClient();
-            String response = connection.postData(dataMap, requestUrl, config);
-            mav.setViewName("apiResponse");
-            mav.addObject("resp", response);
+            String response = connection.postTransaction(dataMap, requestUrl, config);
+            HashMap<String, String> responseMap = ApiResponseService.parseNVPResponse(response);
+            mav.setViewName("nvpApiResponse");
+            //mav.addObject("responseMap", responseMap);
             mav.addObject("operation", apiRequest.getApiOperation());
             mav.addObject("method", apiRequest.getApiMethod());
             mav.addObject("request", dataMap);

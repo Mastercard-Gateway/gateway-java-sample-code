@@ -3,6 +3,7 @@ package com.gateway.client;
 import com.gateway.app.Config;
 import com.google.gson.*;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -22,6 +23,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ApiService {
 
@@ -36,7 +40,7 @@ public class ApiService {
      * @return body from API response
      * @throws Exception
      */
-    public static String executeHTTPMethod(HttpRequestBase httpMethod, Config config) throws Exception {
+    public static String executeHTTPMethod(HttpRequestBase httpMethod, Config config, ApiProtocol protocol) throws Exception {
         String body = "";
         try {
             // Set the proper authentication type, username/password or certificate authentication
@@ -72,7 +76,9 @@ public class ApiService {
                 HttpResponse response = httpClient.execute(httpMethod);
                 body = new BasicResponseHandler().handleResponse(response);
             }
-            checkForErrorResponse(body);
+            if(protocol.equals(ApiProtocol.REST)) {
+                checkForRESTErrorResponse(body);
+            }
         }
         catch (ApiException apiException) {
             logger.error("The API returned an error", apiException);
@@ -88,12 +94,12 @@ public class ApiService {
     }
 
     /**
-     * Checks if the API response contains an error
+     * Checks if the API response contains an error (handles JSON response from REST call)
      *
      * @param response from the API call
      * @throws ApiException
      */
-    private static void checkForErrorResponse(String response) throws ApiException {
+    private static void checkForRESTErrorResponse(String response) throws ApiException {
 
         JsonObject json = new Gson().fromJson(response, JsonObject.class);
 

@@ -6,6 +6,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,32 +39,15 @@ public final class NVPApiClient {
      * @return body
      * @throws Exception
      */
-    public String postData(Map<String, String> data, String requestUrl, Config config) throws Exception {
-
-
-        HttpClient httpClient = HttpClients.createDefault();
+    public String postTransaction(Map<String, String> data, String requestUrl, Config config) throws Exception {
 
         HttpPost httpPost = new HttpPost(requestUrl);
-
         httpPost.setHeader(CONTENT_TYPE_HEADER, FORM_URL_ENCODED_CONTENT_TYPE);
 
         data.put("merchant", config.getMerchantId());
-
         configureRequest(httpPost, data, config);
 
-        String body = null;
-
-        try {
-            //make POST call
-            HttpResponse response = httpClient.execute(httpPost);
-            body = new BasicResponseHandler().handleResponse(response);
-        } catch (IOException ioe) {
-            throw new Exception(ioe);
-        } finally {
-            httpPost.releaseConnection();
-        }
-
-        return body;
+        return ApiService.executeHTTPMethod(httpPost, config, ApiProtocol.NVP);
     }
 
     private void configureRequest(HttpPost httpPost, Map<String, String> data, Config config) throws UnsupportedEncodingException {

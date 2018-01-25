@@ -7,8 +7,15 @@ import com.gateway.response.WalletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ApiResponseService {
 
@@ -191,6 +198,32 @@ public class ApiResponseService {
             logger.error("Unable to parse Masterpass response", e);
             throw e;
         }
+    }
+
+    /**
+     * Parses name-value pair response
+     *
+     * @param response from the API call
+     * @throws ApiException
+     */
+    public static HashMap parseNVPResponse(String response) throws ApiException {
+
+        HashMap<String, String> responseMap = new HashMap<String, String>();
+        List<NameValuePair> pairs = URLEncodedUtils.parse(response, Charset.forName("UTF-8"));
+        for (NameValuePair p : pairs) {
+            responseMap.put(p.getName(), p.getValue());
+        }
+
+        if (responseMap.get("result").equals("ERROR")) {
+            ApiException apiException = new ApiException("The API returned an error");
+            if(Utils.notNullOrEmpty(responseMap.get("error.cause"))) apiException.setErrorCode(responseMap.get("error.cause"));
+            if(Utils.notNullOrEmpty(responseMap.get("error.explanation"))) apiException.setExplanation(responseMap.get("error.explanation"));
+            if(Utils.notNullOrEmpty(responseMap.get("error.field"))) apiException.setField(responseMap.get("error.field"));
+            if(Utils.notNullOrEmpty(responseMap.get("error.validationType"))) apiException.setValidationType(responseMap.get("error.validationType"));
+            throw apiException;
+        }
+
+        return responseMap;
     }
 
     /**
