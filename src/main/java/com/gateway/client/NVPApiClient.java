@@ -71,7 +71,7 @@ public final class NVPApiClient {
             ArrayList<NameValuePair> postParameters = new ArrayList<>();
 
             // Add username/password to request
-            postParameters.add(new BasicNameValuePair("apiUsername", "merchant." + config.getMerchantId()));
+            postParameters.add(new BasicNameValuePair("apiUsername", config.getApiUsername()));
             postParameters.add(new BasicNameValuePair("apiPassword", config.getApiPassword()));
 
             // Add data to request

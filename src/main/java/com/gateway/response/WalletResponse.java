@@ -1,4 +1,4 @@
-package com.gateway.client;
+package com.gateway.response;
 
 public class WalletResponse {
 
