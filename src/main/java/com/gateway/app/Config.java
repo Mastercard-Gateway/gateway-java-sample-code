@@ -26,20 +26,28 @@ public class Config {
             throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
         }
 
+        this.merchantId = merchantId;
+        this.apiBaseURL = apiBaseURL;
+        this.apiUsername = "merchant." + this.merchantId;
+
         if (System.getProperty("javax.net.ssl.keyStore") != null && System.getProperty("javax.net.ssl.keyStorePassword") != null) {
             this.keyStore = System.getProperty("javax.net.ssl.keyStore");
             this.keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
             this.authenticationType = AuthenticationType.CERTIFICATE;
+            // Different hostname for cert authentication - need to replace with PKI hostname
+            try {
+                this.gatewayHost = this.apiBaseURL.replace("test-gateway", "pki.mtf.gateway");
+            }
+            catch(Exception e) {
+                throw new IllegalArgumentException("Certificate authentication not supported for this hostname");
+            }
+
         }
         else if (apiPassword != null) {
             this.apiPassword = apiPassword;
+            this.gatewayHost = this.apiBaseURL;
             this.authenticationType = AuthenticationType.PASSWORD;
         }
-
-        this.merchantId = merchantId;
-        this.apiBaseURL = apiBaseURL;
-        this.gatewayHost = this.apiBaseURL;
-        this.apiUsername = "merchant." + this.merchantId;
     }
 
     public String getMerchantId() {
