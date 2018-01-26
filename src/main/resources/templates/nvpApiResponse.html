@@ -11,11 +11,11 @@
     <pre th:text="${request}">Request</pre>
 
     <h5>Response</h5>
-    <pre>
+    <div class="mt-4">
         <p th:each="key: ${responseMap.keySet()}">
             <span th:text="${key}"></span> = <span th:text="${responseMap.get(key)}"></span>
         </p>
-    </pre>
+    </div>
 </div>
 
 </body>
