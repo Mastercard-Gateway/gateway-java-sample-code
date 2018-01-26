@@ -10,11 +10,11 @@
 
 4. Pass the keystore information and the certificate hostname as VM options and environment variables.
 
-##### VM options:
+#### VM options:
 -Djavax.net.ssl.keyStore - Path to the PKCS12 file you created <br>
 -Djavax.net.ssl.keyStorePassword - The certificate password (which is the same as your test merchant ID, for instance, TESTMERCHANT123)
 
-##### Environment variables:
+#### Environment variables:
 gateway.merchant.id - Your merchant ID <br>
 gateway.base.url - The base URL of the gateway <br>
 gateway.api.version - The gateway version you're targeting <br>
