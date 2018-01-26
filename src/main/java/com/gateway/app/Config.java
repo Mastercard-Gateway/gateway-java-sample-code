@@ -16,14 +16,14 @@ public class Config {
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
-    public Config(String merchantId, String apiPassword, String apiBaseURL) {
+    public Config(String merchantId, String apiPassword, String apiBaseURL, String gatewayHost) {
 
         if (merchantId == null || apiBaseURL == null) {
             throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
         }
 
-        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && (apiPassword == null || apiPassword.isEmpty())) {
-            throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
+        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && gatewayHost == null && (apiPassword == null || apiPassword.isEmpty())) {
+            throw new IllegalArgumentException("Must provide either an API password OR a Java keystore and certificate hostname");
         }
 
         this.merchantId = merchantId;
@@ -31,22 +31,15 @@ public class Config {
         this.apiUsername = "merchant." + this.merchantId;
 
         if (System.getProperty("javax.net.ssl.keyStore") != null && System.getProperty("javax.net.ssl.keyStorePassword") != null) {
+            this.authenticationType = AuthenticationType.CERTIFICATE;
             this.keyStore = System.getProperty("javax.net.ssl.keyStore");
             this.keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
-            this.authenticationType = AuthenticationType.CERTIFICATE;
-            // Different hostname for cert authentication - need to replace with PKI hostname
-            try {
-                this.gatewayHost = this.apiBaseURL.replace("test-gateway", "pki.mtf.gateway");
-            }
-            catch(Exception e) {
-                throw new IllegalArgumentException("Certificate authentication not supported for this hostname");
-            }
-
+            this.gatewayHost = gatewayHost;
         }
         else if (apiPassword != null) {
+            this.authenticationType = AuthenticationType.PASSWORD;
             this.apiPassword = apiPassword;
             this.gatewayHost = this.apiBaseURL;
-            this.authenticationType = AuthenticationType.PASSWORD;
         }
     }
 
