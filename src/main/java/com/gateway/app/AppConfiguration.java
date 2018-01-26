@@ -25,11 +25,11 @@ public class AppConfiguration {
     @Value("${webhooks.notification.secret}")
     private String webhooksNotificationSecret;
 
-    @Value("${javax.net.ssl.trustStore}")
-    private String trustStore;
+    @Value("${javax.net.ssl.keyStore}")
+    private String keyStore;
 
-    @Value("${javax.net.ssl.trustStorePassword}")
-    private String trustStorePassword;
+    @Value("${javax.net.ssl.keyStorePassword}")
+    private String keyStorePassword;
 
     @Bean
     public Config buildConfig() {

@@ -14,19 +14,19 @@ This is a sample application to help developers start building Java applications
 ## Authentication
 1. You can authenticate in one of two ways:
 - Using your API key and password (available from the merchant portal). To do this, see instructions below.
-- Using a certificate, which can be downloaded from the merchant portal. To do this, see instructions [here](CERT_AUTH.md) .
+- Using a certificate, which can be downloaded from the merchant portal. To do this, see instructions [here](./CERT_AUTH.md) .
 
 ## Steps for running locally
 1. Download code
 1. Run *mvn clean install*
 1. Run the following:
-```
-java -jar target/gateway-java-sample-code-1.0.jar
-       --gateway.merchant.id="YOUR_MERCHANT_ID"
-       --gateway.api.password="YOUR_API_PASSWORD"
-       --gateway.api.version="GATEWAY_VERSION"
-       --gateway.base.url="YOUR_GATEWAY_BASE_URL"
-```
+
+        java -jar target/gateway-java-sample-code-1.0.jar
+               --gateway.merchant.id="YOUR_MERCHANT_ID"
+               --gateway.api.password="YOUR_API_PASSWORD"
+               --gateway.api.version="GATEWAY_VERSION"
+               --gateway.base.url="YOUR_GATEWAY_BASE_URL"
+
 1. Navigate to *http://localhost:5000* to test locally
 
 ## Disclaimer
