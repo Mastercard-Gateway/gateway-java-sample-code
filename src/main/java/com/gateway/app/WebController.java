@@ -84,7 +84,7 @@ public class WebController {
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -106,7 +106,7 @@ public class WebController {
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -135,7 +135,7 @@ public class WebController {
             mav.addObject("config", config);
         }
         catch(Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -185,9 +185,9 @@ public class WebController {
             mav.addObject("config", config);
             mav.addObject("checkoutSession", checkoutSession);
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -243,10 +243,10 @@ public class WebController {
 
         }
         catch(ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         }
         catch(Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -358,9 +358,9 @@ public class WebController {
             mav.addObject("orderId", req.getOrderId());
             mav.addObject("checkoutSession", checkoutSession);
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -400,10 +400,10 @@ public class WebController {
             }
         }
         catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         }
         catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -441,9 +441,9 @@ public class WebController {
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -475,9 +475,9 @@ public class WebController {
             mav.addObject("request", dataMap);
             mav.addObject("requestUrl", requestUrl);
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -516,9 +516,9 @@ public class WebController {
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
             mav.addObject("requestUrl", requestUrl);
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -542,9 +542,9 @@ public class WebController {
             // Redirect to provider's website
             mav.setViewName("redirect:" + ApiResponseService.getBrowserPaymentRedirectUrl(resp));
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -584,9 +584,9 @@ public class WebController {
                 mav.addObject("message", browserPaymentResponse.getAcquirerMessage());
             }
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -639,10 +639,10 @@ public class WebController {
             }
         }
         catch(ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         }
         catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
 
         return mav;
@@ -711,13 +711,19 @@ public class WebController {
                 mav.addObject("message", "3DS authentication failed. Please try again with another card.");
             }
         } catch (ApiException e) {
-            ApiException.constructApiErrorResponse(mav, e);
+            constructApiErrorResponse(mav, e);
         } catch (Exception e) {
-            ApiException.constructGeneralErrorResponse(mav, e);
+            constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
 
+    /**
+     * Constructs view model with prefilled data for Hosted Session requests
+     *
+     * @param viewName
+     * @return mav
+     */
     private ModelAndView createHostedSessionModel(String viewName) {
         ModelAndView mav = new ModelAndView(viewName);
 
@@ -732,6 +738,38 @@ public class WebController {
         mav.addObject("request", request);
         mav.addObject("config", config);
 
+        return mav;
+    }
+
+    /**
+     * Constructs the view model for an API error response
+     *
+     * @param mav model from controller
+     * @param e ApiException
+     * @return mav
+     */
+    private static ModelAndView constructApiErrorResponse(ModelAndView mav, ApiException e) {
+        mav.setViewName("error");
+        logger.error(e.getMessage());
+        mav.addObject("errorCode", e.getErrorCode());
+        mav.addObject("explanation", e.getExplanation());
+        mav.addObject("field", e.getField());
+        mav.addObject("validationType", e.getValidationType());
+        return mav;
+    }
+
+    /**
+     * Constructs the view model for a general error response
+     *
+     * @param mav model from controller
+     * @param e Exception
+     * @return mav
+     */
+    private static ModelAndView constructGeneralErrorResponse(ModelAndView mav, Exception e) {
+        mav.setViewName("error");
+        logger.error("An error occurred", e);
+        mav.addObject("cause", e.getCause());
+        mav.addObject("message", e.getMessage());
         return mav;
     }
 }
