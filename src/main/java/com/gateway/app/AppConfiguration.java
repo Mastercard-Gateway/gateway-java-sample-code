@@ -16,6 +16,9 @@ public class AppConfiguration {
     @Value("${gateway.base.url}")
     private String baseURL;
 
+    @Value("${gateway.certificate.url}")
+    private String gatewayHost;
+
     @Value("${gateway.api.version}")
     private String apiVersion;
 
@@ -30,7 +33,8 @@ public class AppConfiguration {
 
     @Bean
     public Config buildConfig() {
-        Config config = new Config(merchantId, apiPassword, baseURL);
+
+        Config config = new Config(merchantId, apiPassword, baseURL, gatewayHost);
 
         config.setApiVersion(Integer.parseInt(apiVersion));
 

@@ -3,7 +3,7 @@ package com.gateway;
 import com.gateway.app.Config;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
-import com.gateway.client.ApiService;
+import com.gateway.client.ApiRequestService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -13,13 +13,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ApiServiceTest {
+public class ApiRequestServiceTest {
 
     private Config config;
 
     @Before
     public void setUp() {
-        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://www.test-gateway.com");
+        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com", null);
         config.setApiVersion(45);
     }
 
@@ -28,26 +28,20 @@ public class ApiServiceTest {
         ApiRequest request = new ApiRequest();
         request.setOrderId("DS9SJ3J39A");
         request.setTransactionId("H9JK29SM0J");
-        String result = ApiService.getRequestUrl(ApiProtocol.REST, config, request);
-        assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
+        String result = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, request);
+        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
     }
 
     @Test
     public void getSessionRequestUrl() throws Exception {
-        String result = ApiService.getSessionRequestUrl(ApiProtocol.REST, config);
-        assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
+        String result = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
     }
 
     @Test
-    public void getSessionRequestUrlWithSessionId_REST() throws Exception {
-        String result = ApiService.getSessionRequestUrl(ApiProtocol.REST, config, "SESSIONID");
-        assertEquals("https://www.test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
-    }
-
-    @Test
-    public void getSessionRequestUrlWithSessionId_NVP() throws Exception {
-        String result = ApiService.getSessionRequestUrl(ApiProtocol.NVP, config, "SESSIONID");
-        assertEquals("https://www.test-gateway.com/api/nvp/version/45", result);
+    public void getSessionRequestUrlWithSessionId() throws Exception {
+        String result = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, "SESSIONID");
+        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
     }
 
     @Test
@@ -57,7 +51,7 @@ public class ApiServiceTest {
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setSourceType("CARD");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"AUTHORIZE\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"CARD\"}}";
 
@@ -70,7 +64,7 @@ public class ApiServiceTest {
         request.setApiOperation("CAPTURE");
         request.setTransactionAmount("10.00");
         request.setTransactionCurrency("USD");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CAPTURE\",\"transaction\":{\"amount\":\"10.00\",\"currency\":\"USD\"}}";
 
@@ -84,7 +78,7 @@ public class ApiServiceTest {
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setSourceType("CARD");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"PAY\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"CARD\"}}";
 
@@ -97,7 +91,7 @@ public class ApiServiceTest {
         request.setApiOperation("REFUND");
         request.setTransactionAmount("10.00");
         request.setTransactionCurrency("USD");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"REFUND\",\"transaction\":{\"amount\":\"10.00\",\"currency\":\"USD\"}}";
 
@@ -110,7 +104,7 @@ public class ApiServiceTest {
         request.setApiOperation("VERIFY");
         request.setOrderCurrency("USD");
         request.setSourceType("CARD");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"VERIFY\",\"order\":{\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"CARD\"}}";
 
@@ -122,7 +116,7 @@ public class ApiServiceTest {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("VOID");
         request.setTargetTransactionId("D9DK0KMWBS");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"VOID\",\"transaction\":{\"targetTransactionId\":\"D9DK0KMWBS\"}}";
 
@@ -133,7 +127,7 @@ public class ApiServiceTest {
     public void parseRetrieveTransactionRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("RETRIEVE_TRANSACTION");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"RETRIEVE_TRANSACTION\"}";
 
@@ -144,7 +138,7 @@ public class ApiServiceTest {
     public void parseUpdateAuthRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("UPDATE_AUTHORIZATION");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"UPDATE_AUTHORIZATION\"}";
 
@@ -157,7 +151,7 @@ public class ApiServiceTest {
         request.setApiOperation("CONFIRM_BROWSER_PAYMENT");
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CONFIRM_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"}}";
 
@@ -174,7 +168,7 @@ public class ApiServiceTest {
         request.setBrowserPaymentConfirmation("CONFIRM_AT_PROVIDER");
         request.setReturnUrl("http://www.mysite.com/receipt");
         request.setSourceType("PAYPAL");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"INITIATE_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"PAYPAL\"},\"browserPayment\":{\"operation\":\"PAY\",\"paypal\":{\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
 
@@ -190,7 +184,7 @@ public class ApiServiceTest {
         request.setBrowserPaymentOperation("PAY");
         request.setReturnUrl("http://www.mysite.com/receipt");
         request.setSourceType("UNION_PAY");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"INITIATE_BROWSER_PAYMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"sourceOfFunds\":{\"type\":\"UNION_PAY\"},\"browserPayment\":{\"operation\":\"PAY\",\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
 
@@ -204,7 +198,7 @@ public class ApiServiceTest {
         request.setOrderId("DS9SJ3J39A");
         request.setOrderCurrency("USD");
         request.setReturnUrl("http://www.mysite.com/receipt");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CREATE_CHECKOUT_SESSION\",\"order\":{\"id\":\"DS9SJ3J39A\",\"currency\":\"USD\"},\"interaction\":{\"returnUrl\":\"http://www.mysite.com/receipt\"}}";
 
@@ -218,7 +212,7 @@ public class ApiServiceTest {
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setSessionId("SESSION0002647025380I5651515F86");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"PAY\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"}}";
 
@@ -233,7 +227,7 @@ public class ApiServiceTest {
         request.setOrderCurrency("USD");
         request.setSessionId("SESSION0002647025380I5651515F86");
         request.setSecureIdResponseUrl("http://www.mysite.com/receipt");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\",\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
 
@@ -245,7 +239,7 @@ public class ApiServiceTest {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("PROCESS_ACS_RESULT");
         request.setPaymentAuthResponse("LONG_PARES_VALUE");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"PROCESS_ACS_RESULT\",\"3DSecure\":{\"paRes\":\"LONG_PARES_VALUE\"}}";
 
@@ -260,7 +254,7 @@ public class ApiServiceTest {
         request.setOrderCurrency("USD");
         request.setSessionId("SESSION0002647025380I5651515F86");
         request.setSecureId("1234567890");
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"PAY\",\"3DSecureId\":\"1234567890\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"}}";
 
@@ -275,7 +269,7 @@ public class ApiServiceTest {
         request.setOrderCurrency("USD");
         request.setMasterpassOriginUrl("http://www.mysite.com/receipt");
 
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"wallet\":{\"masterpass\":{\"originUrl\":\"http://www.mysite.com/receipt\"}}}";
 
@@ -287,7 +281,7 @@ public class ApiServiceTest {
         ApiRequest request = new ApiRequest();
         request.setWalletProvider("MASTERPASS_ONLINE");
 
-        String result = ApiService.buildJSONPayload(request);
+        String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"order\":{\"walletProvider\":\"MASTERPASS_ONLINE\"}}";
 

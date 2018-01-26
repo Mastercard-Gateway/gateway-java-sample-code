@@ -8,38 +8,39 @@ public class Config {
     private int apiVersion;
     private String gatewayHost;
     private String apiUsername;
-    private String trustStore;
-    private String trustStorePassword;
+    private String keyStore;
+    private String keyStorePassword;
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
-    public Config(String merchantId, String apiPassword, String apiBaseURL) {
+    public Config(String merchantId, String apiPassword, String apiBaseURL, String gatewayHost) {
 
         if (merchantId == null || apiBaseURL == null) {
             throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
         }
 
-        if (System.getProperty("javax.net.ssl.trustStore") == null && System.getProperty("javax.net.ssl.trustStorePassword") == null && apiPassword == null) {
-            throw new IllegalArgumentException("Must provide either an API password or a Java keystore");
-        }
-
-        if (System.getProperty("javax.net.ssl.trustStore") != null && System.getProperty("javax.net.ssl.trustStorePassword") != null) {
-            this.trustStore = System.getProperty("javax.net.ssl.trustStore");
-            this.trustStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
-            this.authenticationType = AuthenticationType.CERTIFICATE;
-        }
-        else if (apiPassword != null) {
-            this.apiPassword = apiPassword;
-            this.authenticationType = AuthenticationType.PASSWORD;
+        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && gatewayHost == null && (apiPassword == null || apiPassword.isEmpty())) {
+            throw new IllegalArgumentException("Must provide either an API password OR a Java keystore and certificate hostname");
         }
 
         this.merchantId = merchantId;
         this.apiBaseURL = apiBaseURL;
-        this.gatewayHost = this.apiBaseURL;
         this.apiUsername = "merchant." + this.merchantId;
+
+        if (System.getProperty("javax.net.ssl.keyStore") != null && System.getProperty("javax.net.ssl.keyStorePassword") != null) {
+            this.authenticationType = AuthenticationType.CERTIFICATE;
+            this.keyStore = System.getProperty("javax.net.ssl.keyStore");
+            this.keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
+            this.gatewayHost = gatewayHost;
+        }
+        else if (apiPassword != null) {
+            this.authenticationType = AuthenticationType.PASSWORD;
+            this.apiPassword = apiPassword;
+            this.gatewayHost = this.apiBaseURL;
+        }
     }
 
     public String getMerchantId() {
@@ -66,12 +67,12 @@ public class Config {
         return apiUsername;
     }
 
-    public String getTrustStore() {
-        return trustStore;
+    public String getKeyStore() {
+        return keyStore;
     }
 
-    public String getTrustStorePassword() {
-        return trustStorePassword;
+    public String getKeyStorePassword() {
+        return keyStorePassword;
     }
 
     public String getWebhooksNotificationSecret() {
