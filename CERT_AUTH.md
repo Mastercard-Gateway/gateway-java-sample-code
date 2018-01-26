@@ -1,6 +1,6 @@
 ## Authenticating to the Gateway using a certficate
 1. Download the test certificate from the merchant admin portal. Your merchant must be configured to use SSL certificate authentication.
-2. Convert the test.crt and test.key files included in the download to PKCS12 format using the <a href="https://www.openssl.org/source/" target="_blank">OpenSSL</a>.
+2. Convert the test.crt and test.key files included in the download to PKCS12 format using the [OpenSSL tool](https://www.openssl.org/source/).
 
         openssl pkcs12 -export -out certificate.p12 -inkey test.key -in test.crt
 
