@@ -11,9 +11,10 @@
     <pre th:text="${request}">Request</pre>
 
     <h5>Response</h5>
-    <pre th:each="responseEntry: ${responseMap}">
-        <p th:text="${responseMap.key}"></p>
-        <p th:text="${responseMap.value}"></p>
+    <pre>
+        <p th:each="key: ${responseMap.keySet()}">
+            <span th:text="${key}"></span> = <span th:text="${responseMap.get(key)}"></span>
+        </p>
     </pre>
 </div>
 
