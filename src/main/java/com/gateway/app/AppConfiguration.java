@@ -16,7 +16,7 @@ public class AppConfiguration {
     @Value("${gateway.base.url}")
     private String baseURL;
 
-    @Value("${gateway.certificate.host}")
+    @Value("${gateway.certificate.url}")
     private String gatewayHost;
 
     @Value("${gateway.api.version}")
