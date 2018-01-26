@@ -24,14 +24,14 @@
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="wallet-provider">Wallet Provider</label>
                     <div class="col-md-7">
-                        <input id="wallet-provider" th:field="*{walletProvider}" value="MASTERPASS_ONLINE" type="text" placeholder="" class="form-control input-md"/>
+                        <input id="wallet-provider" th:field="*{walletProvider}" value="MASTERPASS_ONLINE" type="text" placeholder="" class="form-control input-md" readonly/>
 
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-md-7 control-label" for="origin-url">Origin URL (where Masterpass will redirect after transaction is complete)</label>
                     <div class="col-md-7">
-                        <input id="origin-url" th:field="*{masterpassOriginUrl}" type="text" placeholder="" class="form-control input-md"/>
+                        <input id="origin-url" th:field="*{masterpassOriginUrl}" type="text" placeholder="" class="form-control input-md" readonly/>
 
                     </div>
                 </div>
