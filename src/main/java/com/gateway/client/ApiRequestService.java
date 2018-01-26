@@ -233,8 +233,8 @@ public class ApiRequestService {
         keyValueMap.put("order.currency", request.getOrderCurrency());
         keyValueMap.put("transaction.id", request.getTransactionId());
         keyValueMap.put("session.id", request.getSessionId());
-
         keyValueMap.put("sourceOfFunds.type", "CARD");
+
         return keyValueMap;
     }
 

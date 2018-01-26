@@ -11,6 +11,9 @@ import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
 public class ApiRequestServiceTest {
@@ -286,6 +289,30 @@ public class ApiRequestServiceTest {
         String data = "{\"order\":{\"walletProvider\":\"MASTERPASS_ONLINE\"}}";
 
         assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseNVPRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation("PAY");
+        request.setOrderAmount("10.00");
+        request.setOrderCurrency("USD");
+        request.setSourceType("CARD");
+        request.setOrderId("DS9SJ3J39A");
+        request.setTransactionId("H9JK29SM0J");
+        request.setSessionId("SESSION0002650629789J85543139F3");
+        Map result = ApiRequestService.buildMap(request);
+
+        HashMap<String, String> requestMap= new HashMap<String, String>();
+        requestMap.put("apiOperation", "PAY");
+        requestMap.put("order.id", "DS9SJ3J39A");
+        requestMap.put("order.amount", "10.00");
+        requestMap.put("order.currency", "USD");
+        requestMap.put("transaction.id", "H9JK29SM0J");
+        requestMap.put("session.id", "SESSION0002650629789J85543139F3");
+        requestMap.put("sourceOfFunds.type", "CARD");
+
+        assertEquals(requestMap, result);
     }
 
     private String prettifyJson(String data) {
