@@ -4,12 +4,18 @@ import com.gateway.app.Config;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
 import com.gateway.client.ApiRequestService;
+import com.gateway.client.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +51,18 @@ public class ApiRequestServiceTest {
     public void getSessionRequestUrlWithSessionId() throws Exception {
         String result = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, "SESSIONID");
         assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
+    }
+
+    @Test
+    public void getNVPSecureIdRequest() throws Exception {
+        String result = ApiRequestService.getSecureIdRequest(ApiProtocol.NVP, config, "SECURE_ID");
+        assertEquals(result, "https://test-gateway.mastercard.com/api/nvp/version/45/merchant/TESTMERCHANTID/3DSecureId/SECURE_ID");
+    }
+
+    @Test
+    public void getRESTSecureIdRequest() throws Exception {
+        String result = ApiRequestService.getSecureIdRequest(ApiProtocol.REST, config, "SECURE_ID");
+        assertEquals(result, "https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/3DSecureId/SECURE_ID");
     }
 
     @Test
@@ -313,6 +331,13 @@ public class ApiRequestServiceTest {
         requestMap.put("sourceOfFunds.type", "CARD");
 
         assertEquals(requestMap, result);
+    }
+
+    @Test
+    public void getCurrentContext() throws Exception {
+        HttpServletRequest mockedRequest = Mockito.mock(HttpServletRequest.class);
+        String currentContext = ApiRequestService.getCurrentContext(mockedRequest);
+        assertEquals(currentContext, "http://localhost:5000");
     }
 
     private String prettifyJson(String data) {
