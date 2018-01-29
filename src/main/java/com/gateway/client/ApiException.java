@@ -1,6 +1,12 @@
 package com.gateway.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.servlet.ModelAndView;
+
 public class ApiException extends Exception {
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiException.class);
 
     private String errorCode;
     private String explanation;
@@ -42,4 +48,5 @@ public class ApiException extends Exception {
     public void setValidationType(String validationType) {
         this.validationType = validationType;
     }
+
 }

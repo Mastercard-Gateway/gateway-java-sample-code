@@ -16,6 +16,8 @@
 
 package com.gateway.app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,8 @@ import java.io.File;
 @Controller
 @SpringBootApplication
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
         initWebhooksNotificationsFolder();
@@ -41,10 +45,10 @@ public class Main {
     private static void initWebhooksNotificationsFolder() {
         File webhooksNotificationsFolder = new File(Config.WEBHOOKS_NOTIFICATION_FOLDER);
         if (!webhooksNotificationsFolder.exists()) {
-            System.out.println("Creating Webhooks Notifications folder... ");
+            logger.info("Creating Webhooks Notifications folder... ");
             webhooksNotificationsFolder.mkdir();
         } else {
-            System.out.println("Webhooks Notifications folder already exists!");
+            logger.info("Webhooks Notifications folder already exists!");
             //delete all json files from notifications folder
             File[] files = webhooksNotificationsFolder.listFiles();
             if (files != null) {
