@@ -4,18 +4,12 @@ import com.gateway.app.Config;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
 import com.gateway.client.ApiRequestService;
-import com.gateway.client.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
