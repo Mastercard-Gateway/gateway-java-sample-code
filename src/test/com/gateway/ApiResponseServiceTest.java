@@ -1,9 +1,11 @@
 package com.gateway;
 
 import com.gateway.app.Config;
+import com.gateway.client.ApiException;
 import com.gateway.client.ApiResponseService;
 import com.gateway.client.CheckoutSession;
 import com.gateway.client.SecureId;
+import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
 import org.junit.Before;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class ApiResponseServiceTest {
 
@@ -35,7 +38,7 @@ public class ApiResponseServiceTest {
 
     @Test
     public void parse3DSecureResponse() throws Exception {
-        String data = "{\"3DSecure\":{\"authenticationRedirect\":{\"customized\":{\"acsUrl\":\"https://www.issuer.com/acsUrl\",\"paReq\":\"PAREQ_VALUE\"}},\"summaryStatus\":\"CARD_ENROLLED\",\"xid\":\"XID_VALUE\"},\"3DSecureId\":\"SECURE_ID_VALUE\",\"merchant\":\"TESTMERCHANTID\",\"response\":{\"3DSecure\":{\"gatewayCode\":\"CARD_ENROLLED\"}}}";
+        String data = "{\"3DSecure\":{\"authenticationRedirect\":{\"customized\":{\"acsUrl\":\"https://www.issuer.com/acsUrl\",\"paReq\":\"PAREQ_VALUE\"}},\"summaryStatus\":\"CARD_ENROLLED\"},\"3DSecureId\":\"wqUyNrvOO6\",\"merchant\":\"TESTAB2894354\",\"response\":{\"3DSecure\":{\"gatewayCode\":\"CARD_ENROLLED\"}}}";
         SecureId secureId = ApiResponseService.parse3DSecureResponse(data);
 
         assertEquals(secureId.getAcsUrl(), "https://www.issuer.com/acsUrl");
@@ -45,7 +48,7 @@ public class ApiResponseServiceTest {
 
     @Test
     public void parseHostedCheckoutResponse() throws Exception {
-        String data = "{\"amount\":100.00,\"billing\":{\"address\":{\"city\":\"St. Louis\",\"country\":\"USA\",\"postcodeZip\":\"63001\",\"stateProvince\":\"MO\",\"street\":\"123 Main St., #456, #456\"}},\"creationTime\":\"2018-01-26T22:42:47.769Z\",\"currency\":\"USD\",\"customer\":{\"firstName\":\"John\",\"lastName\":\"Smith\"},\"description\":\"Ordered goods\",\"device\":{\"browser\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36\",\"ipAddress\":\"65.254.97.40\"},\"id\":\"2AbGbrb3xl\",\"merchant\":\"TESTMERCHANTID\",\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"provided\":{\"card\":{\"brand\":\"MASTERCARD\",\"expiry\":{\"month\":\"5\",\"year\":\"21\"},\"fundingMethod\":\"CREDIT\",\"issuer\":\"BANCO DEL PICHINCHA, C.A.\",\"nameOnCard\":\"John Smith\",\"number\":\"512345xxxxxx0008\",\"scheme\":\"MASTERCARD\"}},\"type\":\"CARD\"},\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":100.00,\"totalCapturedAmount\":100.00,\"totalRefundedAmount\":0.00,\"transaction\":[{\"authorizationResponse\":{\"posData\":\"1605S0100130\",\"transactionIdentifier\":\"AmexTidTest\"},\"billing\":{\"address\":{\"city\":\"St. Louis\",\"country\":\"USA\",\"postcodeZip\":\"63001\",\"stateProvince\":\"MO\",\"street\":\"123 Main St., #456, #456\"}},\"customer\":{\"firstName\":\"John\",\"lastName\":\"Smith\"},\"device\":{\"browser\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36\",\"ipAddress\":\"65.254.97.40\"},\"gatewayEntryPoint\":\"CHECKOUT\",\"merchant\":\"TESTMERCHANTID\",\"order\":{\"amount\":100.00,\"creationTime\":\"2018-01-26T22:42:47.769Z\",\"currency\":\"USD\",\"description\":\"Ordered goods\",\"id\":\"2AbGbrb3xl\",\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":100.00,\"totalCapturedAmount\":100.00,\"totalRefundedAmount\":0.00},\"response\":{\"acquirerCode\":\"00\",\"cardSecurityCode\":{\"acquirerCode\":\"M\",\"gatewayCode\":\"MATCH\"},\"gatewayCode\":\"APPROVED\"},\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"provided\":{\"card\":{\"brand\":\"MASTERCARD\",\"expiry\":{\"month\":\"5\",\"year\":\"21\"},\"fundingMethod\":\"CREDIT\",\"issuer\":\"BANCO DEL PICHINCHA, C.A.\",\"nameOnCard\":\"John Smith\",\"number\":\"512345xxxxxx0008\",\"scheme\":\"MASTERCARD\"}},\"type\":\"CARD\"},\"timeOfRecord\":\"2018-01-26T22:42:47.769Z\",\"transaction\":{\"acquirer\":{\"batch\":1,\"id\":\"SYSTEST_ACQ1\",\"merchantId\":\"646515314\"},\"amount\":100.00,\"authorizationCode\":\"004745\",\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"1\",\"receipt\":\"180126285\",\"source\":\"INTERNET\",\"terminal\":\"9358\",\"type\":\"PAYMENT\"},\"version\":\"45\"}]}";
+        String data = "{\"amount\":100.00,\"billing\":{\"address\":{\"city\":\"St. Louis\",\"country\":\"USA\",\"postcodeZip\":\"63001\",\"stateProvince\":\"MO\",\"street\":\"123 Main St., #456, #456\"}},\"currency\":\"USD\",\"customer\":{\"firstName\":\"John\",\"lastName\":\"Smith\"},\"description\":\"Ordered goods\",\"device\":{\"browser\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36\",\"ipAddress\":\"65.254.97.40\"},\"id\":\"2AbGbrb3xl\",\"merchant\":\"TESTMERCHANTID\",\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"provided\":{\"card\":{\"brand\":\"MASTERCARD\",\"expiry\":{\"month\":\"5\",\"year\":\"21\"},\"fundingMethod\":\"CREDIT\",\"issuer\":\"BANCO DEL PICHINCHA, C.A.\",\"nameOnCard\":\"John Smith\",\"number\":\"512345xxxxxx0008\",\"scheme\":\"MASTERCARD\"}},\"type\":\"CARD\"},\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":100.00,\"totalCapturedAmount\":100.00,\"totalRefundedAmount\":0.00,\"transaction\":[{\"authorizationResponse\":{\"posData\":\"1605S0100130\",\"transactionIdentifier\":\"AmexTidTest\"},\"billing\":{\"address\":{\"city\":\"St. Louis\",\"country\":\"USA\",\"postcodeZip\":\"63001\",\"stateProvince\":\"MO\",\"street\":\"123 Main St., #456, #456\"}},\"customer\":{\"firstName\":\"John\",\"lastName\":\"Smith\"},\"device\":{\"browser\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36\",\"ipAddress\":\"65.254.97.40\"},\"gatewayEntryPoint\":\"CHECKOUT\",\"merchant\":\"TESTMERCHANTID\",\"order\":{\"amount\":100.00,\"creationTime\":\"2018-01-26T22:42:47.769Z\",\"currency\":\"USD\",\"description\":\"Ordered goods\",\"id\":\"2AbGbrb3xl\",\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":100.00,\"totalCapturedAmount\":100.00,\"totalRefundedAmount\":0.00},\"response\":{\"acquirerCode\":\"00\",\"cardSecurityCode\":{\"acquirerCode\":\"M\",\"gatewayCode\":\"MATCH\"},\"gatewayCode\":\"APPROVED\"},\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"provided\":{\"card\":{\"brand\":\"MASTERCARD\",\"expiry\":{\"month\":\"5\",\"year\":\"21\"},\"fundingMethod\":\"CREDIT\",\"issuer\":\"BANCO DEL PICHINCHA, C.A.\",\"nameOnCard\":\"John Smith\",\"number\":\"512345xxxxxx0008\",\"scheme\":\"MASTERCARD\"}},\"type\":\"CARD\"},\"timeOfRecord\":\"2018-01-26T22:42:47.769Z\",\"transaction\":{\"acquirer\":{\"batch\":1,\"id\":\"SYSTEST_ACQ1\",\"merchantId\":\"646515314\"},\"amount\":100.00,\"authorizationCode\":\"004745\",\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"1\",\"receipt\":\"180126285\",\"source\":\"INTERNET\",\"terminal\":\"9358\",\"type\":\"PAYMENT\"},\"version\":\"45\"}]}";
         TransactionResponse response = ApiResponseService.parseHostedCheckoutResponse(data);
 
         assertEquals(response.getApiResult(), "SUCCESS");
@@ -68,10 +71,18 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOrderId(), "1iUe0JRNYK");
     }
 
-//    @Test
-//    public void parseBrowserPaymentResponse() throws Exception {
-//
-//    }
+    @Test
+    public void parseBrowserPaymentResponse() throws Exception {
+        String data = "{\"browserPayment\":{\"interaction\":{\"status\":\"COMPLETED\",\"timeCompleted\":\"2018-01-29T16:11:19.541Z\",\"timeInitiated\":\"2018-01-29T16:08:39.299Z\",\"timeRedirected\":\"2018-01-29T16:10:20.444Z\",\"timeReturned\":\"2018-01-29T16:11:19.353Z\"},\"operation\":\"PAY\",\"paypal\":{\"displayShippingAddress\":true,\"overrideShippingAddress\":true,\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"redirectUrl\":\"https://test-gateway.mastercard.com/bpui/pp/out/BP-4652f0dd79cade57ba6726992464c994\",\"returnUrl\":\"http://localhost:5000/browserPaymentReceipt?transactionId=oZRL5sU3Fm&orderId=Qcgkl4EGnR\"},\"device\":{\"browser\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36\",\"ipAddress\":\"10.149.16.35\"},\"gatewayEntryPoint\":\"WEB_SERVICES_API\",\"merchant\":\"TESTSIMPLIFYDEV1\",\"order\":{\"amount\":50.00,\"creationTime\":\"2018-01-29T16:08:39.296Z\",\"currency\":\"USD\",\"id\":\"Qcgkl4EGnR\",\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":50.00,\"totalCapturedAmount\":50.00,\"totalRefundedAmount\":0},\"response\":{\"acquirerCode\":\"Success\",\"gatewayCode\":\"APPROVED\"},\"result\":\"SUCCESS\",\"shipping\":{\"address\":{\"city\":\"Market City\",\"country\":\"AUS\",\"postcodeZip\":\"4322\",\"stateProvince\":\"Queensland\",\"street\":\"35 Rainbow street\",\"street2\":\"Floor 5, Apartment 34\"},\"contact\":{\"firstName\":\"John\",\"lastName\":\"Smith\",\"phone\":\"0745231111\"}},\"sourceOfFunds\":{\"provided\":{\"paypal\":{\"accountEmail\":\"john@smith.com\",\"accountHolder\":\"John Smith\"}},\"type\":\"PAYPAL\"},\"timeOfRecord\":\"2018-01-29T16:08:39.296Z\",\"transaction\":{\"acquirer\":{\"date\":\"2018-01-29\",\"id\":\"PAYPAL\",\"merchantId\":\"test.sandbox@paypal.com\",\"time\":\"16:11:19\"},\"amount\":50.00,\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"oZRL5sU3Fm\",\"receipt\":\"IXBNIX8UFZ06J09Z3\",\"source\":\"CALL_CENTRE\",\"type\":\"PAYMENT\"},\"version\":\"45\"}";
+        BrowserPaymentResponse response = ApiResponseService.parseBrowserPaymentResponse(data);
+
+        assertEquals(response.getApiResult(), "SUCCESS");
+        assertEquals(response.getGatewayCode(), "APPROVED");
+        assertEquals(response.getInteractionStatus(), "COMPLETED");
+        assertEquals(response.getOrderAmount(), "50.00");
+        assertEquals(response.getOrderCurrency(), "USD");
+        assertEquals(response.getOrderId(), "Qcgkl4EGnR");
+    }
 
     @Test
     public void parseWalletResponse() throws Exception {
@@ -86,19 +97,40 @@ public class ApiResponseServiceTest {
         assertEquals(response.getRequestToken(), "REQUEST_TOKEN");
     }
 
-//    @Test
-//    public void parseNVPResponse() throws Exception {
-//        String data = "authorizationResponse.cardSecurityCodeError=M&authorizationResponse.commercialCard=888&authorizationResponse.commercialCardIndicator=3&authorizationResponse.financialNetworkCode=777&authorizationResponse.processingCode=003000&authorizationResponse.responseCode=00&authorizationResponse.stan=237436&authorizationResponse.transactionIdentifier=123456789&device.browser=Mozilla%2F5.0+%28Macintosh%3B+Intel+Mac+OS+X+10_13_1%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Chrome%2F63.0.3239.132+Safari%2F537.36&device.ipAddress=10.149.16.36&gatewayEntryPoint=WEB_SERVICES_API&merchant=TESTCSTESTMID&order.amount=50.00&order.creationTime=2018-01-28T03%3A46%3A52.961Z&order.currency=USD&order.id=IXoAyo48VS&order.status=CAPTURED&order.totalAuthorizedAmount=50.00&order.totalCapturedAmount=50.00&order.totalRefundedAmount=0.00&response.acquirerCode=00&response.acquirerMessage=Approved&response.cardSecurityCode.acquirerCode=M&response.cardSecurityCode.gatewayCode=MATCH&response.gatewayCode=APPROVED&result=SUCCESS&risk.response.gatewayCode=ACCEPTED&risk.response.review.decision=NOT_REQUIRED&risk.response.rule%5B0%5D.id=GATEKEEPER&risk.response.rule%5B0%5D.name=Gatekeeper&risk.response.rule%5B0%5D.recommendation=NO_ACTION&risk.response.rule%5B0%5D.score=0&risk.response.rule%5B0%5D.type=EXTERNAL_RULE&risk.response.rule%5B10%5D.data=UK1&risk.response.rule%5B10%5D.name=MSO_IP_COUNTRY&risk.response.rule%5B10%5D.recommendation=NO_ACTION&risk.response.rule%5B10%5D.type=MSO_RULE&risk.response.rule%5B1%5D.data=512345&risk.response.rule%5B1%5D.name=MERCHANT_BIN_RANGE&risk.response.rule%5B1%5D.recommendation=NO_ACTION&risk.response.rule%5B1%5D.type=MERCHANT_RULE&risk.response.rule%5B2%5D.data=M&risk.response.rule%5B2%5D.name=MERCHANT_CSC&risk.response.rule%5B2%5D.recommendation=NO_ACTION&risk.response.rule%5B2%5D.type=MERCHANT_RULE&risk.response.rule%5B3%5D.data=10.149.16.36&risk.response.rule%5B3%5D.name=MERCHANT_IP_ADDRESS_RANGE&risk.response.rule%5B3%5D.recommendation=NO_ACTION&risk.response.rule%5B3%5D.type=MERCHANT_RULE&risk.response.rule%5B4%5D.data=UK1&risk.response.rule%5B4%5D.name=MERCHANT_IP_COUNTRY&risk.response.rule%5B4%5D.recommendation=NO_ACTION&risk.response.rule%5B4%5D.type=MERCHANT_RULE&risk.response.rule%5B5%5D.name=SUSPECT_CARD_LIST&risk.response.rule%5B5%5D.recommendation=NO_ACTION&risk.response.rule%5B5%5D.type=MERCHANT_RULE&risk.response.rule%5B6%5D.name=TRUSTED_CARD_LIST&risk.response.rule%5B6%5D.recommendation=NO_ACTION&risk.response.rule%5B6%5D.type=MERCHANT_RULE&risk.response.rule%5B7%5D.data=512345&risk.response.rule%5B7%5D.name=MSO_BIN_RANGE&risk.response.rule%5B7%5D.recommendation=NO_ACTION&risk.response.rule%5B7%5D.type=MSO_RULE&risk.response.rule%5B8%5D.data=M&risk.response.rule%5B8%5D.name=MSO_CSC&risk.response.rule%5B8%5D.recommendation=NO_ACTION&risk.response.rule%5B8%5D.type=MSO_RULE&risk.response.rule%5B9%5D.data=10.149.16.36&risk.response.rule%5B9%5D.name=MSO_IP_ADDRESS_RANGE&risk.response.rule%5B9%5D.recommendation=NO_ACTION&risk.response.rule%5B9%5D.type=MSO_RULE&risk.response.totalScore=0&sourceOfFunds.provided.card.brand=MASTERCARD&sourceOfFunds.provided.card.expiry.month=5&sourceOfFunds.provided.card.expiry.year=21&sourceOfFunds.provided.card.fundingMethod=CREDIT&sourceOfFunds.provided.card.issuer=BANCO+DEL+PICHINCHA%2C+C.A.&sourceOfFunds.provided.card.number=512345xxxxxx0008&sourceOfFunds.provided.card.scheme=MASTERCARD&sourceOfFunds.type=CARD&timeOfRecord=2018-01-28T03%3A46%3A52.961Z&transaction.acquirer.batch=20180128&transaction.acquirer.date=0128&transaction.acquirer.id=CBA_S2I&transaction.acquirer.merchantId=1234567890&transaction.acquirer.settlementDate=2018-01-28&transaction.acquirer.timeZone=%2B1100&transaction.acquirer.transactionId=123456789&transaction.amount=50.00&transaction.authorizationCode=237436&transaction.currency=USD&transaction.frequency=SINGLE&transaction.id=nhbh6ldkJo&transaction.receipt=802803237436&transaction.source=INTERNET&transaction.terminal=CBAS2I01&transaction.type=PAYMENT&version=45";
-//        Map<String, String> map = ApiResponseService.parseNVPResponse(data);
-//    }
+    @Test
+    public void parseNVPResponse() throws Exception {
+        String data = "merchant=TESTCSTESTMID&order.amount=50.00&order.currency=USD&order.id=IXoAyo48VS&order.status=CAPTURED&response.gatewayCode=APPROVED&result=SUCCESS";
+        Map<String, String> map = ApiResponseService.parseNVPResponse(data);
 
-//    @Test
-//    public void retrieveSession() throws Exception {
-//
-//    }
-//
-//    @Test
-//    public void getBrowserPaymentRedirectUrl() throws Exception {
-//
-//    }
+        assertEquals(map.get("merchant"), "TESTCSTESTMID");
+        assertEquals(map.get("order.amount"), "50.00");
+        assertEquals(map.get("order.currency"), "USD");
+        assertEquals(map.get("order.id"), "IXoAyo48VS");
+        assertEquals(map.get("order.status"), "CAPTURED");
+        assertEquals(map.get("response.gatewayCode"), "APPROVED");
+        assertEquals(map.get("result"), "SUCCESS");
+    }
+
+    @Test
+    public void parseNVPErrorResponseThrowsApiException() throws Exception {
+        String data = "error.cause=INVALID_REQUEST&error.explanation=Value+%27PAY%27+is+invalid.+Pay+request+not+permitted+for+this+merchant.&error.field=apiOperation&error.validationType=INVALID&result=ERROR";
+
+        try {
+            Map<String, String> map = ApiResponseService.parseNVPResponse(data);
+            fail("Expected exception was not thrown");
+        } catch(ApiException e) {
+            assertEquals(e.getErrorCode(), "INVALID_REQUEST");
+            assertEquals(e.getExplanation(), "Value 'PAY' is invalid. Pay request not permitted for this merchant.");
+            assertEquals(e.getField(), "apiOperation");
+            assertEquals(e.getValidationType(), "INVALID");
+        }
+    }
+
+    @Test
+    public void getBrowserPaymentRedirectUrl() throws Exception {
+        String data = "{\"browserPayment\":{\"interaction\":{\"status\":\"INITIATED\",\"timeInitiated\":\"2018-01-29T16:08:39.299Z\"},\"operation\":\"PAY\",\"paypal\":{\"displayShippingAddress\":true,\"overrideShippingAddress\":true,\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"redirectUrl\":\"https://test-gateway.mastercard.com/bpui/pp/out/BP-4652f0dd79cade57ba6726992464c994\",\"returnUrl\":\"http://localhost:5000/browserPaymentReceipt?transactionId=oZRL5sU3Fm&orderId=Qcgkl4EGnR\"},\"gatewayEntryPoint\":\"WEB_SERVICES_API\",\"merchant\":\"TESTSIMPLIFYDEV1\",\"order\":{\"amount\":50.00,\"creationTime\":\"2018-01-29T16:08:39.296Z\",\"currency\":\"USD\",\"id\":\"Qcgkl4EGnR\",\"status\":\"INITIATED\",\"totalAuthorizedAmount\":0,\"totalCapturedAmount\":0,\"totalRefundedAmount\":0},\"response\":{\"gatewayCode\":\"SUBMITTED\"},\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"type\":\"PAYPAL\"},\"timeOfRecord\":\"2018-01-29T16:08:39.296Z\",\"transaction\":{\"acquirer\":{\"date\":\"2018-01-29\",\"id\":\"PAYPAL\",\"merchantId\":\"test.sandbox@paypal.com\",\"time\":\"16:08:39\"},\"amount\":50.00,\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"oZRL5sU3Fm\",\"source\":\"CALL_CENTRE\",\"type\":\"PAYMENT\"},\"version\":\"45\"}";
+
+        assertEquals(ApiResponseService.getBrowserPaymentRedirectUrl(data), "https://test-gateway.mastercard.com/bpui/pp/out/BP-4652f0dd79cade57ba6726992464c994");
+
+    }
 }
