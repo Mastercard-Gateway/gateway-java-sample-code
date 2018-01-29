@@ -333,13 +333,6 @@ public class ApiRequestServiceTest {
         assertEquals(requestMap, result);
     }
 
-    @Test
-    public void getCurrentContext() throws Exception {
-        HttpServletRequest mockedRequest = Mockito.mock(HttpServletRequest.class);
-        String currentContext = ApiRequestService.getCurrentContext(mockedRequest);
-        assertEquals(currentContext, "http://localhost:5000");
-    }
-
     private String prettifyJson(String data) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(data).getAsJsonObject();
