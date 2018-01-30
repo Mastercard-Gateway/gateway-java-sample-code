@@ -317,11 +317,11 @@ public class WebController {
     /**
      * Display 3DSecure operation page
      *
-     * @return ModelAndView for secureId.html
+     * @return ModelAndView for 3dSecure.html
      */
-    @GetMapping("/secureId")
+    @GetMapping("/3dSecure")
     public ModelAndView showSecureId() {
-        return createHostedSessionModel("secureId");
+        return createHostedSessionModel("3dSecure");
     }
 
     /**
@@ -588,7 +588,7 @@ public class WebController {
     }
 
     /**
-     * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into secureIdPayerAuthenticationForm.html.
+     * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into 3dSecurePayerAuthenticationForm.html.
      * Otherwise, it displays an error.
      *
      * @param request     needed to store 3DSecure ID and session ID in HttpSession
@@ -604,7 +604,7 @@ public class WebController {
             // Retrieve session
             CheckoutSession session = ApiResponseService.retrieveSession(config, apiRequest.getSessionId());
 
-            // Construct UPDATE_SESSION_FROM_WALLET API request
+            // Construct CHECK_3DS_ENROLLMENT API request
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
 
             // Create a unique identifier to use for 3DSecure
@@ -625,7 +625,7 @@ public class WebController {
             secureIdObject.setResponseUrl(ApiRequestService.getCurrentContext(request) + "/process3ds");
 
             if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
-                mav.setViewName("secureIdPayerAuthenticationForm");
+                mav.setViewName("3dSecurePayerAuthenticationForm");
                 mav.addObject("secureId", secureIdObject);
                 mav.addObject("config", config);
             } else {
