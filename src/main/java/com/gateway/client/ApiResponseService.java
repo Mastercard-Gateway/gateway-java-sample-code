@@ -2,6 +2,7 @@ package com.gateway.client;
 
 import com.gateway.app.Config;
 import com.gateway.response.BrowserPaymentResponse;
+import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
 import com.google.gson.Gson;
@@ -15,30 +16,29 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ApiResponseService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiResponseService.class);
 
     /**
-     * Parses JSON response from session-based API call into CheckoutSession object
+     * Parses JSON response from session-based API call into HostedSession object
      *
      * @param sessionResponse response from API
-     * @return CheckoutSession
+     * @return HostedSession
      */
-    public static CheckoutSession parseSessionResponse(String sessionResponse) {
+    public static HostedSession parseSessionResponse(String sessionResponse) {
         try {
             JsonObject json = new Gson().fromJson(sessionResponse, JsonObject.class);
             JsonObject jsonSession = json.get("session").getAsJsonObject();
 
-            CheckoutSession checkoutSession = new CheckoutSession();
-            checkoutSession.setId(jsonSession.get("id").getAsString());
-            checkoutSession.setVersion(jsonSession.get("version").getAsString());
+            HostedSession hostedSession = new HostedSession();
+            hostedSession.setId(jsonSession.get("id").getAsString());
+            hostedSession.setVersion(jsonSession.get("version").getAsString());
             if (json.get("successIndicator") != null)
-                checkoutSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+                hostedSession.setSuccessIndicator(json.get("successIndicator").getAsString());
 
-            return checkoutSession;
+            return hostedSession;
         } catch (Exception e) {
             logger.error("Unable to parse session response", e);
             throw e;
@@ -46,25 +46,25 @@ public class ApiResponseService {
     }
 
     /**
-     * Parses JSON response from 3DS transaction into SecureId object
+     * Parses JSON response from 3DS transaction into SecureIdEnrollmentResponse object
      *
      * @param response response from API
-     * @return SecureId
+     * @return SecureIdEnrollmentResponse
      */
-    public static SecureId parse3DSecureResponse(String response) {
+    public static SecureIdEnrollmentResponse parse3DSecureResponse(String response) {
         try {
             JsonObject json = new Gson().fromJson(response, JsonObject.class);
             JsonObject json3ds = json.get("3DSecure").getAsJsonObject();
             JsonObject jsonAuth = json3ds.get("authenticationRedirect").getAsJsonObject();
             JsonObject jsonCustomized = jsonAuth.get("customized").getAsJsonObject();
 
-            SecureId secureId = new SecureId();
-            secureId.setStatus(json3ds.get("summaryStatus").getAsString());
-            secureId.setAcsUrl(jsonCustomized.get("acsUrl").getAsString());
-            secureId.setPaReq(jsonCustomized.get("paReq").getAsString());
-            secureId.setMdValue(Utils.randomNumber());        //This is just a required unique ID to be able to connect the request to the response from ACS
+            SecureIdEnrollmentResponse secureIdEnrollmentResponse = new SecureIdEnrollmentResponse();
+            secureIdEnrollmentResponse.setStatus(json3ds.get("summaryStatus").getAsString());
+            secureIdEnrollmentResponse.setAcsUrl(jsonCustomized.get("acsUrl").getAsString());
+            secureIdEnrollmentResponse.setPaReq(jsonCustomized.get("paReq").getAsString());
+            secureIdEnrollmentResponse.setMdValue(Utils.randomNumber());        //This is just a required unique ID to be able to connect the request to the response from ACS
 
-            return secureId;
+            return secureIdEnrollmentResponse;
         } catch (Exception e) {
             logger.error("Unable to parse 3DSecure response", e);
             throw e;
@@ -232,7 +232,7 @@ public class ApiResponseService {
      * @param sessionId used to target a specific session
      * @return parsed session or throw exception
      */
-    public static CheckoutSession retrieveSession(Config config, String sessionId) throws Exception {
+    public static HostedSession retrieveSession(Config config, String sessionId) throws Exception {
         String url = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
         RESTApiClient sessionConnection = new RESTApiClient();
         try {

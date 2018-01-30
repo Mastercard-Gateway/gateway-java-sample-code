@@ -2,7 +2,7 @@
 <body>
 <!-- Populate the form action attribute with the value returned in the 3DSecure.authenticationRedirect.customized.acsUrl response parameter -->
 <form name="3dsRedirect" th:action="${secureId.acsUrl}" method="POST" accept-charset="UTF-8">
-    <p>ACS redirection page. In your integration you should redirect the payer automatically.</p>
+    <p>This is the ACS redirection page. In your integration you should redirect the payer automatically.</p>
     <!-- Populate the mandatory PaReq parameter with the value returned in the 3DSecure.authenticationRedirect.customized.paReq response parameter.  -->
 
     <input type="hidden" name="PaReq" th:value="${secureId.paReq}"/>

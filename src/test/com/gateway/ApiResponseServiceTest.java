@@ -3,8 +3,8 @@ package com.gateway;
 import com.gateway.app.Config;
 import com.gateway.client.ApiException;
 import com.gateway.client.ApiResponseService;
-import com.gateway.client.CheckoutSession;
-import com.gateway.client.SecureId;
+import com.gateway.client.HostedSession;
+import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
@@ -29,7 +29,7 @@ public class ApiResponseServiceTest {
     @Test
     public void parseSessionResponse() throws Exception {
         String data = "{\"merchant\":\"TESTAB2894354\",\"result\":\"SUCCESS\",\"session\":{\"id\":\"SESSION0002799480514F69145320L2\",\"updateStatus\":\"SUCCESS\",\"version\":\"6f8b683701\"},\"successIndicator\":\"0a292205c57e4dc8\"}";
-        CheckoutSession session = ApiResponseService.parseSessionResponse(data);
+        HostedSession session = ApiResponseService.parseSessionResponse(data);
 
         assertEquals(session.getId(), "SESSION0002799480514F69145320L2");
         assertEquals(session.getSuccessIndicator(), "0a292205c57e4dc8");
@@ -39,11 +39,11 @@ public class ApiResponseServiceTest {
     @Test
     public void parse3DSecureResponse() throws Exception {
         String data = "{\"3DSecure\":{\"authenticationRedirect\":{\"customized\":{\"acsUrl\":\"https://www.issuer.com/acsUrl\",\"paReq\":\"PAREQ_VALUE\"}},\"summaryStatus\":\"CARD_ENROLLED\"},\"3DSecureId\":\"wqUyNrvOO6\",\"merchant\":\"TESTAB2894354\",\"response\":{\"3DSecure\":{\"gatewayCode\":\"CARD_ENROLLED\"}}}";
-        SecureId secureId = ApiResponseService.parse3DSecureResponse(data);
+        SecureIdEnrollmentResponse secureIdEnrollmentResponse = ApiResponseService.parse3DSecureResponse(data);
 
-        assertEquals(secureId.getAcsUrl(), "https://www.issuer.com/acsUrl");
-        assertEquals(secureId.getStatus(), "CARD_ENROLLED");
-        assertEquals(secureId.getPaReq(), "PAREQ_VALUE");
+        assertEquals(secureIdEnrollmentResponse.getAcsUrl(), "https://www.issuer.com/acsUrl");
+        assertEquals(secureIdEnrollmentResponse.getStatus(), "CARD_ENROLLED");
+        assertEquals(secureIdEnrollmentResponse.getPaReq(), "PAREQ_VALUE");
     }
 
     @Test

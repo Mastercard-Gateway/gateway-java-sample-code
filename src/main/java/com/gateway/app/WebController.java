@@ -3,6 +3,7 @@ package com.gateway.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.*;
 import com.gateway.response.BrowserPaymentResponse;
+import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
 import org.slf4j.Logger;
@@ -155,10 +156,10 @@ public class WebController {
             // Create session to use with OPEN_WALLET operation
             String sessionRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
             String sessionResponse = connection.postTransaction(sessionRequestUrl, config);
-            CheckoutSession checkoutSession = ApiResponseService.parseSessionResponse(sessionResponse);
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(sessionResponse);
 
             // Call UPDATE_SESSION to add order information to session
-            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, checkoutSession.getId());
+            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, hostedSession.getId());
             ApiRequest updateSessionRequest = new ApiRequest();
             updateSessionRequest.setOrderAmount(request.getOrderAmount());
             updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
@@ -167,19 +168,19 @@ public class WebController {
             connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
 
             // Call OPEN_WALLET to retrieve Masterpass configuration
-            String walletRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, checkoutSession.getId());
+            String walletRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, hostedSession.getId());
             String openWalletPayload = ApiRequestService.buildJSONPayload(request);
             String walletResponse = connection.postTransaction(openWalletPayload, walletRequestUrl, config);
             WalletResponse wallet = ApiResponseService.parseWalletResponse(walletResponse, "masterpass");
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = httpServletRequest.getSession();
-            httpSession.setAttribute("sessionId", checkoutSession.getId());
+            httpSession.setAttribute("sessionId", hostedSession.getId());
 
             mav.setViewName("masterpassButton");
             mav.addObject("wallet", wallet);
             mav.addObject("config", config);
-            mav.addObject("checkoutSession", checkoutSession);
+            mav.addObject("checkoutSession", hostedSession);
         } catch (ApiException e) {
             constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -347,12 +348,12 @@ public class WebController {
             RESTApiClient connection = new RESTApiClient();
             String resp = connection.postTransaction(data, requestUrl, config);
 
-            CheckoutSession checkoutSession = ApiResponseService.parseSessionResponse(resp);
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("orderId", req.getOrderId());
-            mav.addObject("checkoutSession", checkoutSession);
+            mav.addObject("checkoutSession", hostedSession);
         } catch (ApiException e) {
             constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -602,7 +603,7 @@ public class WebController {
 
         try {
             // Retrieve session
-            CheckoutSession session = ApiResponseService.retrieveSession(config, apiRequest.getSessionId());
+            HostedSession session = ApiResponseService.retrieveSession(config, apiRequest.getSessionId());
 
             // Construct CHECK_3DS_ENROLLMENT API request
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
@@ -621,16 +622,16 @@ public class WebController {
             RESTApiClient apiConnection = new RESTApiClient();
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
-            SecureId secureIdObject = ApiResponseService.parse3DSecureResponse(apiResponse);
-            secureIdObject.setResponseUrl(ApiRequestService.getCurrentContext(request) + "/process3ds");
+            SecureIdEnrollmentResponse secureIdEnrollmentResponseObject = ApiResponseService.parse3DSecureResponse(apiResponse);
+            secureIdEnrollmentResponseObject.setResponseUrl(ApiRequestService.getCurrentContext(request) + "/process3ds");
 
-            if (secureIdObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
+            if (secureIdEnrollmentResponseObject.getStatus().equals(ApiResponses.CARD_ENROLLED.toString())) {
                 mav.setViewName("3dSecurePayerAuthenticationForm");
-                mav.addObject("secureId", secureIdObject);
+                mav.addObject("secureId", secureIdEnrollmentResponseObject);
                 mav.addObject("config", config);
             } else {
                 mav.setViewName("error");
-                mav.addObject("cause", secureIdObject.getStatus());
+                mav.addObject("cause", secureIdEnrollmentResponseObject.getStatus());
                 mav.addObject("message", "Card not enrolled in 3DS.");
             }
         }
@@ -676,9 +677,9 @@ public class WebController {
 
             String data = ApiRequestService.buildJSONPayload(req);
             String resp = connection.postTransaction(data, requestUrl, config);
-            SecureId secureIdObject = ApiResponseService.parse3DSecureResponse(resp);
+            SecureIdEnrollmentResponse secureIdEnrollmentResponseObject = ApiResponseService.parse3DSecureResponse(resp);
 
-            if (!secureIdObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
+            if (!secureIdEnrollmentResponseObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
                 ApiRequest apiReq = ApiRequestService.createApiRequest("AUTHORIZE");
                 apiReq.setSessionId(sessionId);
