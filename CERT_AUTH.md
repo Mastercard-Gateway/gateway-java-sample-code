@@ -10,6 +10,8 @@
 
 4. Pass the keystore information and the certificate hostname as VM options and environment variables.
 
+NOTE: The following parameters are required for certificate authentication: keystore path, keystore password, merchant ID, gateway base URL, and gateway certificate host URL.
+
 #### VM options:
 -Djavax.net.ssl.keyStore - Path to the PKCS12 file you created <br>
 -Djavax.net.ssl.keyStorePassword - The certificate password (which is the same as your test merchant ID, for instance, TESTMERCHANT123)
