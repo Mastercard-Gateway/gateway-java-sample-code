@@ -115,7 +115,7 @@ public class WebController {
         try {
             mav.setViewName("masterpass");
             ApiRequest req = new ApiRequest();
-            req.setOrderId(Utils.randomNumber());
+            req.setOrderId(Utils.createUniqueId("order-"));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
@@ -179,7 +179,7 @@ public class WebController {
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
         ApiRequest req = ApiRequestService.createApiRequest("UPDATE_AUTHORIZATION", config);
-        req.setTransactionId(Utils.randomNumber());
+        req.setTransactionId(Utils.createUniqueId("trans-"));
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -193,7 +193,7 @@ public class WebController {
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
         ApiRequest req = ApiRequestService.createApiRequest("VOID", config);
-        req.setTransactionId(Utils.randomNumber());
+        req.setTransactionId(Utils.createUniqueId("trans-"));
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -220,7 +220,7 @@ public class WebController {
 
         ApiRequest req = new ApiRequest();
         req.setApiOperation("CREATE_CHECKOUT_SESSION");
-        req.setOrderId(Utils.randomNumber());
+        req.setOrderId(Utils.createUniqueId("order-"));
         req.setOrderCurrency(config.getCurrency());
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
@@ -256,8 +256,8 @@ public class WebController {
 
         // Add some prefilled data - can be changed by user
         ApiRequest request = new ApiRequest();
-        request.setOrderId(Utils.randomNumber());
-        request.setTransactionId(Utils.randomNumber());
+        request.setOrderId(Utils.createUniqueId("order-"));
+        request.setTransactionId(Utils.createUniqueId("trans-"));
         request.setOrderAmount("50.00");
         request.setOrderCurrency(config.getCurrency());
         request.setOrderDescription("Wonderful product that you should buy!");

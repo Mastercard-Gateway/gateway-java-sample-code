@@ -382,7 +382,7 @@ public class ApiController {
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
 
             // Create a unique identifier to use for 3DSecure
-            String secureId = Utils.randomNumber();
+            String secureId = Utils.createUniqueId("3ds-");
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = request.getSession();

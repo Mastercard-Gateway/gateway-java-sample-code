@@ -30,8 +30,8 @@ public class ApiRequestService {
         req.setApiOperation(apiOperation);
         req.setOrderAmount("5000");
         req.setOrderCurrency(config.getCurrency());
-        req.setOrderId(Utils.randomNumber());
-        req.setTransactionId(Utils.randomNumber());
+        req.setOrderId(Utils.createUniqueId("order-"));
+        req.setTransactionId(Utils.createUniqueId("trans-"));
         if (apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND") || apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
             req.setOrderId(null);
         }
@@ -251,8 +251,8 @@ public class ApiRequestService {
         try {
             ApiRequest req = new ApiRequest();
             req.setApiOperation("INITIATE_BROWSER_PAYMENT");
-            req.setTransactionId(Utils.randomNumber());
-            req.setOrderId(Utils.randomNumber());
+            req.setTransactionId(Utils.createUniqueId("trans-"));
+            req.setOrderId(Utils.createUniqueId("order-"));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");

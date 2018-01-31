@@ -9,8 +9,8 @@ public class Utils {
      *
      * @return random identifier
      */
-    public static String randomNumber() {
-        return RandomStringUtils.random(10, true, true);
+    public static String createUniqueId(String prefix) {
+        return prefix + RandomStringUtils.random(10, true, true);
     }
 
     /**

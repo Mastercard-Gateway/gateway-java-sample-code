@@ -62,7 +62,7 @@ public class ApiResponseService {
             secureIdEnrollmentResponse.setStatus(json3ds.get("summaryStatus").getAsString());
             secureIdEnrollmentResponse.setAcsUrl(jsonCustomized.get("acsUrl").getAsString());
             secureIdEnrollmentResponse.setPaReq(jsonCustomized.get("paReq").getAsString());
-            secureIdEnrollmentResponse.setMdValue(Utils.randomNumber());        //This is just a required unique ID to be able to connect the request to the response from ACS
+            secureIdEnrollmentResponse.setMdValue(Utils.createUniqueId("md-"));        //This is just a required unique ID to be able to connect the request to the response from ACS
 
             return secureIdEnrollmentResponse;
         } catch (Exception e) {
