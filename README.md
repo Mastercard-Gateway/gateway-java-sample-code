@@ -20,20 +20,20 @@ This is a sample application to help developers start building Java applications
 1. Download code
 1. Run *mvn clean install*
 1. Set the environment variables
-- On Mac/Linux: Use the ```export``` command:
+    - On Mac/Linux: Use the ```export``` command:
 
-        prompt> export GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
-        prompt> export GATEWAY_API_PASSWORD=YOUR_API_PASSWORD
-        prompt> export GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
-        prompt> export GATEWAY_CURRENCY=YOUR_CURRENCY
-        prompt> export GATEWAY_VERSION=YOUR_VERSION (optional)
-- On Windows, use the ```set``` command:
+            prompt> export GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
+            prompt> export GATEWAY_API_PASSWORD=YOUR_API_PASSWORD
+            prompt> export GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
+            prompt> export GATEWAY_CURRENCY=YOUR_CURRENCY
+            prompt> export GATEWAY_VERSION=YOUR_VERSION (optional)
+    - On Windows, use the ```set``` command:
 
-        prompt> set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
-        prompt> set GATEWAY_API_PASSWORD=YOUR_API_PASSWORD
-        prompt> set GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
-        prompt> set GATEWAY_CURRENCY=YOUR_CURRENCY
-        prompt> set GATEWAY_VERSION=YOUR_VERSION (optional)
+            prompt> set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
+            prompt> set GATEWAY_API_PASSWORD=YOUR_API_PASSWORD
+            prompt> set GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
+            prompt> set GATEWAY_CURRENCY=YOUR_CURRENCY
+            prompt> set GATEWAY_VERSION=YOUR_VERSION (optional)
 
 1. Run the following:
 
