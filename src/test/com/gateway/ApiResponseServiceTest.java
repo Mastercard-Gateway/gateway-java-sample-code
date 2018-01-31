@@ -22,7 +22,7 @@ public class ApiResponseServiceTest {
 
     @Before
     public void setUp() {
-        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com", null);
+        config = new Config("TESTMERCHANTID", "APIPASSWORD1234", "https://test-gateway.mastercard.com", null, "USD");
         config.setApiVersion(45);
     }
 

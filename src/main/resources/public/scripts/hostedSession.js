@@ -94,6 +94,7 @@ function pay() {
 }
 
 function handleError(message) {
+    $("#loading-bar-spinner").hide();
     var $errorAlert = $('#error-alert');
     console.log(message);
     $errorAlert.append("<p>" + message + "</p>");

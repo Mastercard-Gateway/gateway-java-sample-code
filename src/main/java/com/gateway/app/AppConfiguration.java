@@ -13,6 +13,9 @@ public class AppConfiguration {
     @Value("${gateway.api.password}")
     private String apiPassword;
 
+    @Value("${gateway.currency}")
+    private String currency;
+
     @Value("${gateway.base.url}")
     private String baseURL;
 
@@ -28,7 +31,7 @@ public class AppConfiguration {
     @Bean
     public Config buildConfig() {
 
-        Config config = new Config(merchantId, apiPassword, baseURL, gatewayHost);
+        Config config = new Config(merchantId, apiPassword, baseURL, gatewayHost, currency);
 
         config.setApiVersion(Integer.parseInt(apiVersion));
 
