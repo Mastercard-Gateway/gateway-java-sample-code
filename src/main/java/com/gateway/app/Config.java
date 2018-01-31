@@ -10,69 +10,83 @@ public class Config {
     private String apiUsername;
     private String keyStore;
     private String keyStorePassword;
+    private String currency;
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
-    public Config(String merchantId, String apiPassword, String apiBaseURL, String gatewayHost) {
-
-        if (merchantId == null || apiBaseURL == null) {
-            throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
-        }
-
-        if (System.getProperty("javax.net.ssl.keyStore") == null && System.getProperty("javax.net.ssl.keyStorePassword") == null && gatewayHost == null && (apiPassword == null || apiPassword.isEmpty())) {
-            throw new IllegalArgumentException("Must provide either an API password OR a Java keystore and certificate hostname");
-        }
-
-        this.merchantId = merchantId;
-        this.apiBaseURL = apiBaseURL;
-        this.apiUsername = "merchant." + this.merchantId;
-
-        if (System.getProperty("javax.net.ssl.keyStore") != null && System.getProperty("javax.net.ssl.keyStorePassword") != null) {
-            this.authenticationType = AuthenticationType.CERTIFICATE;
-            this.keyStore = System.getProperty("javax.net.ssl.keyStore");
-            this.keyStorePassword = System.getProperty("javax.net.ssl.keyStorePassword");
-            this.gatewayHost = gatewayHost;
-        }
-        else if (apiPassword != null) {
-            this.authenticationType = AuthenticationType.PASSWORD;
-            this.apiPassword = apiPassword;
-            this.gatewayHost = this.apiBaseURL;
-        }
-    }
-
     public String getMerchantId() {
         return merchantId;
+    }
+
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
     }
 
     public String getApiPassword() {
         return apiPassword;
     }
 
+    public void setApiPassword(String apiPassword) {
+        this.apiPassword = apiPassword;
+    }
+
     public String getApiBaseURL() {
         return apiBaseURL;
+    }
+
+    public void setApiBaseURL(String apiBaseURL) {
+        this.apiBaseURL = apiBaseURL;
     }
 
     public int getApiVersion() {
         return apiVersion;
     }
 
+    public void setApiVersion(int apiVersion) {
+        this.apiVersion = apiVersion;
+    }
+
     public String getGatewayHost() {
         return gatewayHost;
+    }
+
+    public void setGatewayHost(String gatewayHost) {
+        this.gatewayHost = gatewayHost;
     }
 
     public String getApiUsername() {
         return apiUsername;
     }
 
+    public void setApiUsername(String apiUsername) {
+        this.apiUsername = apiUsername;
+    }
+
     public String getKeyStore() {
         return keyStore;
     }
 
+    public void setKeyStore(String keyStore) {
+        this.keyStore = keyStore;
+    }
+
     public String getKeyStorePassword() {
         return keyStorePassword;
+    }
+
+    public void setKeyStorePassword(String keyStorePassword) {
+        this.keyStorePassword = keyStorePassword;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getWebhooksNotificationSecret() {
@@ -83,11 +97,11 @@ public class Config {
         this.webhooksNotificationSecret = webhooksNotificationSecret;
     }
 
-    public void setApiVersion(int apiVersion) {
-        this.apiVersion = apiVersion;
-    }
-
     public AuthenticationType getAuthenticationType() {
         return authenticationType;
+    }
+
+    public void setAuthenticationType(AuthenticationType authenticationType) {
+        this.authenticationType = authenticationType;
     }
 }

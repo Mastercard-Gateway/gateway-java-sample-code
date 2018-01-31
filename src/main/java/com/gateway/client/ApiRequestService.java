@@ -25,11 +25,11 @@ public class ApiRequestService {
      * @param apiOperation  indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
      * @return ApiRequest
      */
-    public static ApiRequest createApiRequest(String apiOperation) {
+    public static ApiRequest createApiRequest(String apiOperation, Config config) {
         ApiRequest req = new ApiRequest();
         req.setApiOperation(apiOperation);
         req.setOrderAmount("5000");
-        req.setOrderCurrency("USD");
+        req.setOrderCurrency(config.getCurrency());
         req.setOrderId(Utils.randomNumber());
         req.setTransactionId(Utils.randomNumber());
         if (apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND") || apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
@@ -247,14 +247,14 @@ public class ApiRequestService {
      * @return ApiRequest
      * @throws MalformedURLException
      */
-    public static ApiRequest createBrowserPaymentsRequest(HttpServletRequest request, String operation, String source) throws Exception {
+    public static ApiRequest createBrowserPaymentsRequest(HttpServletRequest request, String operation, String source, Config config) throws Exception {
         try {
             ApiRequest req = new ApiRequest();
             req.setApiOperation("INITIATE_BROWSER_PAYMENT");
             req.setTransactionId(Utils.randomNumber());
             req.setOrderId(Utils.randomNumber());
             req.setOrderAmount("50.00");
-            req.setOrderCurrency("USD");
+            req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
             req.setBrowserPaymentOperation(operation);
             req.setSourceType(source);

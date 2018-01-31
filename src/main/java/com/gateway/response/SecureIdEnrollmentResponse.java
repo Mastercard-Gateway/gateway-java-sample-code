@@ -1,6 +1,6 @@
-package com.gateway.client;
+package com.gateway.response;
 
-public class SecureId {
+public class SecureIdEnrollmentResponse {
 
     private String id;
     private String status;

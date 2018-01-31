@@ -16,24 +16,6 @@
     font-weight: 300;
     font-style: normal;
 }
-@font-face {
-    font-family: 'MarkForMC';
-    src: url('../fonts/MarkWebPro-ExtraLightW01Rg.eot');
-    src: url('../fonts/MarkWebPro-ExtraLightW01Rg.eot?#iefix') format('embedded-opentype'),
-    url('../fonts/MarkWebPro-ExtraLightW01Rg.woff') format('woff'),
-    url('../fonts/MarkWebPro-ExtraLightW01Rg.ttf') format('truetype');
-    font-weight: 200;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'MarkForMC';
-    src: url('../fonts/MarkWebPro-HairlineW011466024.eot');
-    src: url('../fonts/MarkWebPro-HairlineW011466024.eot?#iefix') format('embedded-opentype'),
-    url('../fonts/MarkWebPro-HairlineW011466024.woff') format('woff'),
-    url('../fonts/MarkWebPro-HairlineW011466024.ttf') format('truetype');
-    font-weight: 100;
-    font-style: normal;
-}
 
 body {
     margin-bottom: 50px;
