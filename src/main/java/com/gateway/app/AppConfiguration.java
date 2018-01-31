@@ -47,11 +47,6 @@ public class AppConfiguration {
             throw new IllegalArgumentException("Must provide either an API password OR a Java keystore and certificate hostname");
         }
 
-        config.setMerchantId(merchantId);
-        config.setCurrency(currency);
-        config.setApiBaseURL(baseURL);
-        config.setApiUsername("merchant." + merchantId);
-
         if (keystore != null && !keystore.isEmpty() && keystorePassword != null && !keystorePassword.isEmpty()) {
             config.setAuthenticationType(Config.AuthenticationType.CERTIFICATE);
             config.setKeyStore(keystore);
@@ -64,11 +59,15 @@ public class AppConfiguration {
             config.setGatewayHost(baseURL);
         }
 
-        config.setApiVersion(Integer.parseInt(apiVersion));
-
         if (webhooksNotificationSecret != null) {
             config.setWebhooksNotificationSecret(webhooksNotificationSecret);
         }
+
+        config.setMerchantId(merchantId);
+        config.setApiBaseURL(baseURL);
+        config.setApiUsername("merchant." + merchantId);
+        config.setCurrency(currency);
+        config.setApiVersion(Integer.parseInt(apiVersion));
 
         return config;
     }
