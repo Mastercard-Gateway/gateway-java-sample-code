@@ -10,13 +10,14 @@ public class Config {
     private String apiUsername;
     private String keyStore;
     private String keyStorePassword;
+    private String currency;
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
-    public Config(String merchantId, String apiPassword, String apiBaseURL, String gatewayHost) {
+    public Config(String merchantId, String apiPassword, String apiBaseURL, String gatewayHost, String currency) {
 
         if (merchantId == null || apiBaseURL == null) {
             throw new IllegalArgumentException("Merchant ID & Api Base URL are required arguments!");
@@ -27,6 +28,7 @@ public class Config {
         }
 
         this.merchantId = merchantId;
+        this.currency = currency;
         this.apiBaseURL = apiBaseURL;
         this.apiUsername = "merchant." + this.merchantId;
 
@@ -73,6 +75,10 @@ public class Config {
 
     public String getKeyStorePassword() {
         return keyStorePassword;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public String getWebhooksNotificationSecret() {

@@ -69,7 +69,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest req = ApiRequestService.createBrowserPaymentsRequest(request, "PAY", "PAYPAL");
+            ApiRequest req = ApiRequestService.createBrowserPaymentsRequest(request, "PAY", "PAYPAL", config);
             mav.setViewName("paypal");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
@@ -91,7 +91,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            ApiRequest req = ApiRequestService.createBrowserPaymentsRequest(request, "AUTHORIZE", "UNION_PAY");
+            ApiRequest req = ApiRequestService.createBrowserPaymentsRequest(request, "AUTHORIZE", "UNION_PAY", config);
             mav.setViewName("unionpay");
             mav.addObject("apiRequest", req);
             mav.addObject("config", config);
@@ -117,7 +117,7 @@ public class WebController {
             ApiRequest req = new ApiRequest();
             req.setOrderId(Utils.randomNumber());
             req.setOrderAmount("50.00");
-            req.setOrderCurrency("USD");
+            req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
             req.setWalletProvider("MASTERPASS_ONLINE");
             req.setMasterpassOriginUrl(ApiRequestService.getCurrentContext(request) + "/masterpassResponse");
@@ -139,7 +139,7 @@ public class WebController {
     @GetMapping("/capture")
     public ModelAndView showCapture() {
         ModelAndView mav = new ModelAndView("capture");
-        ApiRequest req = ApiRequestService.createApiRequest("CAPTURE");
+        ApiRequest req = ApiRequestService.createApiRequest("CAPTURE", config);
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -152,7 +152,7 @@ public class WebController {
     @GetMapping("/refund")
     public ModelAndView showRefund() {
         ModelAndView mav = new ModelAndView("refund");
-        ApiRequest req = ApiRequestService.createApiRequest("REFUND");
+        ApiRequest req = ApiRequestService.createApiRequest("REFUND", config);
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -165,7 +165,7 @@ public class WebController {
     @GetMapping("/retrieve")
     public ModelAndView showRetrieve() {
         ModelAndView mav = new ModelAndView("retrieve");
-        ApiRequest req = ApiRequestService.createApiRequest("RETRIEVE_TRANSACTION");
+        ApiRequest req = ApiRequestService.createApiRequest("RETRIEVE_TRANSACTION", config);
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -178,7 +178,7 @@ public class WebController {
     @GetMapping("/update")
     public ModelAndView showUpdate() {
         ModelAndView mav = new ModelAndView("update");
-        ApiRequest req = ApiRequestService.createApiRequest("UPDATE_AUTHORIZATION");
+        ApiRequest req = ApiRequestService.createApiRequest("UPDATE_AUTHORIZATION", config);
         req.setTransactionId(Utils.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -192,7 +192,7 @@ public class WebController {
     @GetMapping("/void")
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
-        ApiRequest req = ApiRequestService.createApiRequest("VOID");
+        ApiRequest req = ApiRequestService.createApiRequest("VOID", config);
         req.setTransactionId(Utils.randomNumber());
         mav.addObject("apiRequest", req);
         return mav;
@@ -221,7 +221,7 @@ public class WebController {
         ApiRequest req = new ApiRequest();
         req.setApiOperation("CREATE_CHECKOUT_SESSION");
         req.setOrderId(Utils.randomNumber());
-        req.setOrderCurrency("USD");
+        req.setOrderCurrency(config.getCurrency());
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -259,7 +259,7 @@ public class WebController {
         request.setOrderId(Utils.randomNumber());
         request.setTransactionId(Utils.randomNumber());
         request.setOrderAmount("50.00");
-        request.setOrderCurrency("USD");
+        request.setOrderCurrency(config.getCurrency());
         request.setOrderDescription("Wonderful product that you should buy!");
 
         mav.addObject("request", request);
