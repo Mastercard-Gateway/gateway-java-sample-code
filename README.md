@@ -13,7 +13,7 @@ This is a sample application to help developers start building Java applications
 
 ## Authentication
 1. You can authenticate in one of two ways:
-- Using your API key and password (available from the merchant portal). To do this, see instructions below.
+- Using your API key and password (available from the merchant portal). To do this, see instructions below. The following fields are required for password authentication: merchant ID, API username, API password, and gateway base URL.
 - Using a certificate, which can be downloaded from the merchant portal. To do this, see instructions [here](CERT_AUTH.md). Certificate authentication is not supported on Heroku.
 
 ## Steps for running locally

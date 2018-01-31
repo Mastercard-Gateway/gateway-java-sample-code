@@ -1,12 +1,12 @@
 package com.gateway.client;
 
-public class CheckoutSession {
+public class HostedSession {
 
     private String id;
     private String version;
     private String successIndicator;
 
-    public CheckoutSession() {}
+    public HostedSession() {}
 
     public String getId() {
         return id;
