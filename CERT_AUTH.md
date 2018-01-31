@@ -23,7 +23,6 @@ NOTE: The following parameters are required for certificate authentication: keys
             prompt> export KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
             prompt> export KEYSTORE_PATH=PATH_TO_PKCS12
             prompt> export GATEWAY_VERSION=YOUR_VERSION (optional)
-
     - On Windows, use the ```set``` command:
 
             prompt> set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
