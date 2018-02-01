@@ -33,44 +33,62 @@
                 </div>
                 <div class="mb-4">
                     <h6>Payment details</h6>
-                    <div class="input-block">
-                        <label for='card-number'>Card number:</label>
-                        <input type="text" id="card-number" class="input-field" value="" readonly>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="card-number">Card number</label>
+                        <div class="col-md-7">
+                            <input id="card-number" type="text" placeholder="" class="form-control input-md" required="" readonly/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='expiry-month'>Expiry month:</label>
-                        <input type="text" id="expiry-month" class="input-field" value="">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
+                        <div class="col-md-7">
+                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md" required=""/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='expiry-year'>Expiry year:</label>
-                        <input type="text" id="expiry-year" class="input-field" value="">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
+                        <div class="col-md-7">
+                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md" required=""/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='security-code'>Security code:</label>
-                        <input type="text" id="security-code" class="input-field" value="" readonly>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="security-code">Security code</label>
+                        <div class="col-md-7">
+                            <input id="security-code" type="text" placeholder="" class="form-control input-md" required="" readonly/>
+                        </div>
                     </div>
                 </div>
                 <div>
                     <h6>Order details</h6>
-                    <div class="input-block">
-                        <label for='order-id'>Order ID:</label>
-                        <input type="text" id="order-id" class="input-field" th:value="${request.orderId}">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                        <div class="col-md-7">
+                            <input id="order-id" type="text" th:value="${request.orderId}" class="form-control input-md" required=""/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='order-amount'>Order amount:</label>
-                        <input type="text" id="order-amount" class="input-field" th:value="${request.orderAmount}" maxlength="14">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-amount">Order amount</label>
+                        <div class="col-md-7">
+                            <input id="order-amount" type="text" th:value="${request.orderAmount}" maxlength="14" class="form-control input-md" required=""/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='order-currency'>Order currency:</label>
-                        <input type="text" id="order-currency" class="input-field" th:value="${request.orderCurrency}" maxlength="3">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-currency">Order currency</label>
+                        <div class="col-md-7">
+                            <input id="order-currency" type="text" th:value="${request.orderCurrency}" maxlength="3" class="form-control input-md" required=""/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='order-description'>Description:</label>
-                        <input type="text" id="order-description" style="width: 325px;" class="input-field" th:value="${request.orderDescription}" maxlength="127">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-description">Order description</label>
+                        <div class="col-md-7">
+                            <input id="order-description" type="text" th:value="${request.orderDescription}" maxlength="127" class="form-control input-md" required=""/>
+                        </div>
                     </div>
-                    <div class="input-block">
-                        <label for='transaction-id'>Transaction ID:</label>
-                        <input type="text" id="transaction-id" class="input-field" th:value="${request.transactionId}">
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="transaction-id">Transaction ID</label>
+                        <div class="col-md-7">
+                            <input id="transaction-id" type="text" th:value="${request.transactionId}" class="form-control input-md" required=""/>
+                        </div>
                     </div>
                 </div>
                 <button type="submit" class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay</button>
