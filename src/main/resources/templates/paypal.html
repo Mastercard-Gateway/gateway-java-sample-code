@@ -7,7 +7,7 @@
             <h3>Pay with PayPal</h3>
             <div class="alert alert-warning" role="alert">
                 <p><strong>NOTE:</strong> You can also do an authorization via PayPal, depending on your merchant settings.</p>
-                <p>You can access full integration guidelines <a th:href="@{${config.apiBaseURL} + 'https://test-gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/PayPal.html'}" target="_blank">here</a>.<p/>
+                <p>You can access full integration guidelines <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/PayPal.html'}" target="_blank">here</a>.<p/>
             </div>
             <fieldset>
                 <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />

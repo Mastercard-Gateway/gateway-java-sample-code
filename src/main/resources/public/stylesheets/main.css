@@ -48,6 +48,9 @@ h6 {
 form, .contents {
     padding: 15px;
 }
+.form-control[readonly] {
+    background-color: #ffffff;
+}
 form label {
     font-weight: 400;
 }

@@ -12,24 +12,29 @@
 
 NOTE: The following parameters are required for certificate authentication: keystore path, keystore password, merchant ID, gateway base URL, currency, and gateway certificate host URL.
 
-#### VM options:
--Djavax.net.ssl.keyStore - Path to the PKCS12 file you created <br>
--Djavax.net.ssl.keyStorePassword - The certificate password (which is the same as your test merchant ID, for instance, TESTMERCHANT123)
-
 #### Environment variables:
-gateway.merchant.id - Your merchant ID <br>
-gateway.base.url - The base URL of the gateway <br>
-gateway.api.version - The gateway version you're targeting <br>
-gateway.certificate.url - The URL for certificate authentication
+1. Set the environment variables
+    - On Mac/Linux: Use the ```export``` command:
+
+            prompt> export GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
+            prompt> export GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
+            prompt> export GATEWAY_CERT_HOST_URL=YOUR_GATEWAY_CERT_HOST_URL
+            prompt> export KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
+            prompt> export KEYSTORE_PATH=PATH_TO_PKCS12
+            prompt> export GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
+            prompt> export GATEWAY_VERSION=YOUR_VERSION (optional - default is version 45)
+    - On Windows, use the ```set``` command:
+
+            prompt> set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
+            prompt> set GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
+            prompt> set GATEWAY_CERT_HOST_URL=YOUR_GATEWAY_CERT_HOST_URL
+            prompt> set KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
+            prompt> set KEYSTORE_PATH=PATH_TO_PKCS12
+            prompt> set GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
+            prompt> set GATEWAY_VERSION=YOUR_VERSION (optional - default is version 45)
 
 5. Run the following:
 
-        java -Djavax.net.ssl.keyStore="PATH_TO_PKCS12" -Djavax.net.ssl.keyStorePassword="YOUR_MERCHANT_ID" -jar
-                target/gateway-java-sample-code-1.0.jar
-               --gateway.merchant.id="YOUR_MERCHANT_ID"
-               --gateway.currency="YOUR_CURRENCY"
-               --gateway.api.password="YOUR_API_PASSWORD"
-               --gateway.base.url="YOUR_GATEWAY_BASE_URL"
-               --gateway.certificate.url="YOUR_GATEWAY_CERTIFICATE_URL"
+        java -jar target/gateway-java-sample-code-1.0.jar
 
 6. Navigate to *http://localhost:5000* to test locally

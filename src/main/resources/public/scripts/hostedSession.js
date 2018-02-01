@@ -5,6 +5,13 @@ if (self === top) {
     top.location = self.location;
 }
 
+PaymentSession.setFocus('card.number');
+
+PaymentSession.setFocusStyle(["card.number","card.securityCode"], {
+    borderColor: 'red',
+    borderWidth: '3px'
+});
+
 PaymentSession.configure({
     fields: {
         // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
@@ -26,16 +33,6 @@ PaymentSession.configure({
             if (response.status) {
                 if ("ok" == response.status) {
                     console.log("Session updated with data: " + response.session.id);
-
-                    //check if the security code was provided by the user
-                    if (response.sourceOfFunds.provided.card.securityCode) {
-                        console.log("Security code was provided.");
-                    }
-
-                    //check if the user entered a MasterCard credit card
-                    if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
-                        console.log("The user entered a MasterCard credit card.")
-                    }
 
                     // Submit fields
                     var data = {
