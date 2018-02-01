@@ -25,8 +25,8 @@ public class ApiRequestServiceTest {
         config = new Config();
         config.setMerchantId("TESTMERCHANTID");
         config.setApiPassword("APIPASSWORD1234");
-        config.setApiBaseURL("https://test-gateway.mastercard.com");
-        config.setGatewayHost("https://test-gateway.mastercard.com");
+        config.setApiBaseURL("https://test-gateway.com");
+        config.setGatewayHost("https://test-gateway.com");
         config.setCurrency("USD");
         config.setApiVersion(45);
     }
@@ -37,31 +37,31 @@ public class ApiRequestServiceTest {
         request.setOrderId("DS9SJ3J39A");
         request.setTransactionId("H9JK29SM0J");
         String result = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, request);
-        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
+        assertEquals("https://test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/order/DS9SJ3J39A/transaction/H9JK29SM0J", result);
     }
 
     @Test
     public void getSessionRequestUrl() throws Exception {
         String result = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
+        assertEquals("https://test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session", result);
     }
 
     @Test
     public void getSessionRequestUrlWithSessionId() throws Exception {
         String result = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, "SESSIONID");
-        assertEquals("https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
+        assertEquals("https://test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/session/SESSIONID", result);
     }
 
     @Test
     public void getNVPSecureIdRequest() throws Exception {
         String result = ApiRequestService.getSecureIdRequest(ApiProtocol.NVP, config, "SECURE_ID");
-        assertEquals(result, "https://test-gateway.mastercard.com/api/nvp/version/45/merchant/TESTMERCHANTID/3DSecureId/SECURE_ID");
+        assertEquals(result, "https://test-gateway.com/api/nvp/version/45/merchant/TESTMERCHANTID/3DSecureId/SECURE_ID");
     }
 
     @Test
     public void getRESTSecureIdRequest() throws Exception {
         String result = ApiRequestService.getSecureIdRequest(ApiProtocol.REST, config, "SECURE_ID");
-        assertEquals(result, "https://test-gateway.mastercard.com/api/rest/version/45/merchant/TESTMERCHANTID/3DSecureId/SECURE_ID");
+        assertEquals(result, "https://test-gateway.com/api/rest/version/45/merchant/TESTMERCHANTID/3DSecureId/SECURE_ID");
     }
 
     @Test
