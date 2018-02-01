@@ -5,6 +5,13 @@ if (self === top) {
     top.location = self.location;
 }
 
+PaymentSession.setFocus('card.number');
+
+PaymentSession.setFocusStyle(["card.number","card.securityCode"], {
+    borderColor: 'red',
+    borderWidth: '3px'
+});
+
 PaymentSession.configure({
     fields: {
         // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
