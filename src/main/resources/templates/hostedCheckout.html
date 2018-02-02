@@ -67,7 +67,7 @@
     }
 
     function errorCallback(error) {
-        console.log(JSON.stringify(error));
+        handleError(JSON.stringify(error));
     }
     function cancelCallback() {
         console.log('Payment cancelled');
