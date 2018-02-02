@@ -67,7 +67,12 @@
     }
 
     function errorCallback(error) {
-        handleError(JSON.stringify(error));
+        var message = JSON.stringify(error);
+        $("#loading-bar-spinner").hide();
+        var $errorAlert = $('#error-alert');
+        console.log(message);
+        $errorAlert.append("<p>" + message + "</p>");
+        $errorAlert.show();
     }
     function cancelCallback() {
         console.log('Payment cancelled');
