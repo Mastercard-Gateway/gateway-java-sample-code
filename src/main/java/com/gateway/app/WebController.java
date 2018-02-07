@@ -236,7 +236,7 @@ public class WebController {
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("orderId", req.getOrderId());
-            mav.addObject("checkoutSession", hostedSession);
+            mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
