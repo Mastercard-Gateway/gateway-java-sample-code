@@ -43,9 +43,9 @@
 
     /*<![CDATA[*/
         var merchantId = /*[[${config.merchantId}]]*/ null;
-        var sessionId = /*[[${checkoutSession.id}]]*/ null;
-        var sessionVersion = /*[[${checkoutSession.version}]]*/ null;
-        var successIndicator = /*[[${checkoutSession.successIndicator}]]*/ null;
+        var sessionId = /*[[${hostedSession.id}]]*/ null;
+        var sessionVersion = /*[[${hostedSession.version}]]*/ null;
+        var successIndicator = /*[[${hostedSession.successIndicator}]]*/ null;
         var orderId = /*[[${orderId}]]*/ null;
     /*]]>*/
         var resultIndicator = null;
@@ -62,8 +62,22 @@
     // state of successIndicator and orderId using the beforeRedirect/afterRedirect option
     function afterRedirect(data) {
         // Compare with the resultIndicator saved in the completeCallback() method
-        var result = (resultIndicator === data.successIndicator) ? "SUCCESS" : "ERROR";
-        window.location.href = "/hostedCheckout/" + data.orderId + "/" + result;
+        if (resultIndicator) {
+            var result = (resultIndicator === data.successIndicator) ? "SUCCESS" : "ERROR";
+            window.location.href = "/hostedCheckout/" + data.orderId + "/" + result;
+        }
+        else {
+            successIndicator = data.successIndicator;
+            orderId = data.orderId;
+            sessionId = data.sessionId;
+            sessionVersion = data.sessionVersion;
+            merchantId = data.merchantId;
+
+            window.location.href = "/hostedCheckout/" + data.orderId + "/" + data.successIndicator + "/" + data.sessionId;
+        }
+
+//        var result = (resultIndicator === data.successIndicator) ? "SUCCESS" : "ERROR";
+//        window.location.href = "/hostedCheckout/" + data.orderId + "/" + result;
     }
 
     function errorCallback(error) {

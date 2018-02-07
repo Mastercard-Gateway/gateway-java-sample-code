@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -67,7 +68,7 @@ public class ApiController {
             mav.setViewName("masterpassButton");
             mav.addObject("wallet", wallet);
             mav.addObject("config", config);
-            mav.addObject("checkoutSession", hostedSession);
+            mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -176,6 +177,20 @@ public class ApiController {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
 
+        return mav;
+    }
+
+    @GetMapping("/hostedCheckout/{orderId}/{successIndicator}/{sessionId}")
+    ModelAndView hostedCheckoutRedirect(@PathVariable(value = "orderId") String orderId, @PathVariable(value = "successIndicator") String successIndicator, @PathVariable(value = "sessionId") String sessionId) {
+        ModelAndView mav = new ModelAndView("hostedCheckout");
+
+        HostedSession hostedSession = new HostedSession();
+        hostedSession.setSuccessIndicator(successIndicator);
+        hostedSession.setId(sessionId);
+
+        mav.addObject("hostedSession", hostedSession);
+        mav.addObject("config", config);
+        mav.addObject("orderId", orderId);
         return mav;
     }
 
