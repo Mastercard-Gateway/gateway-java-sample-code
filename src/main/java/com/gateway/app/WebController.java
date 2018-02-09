@@ -58,6 +58,7 @@ public class WebController {
         return createHostedSessionModel("verify");
     }
 
+    /*----EssentialsExcludeStart----*/
     /**
      * Display page for PayPal browser payment
      *
@@ -79,6 +80,7 @@ public class WebController {
 
         return mav;
     }
+    /*----EssentialsExcludeEnd----*/
 
     /*----EssentialsExcludeStart----*/
     /**
