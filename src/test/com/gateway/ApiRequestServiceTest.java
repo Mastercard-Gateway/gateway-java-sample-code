@@ -197,6 +197,7 @@ public class ApiRequestServiceTest {
     }
     /*----EssentialsExcludeEnd----*/
 
+    /*----EssentialsExcludeStart----*/
     @Test
     public void parseUnionPayRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -212,6 +213,7 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /*----EssentialsExcludeEnd----*/
 
     @Test
     public void parseCreateSessionRequest() throws Exception {
