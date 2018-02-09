@@ -34,12 +34,14 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
+    /*——EssentialsExcludeStart——*/
     // Wallet properties
     private String walletProvider;
     private String masterpassOriginUrl;
     private String masterpassOauthToken;
     private String masterpassOauthVerifier;
     private String masterpassCheckoutUrl;
+    /*——EssentialsExcludeEnd——*/
 
     public String getSourceToken() {
         return sourceToken;
@@ -241,6 +243,7 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
+    /*——EssentialsExcludeStart——*/
     public String getMasterpassOauthToken() {
         return masterpassOauthToken;
     }
@@ -264,4 +267,5 @@ public class ApiRequest {
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
+    /*——EssentialsExcludeEnd——*/
 }

@@ -102,6 +102,7 @@ public class WebController {
         return mav;
     }
 
+    /*——EssentialsExcludeStart——*/
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
      * @param request used to determine context for return URL
@@ -130,6 +131,7 @@ public class WebController {
 
         return mav;
     }
+    /*——EssentialsExcludeEnd——*/
 
     /**
      * Display CAPTURE operation page

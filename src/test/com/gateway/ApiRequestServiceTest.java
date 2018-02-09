@@ -281,6 +281,7 @@ public class ApiRequestServiceTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    /*——EssentialsExcludeStart——*/
     @Test
     public void parseWalletRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -295,6 +296,7 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /*——EssentialsExcludeEnd——*/
 
     @Test
     public void parseGetWalletDetailsRequest() throws Exception {

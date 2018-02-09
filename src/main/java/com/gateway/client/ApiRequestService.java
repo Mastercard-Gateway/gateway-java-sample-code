@@ -140,6 +140,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
+        /*——EssentialsExcludeStart——*/
         JsonObject wallet = new JsonObject();
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
@@ -152,6 +153,7 @@ public class ApiRequestService {
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
+        /*——EssentialsExcludeEnd——*/
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))

@@ -26,6 +26,7 @@ public class ApiController {
     @Autowired
     public Config config;
 
+    /*----EssentialsExcludeStart----*/
     /**
      * Create session and fetch Masterpass configuration details
      * 1. Create session
@@ -76,7 +77,9 @@ public class ApiController {
         }
         return mav;
     }
+    /*----EssentialsExcludeEnd----*/
 
+    /*----EssentialsExcludeStart----*/
     /**
      * Handles the response from Masterpass. Retrieves the parameters and uses them to complete a payment or authorization.
      * @param oauthToken
@@ -135,6 +138,7 @@ public class ApiController {
         }
         return mav;
     }
+    /*----EssentialsExcludeEnd----*/
 
     /**
      * This method receives the callback from the Hosted Checkout redirect. It looks up the order using the RETRIEVE_ORDER operation and

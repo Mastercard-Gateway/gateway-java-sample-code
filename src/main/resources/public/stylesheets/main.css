@@ -105,9 +105,11 @@ input {
 .endpoint {
     word-wrap: break-word;
 }
+/*——EssentialsExcludeStart——*/
 #masterpass-button {
     cursor: pointer;
 }
+/*——EssentialsExcludeEnd——*/
 .input-block {
     height: 50px;
     display: flex;
