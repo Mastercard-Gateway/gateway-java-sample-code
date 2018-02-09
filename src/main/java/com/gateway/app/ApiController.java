@@ -338,6 +338,7 @@ public class ApiController {
         return mav;
     }
 
+    /*----EssentialsExcludeStart----*/
     /**
      * This method handles the callback from the payment provider (PayPal, UnionPay, etc). It looks up the transaction based on the transaction ID and order ID and displays
      * either a receipt page or an error page.
@@ -379,6 +380,7 @@ public class ApiController {
         }
         return mav;
     }
+    /*----EssentialsExcludeEnd----*/
 
     /**
      * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into 3dSecurePayerAuthenticationForm.html.

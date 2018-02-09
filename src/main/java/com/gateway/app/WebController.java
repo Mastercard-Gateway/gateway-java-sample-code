@@ -80,6 +80,7 @@ public class WebController {
         return mav;
     }
 
+    /*----EssentialsExcludeStart----*/
     /**
      * Display page for UnionPay SecurePay browser payment
      *
@@ -101,8 +102,9 @@ public class WebController {
 
         return mav;
     }
+    /*----EssentialsExcludeEnd----*/
 
-    /*——EssentialsExcludeStart——*/
+    /*----EssentialsExcludeStart----*/
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
      * @param request used to determine context for return URL
@@ -131,7 +133,7 @@ public class WebController {
 
         return mav;
     }
-    /*——EssentialsExcludeEnd——*/
+    /*----EssentialsExcludeEnd----*/
 
     /**
      * Display CAPTURE operation page

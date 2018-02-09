@@ -64,7 +64,7 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOrderDescription(), "Ordered goods");
     }
 
-    /*——EssentialsExcludeStart——*/
+    /*----EssentialsExcludeStart----*/
     @Test
     public void parseMasterpassResponse() throws Exception {
         String data = "{\"order\":{\"amount\":\"5000.00\",\"currency\":\"USD\",\"id\":\"order-78oSgRzCqs\",\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":5000,\"totalCapturedAmount\":5000,\"totalRefundedAmount\":0,\"walletIndicator\":\"101\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"response\":{\"acquirerCode\":\"00\",\"acquirerMessage\":\"Approved\",\"gatewayCode\":\"APPROVED\"},\"result\":\"SUCCESS\"}";
@@ -76,7 +76,7 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOrderCurrency(), "USD");
         assertEquals(response.getOrderId(), "order-78oSgRzCqs");
     }
-    /*——EssentialsExcludeEnd——*/
+    /*----EssentialsExcludeEnd----*/
 
     @Test
     public void parseBrowserPaymentResponse() throws Exception {

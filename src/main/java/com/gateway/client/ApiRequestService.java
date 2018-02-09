@@ -140,7 +140,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
-        /*——EssentialsExcludeStart——*/
+        /*----EssentialsExcludeStart----*/
         JsonObject wallet = new JsonObject();
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
@@ -153,7 +153,7 @@ public class ApiRequestService {
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
-        /*——EssentialsExcludeEnd——*/
+        /*----EssentialsExcludeEnd----*/
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))
@@ -240,6 +240,7 @@ public class ApiRequestService {
         return keyValueMap;
     }
 
+    /*----EssentialsExcludeStart----*/
     /**
      * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
      *
@@ -268,6 +269,7 @@ public class ApiRequestService {
             throw e;
         }
     }
+    /*----EssentialsExcludeEnd----*/
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed

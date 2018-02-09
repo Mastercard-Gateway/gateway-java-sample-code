@@ -34,14 +34,14 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
-    /*——EssentialsExcludeStart——*/
+    /*----EssentialsExcludeStart----*/
     // Wallet properties
     private String walletProvider;
     private String masterpassOriginUrl;
     private String masterpassOauthToken;
     private String masterpassOauthVerifier;
     private String masterpassCheckoutUrl;
-    /*——EssentialsExcludeEnd——*/
+    /*----EssentialsExcludeEnd----*/
 
     public String getSourceToken() {
         return sourceToken;
