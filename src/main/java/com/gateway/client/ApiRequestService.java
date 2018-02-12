@@ -140,7 +140,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
-        /*----EssentialsExcludeStart----*/
+        /* essentials_exclude_start */
         JsonObject wallet = new JsonObject();
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
@@ -153,7 +153,7 @@ public class ApiRequestService {
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
-        /*----EssentialsExcludeEnd----*/
+        /* essentials_exclude_end*/
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))
@@ -180,7 +180,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getSourceToken())) sourceOfFunds.addProperty("token", request.getSourceToken());
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
-        /*----EssentialsExcludeStart----*/
+        /* essentials_exclude_start */
         JsonObject browserPayment = new JsonObject();
         if (Utils.notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
@@ -189,7 +189,7 @@ public class ApiRequestService {
             paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
             browserPayment.add("paypal", paypal);
         }
-        /*----EssentialsExcludeEnd----*/
+        /* essentials_exclude_end*/
 
         JsonObject interaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
@@ -242,7 +242,7 @@ public class ApiRequestService {
         return keyValueMap;
     }
 
-    /*----EssentialsExcludeStart----*/
+    /* essentials_exclude_start */
     /**
      * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
      *
@@ -271,7 +271,7 @@ public class ApiRequestService {
             throw e;
         }
     }
-    /*----EssentialsExcludeEnd----*/
+    /* essentials_exclude_end*/
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed

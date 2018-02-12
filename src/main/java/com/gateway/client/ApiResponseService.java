@@ -104,7 +104,7 @@ public class ApiResponseService {
 
     }
 
-    /*----EssentialsExcludeStart----*/
+    /* essentials_exclude_start */
     /**
      * Parses JSON response from Masterpass transaction into TransactionResponse object
      *
@@ -134,7 +134,7 @@ public class ApiResponseService {
         }
 
     }
-    /*----EssentialsExcludeEnd----*/
+    /* essentials_exclude_end*/
 
     /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object
