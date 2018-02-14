@@ -171,20 +171,6 @@ public class WebController {
     }
 
     /**
-     * Display UPDATE_AUTHORIZATION operation page
-     *
-     * @return ModelAndView for update.html
-     */
-    @GetMapping("/update")
-    public ModelAndView showUpdate() {
-        ModelAndView mav = new ModelAndView("update");
-        ApiRequest req = ApiRequestService.createApiRequest("UPDATE_AUTHORIZATION", config);
-        req.setTransactionId(Utils.createUniqueId("trans-"));
-        mav.addObject("apiRequest", req);
-        return mav;
-    }
-
-    /**
      * Display VOID operation page
      *
      * @return ModelAndView for void.html
