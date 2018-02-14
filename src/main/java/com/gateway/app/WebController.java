@@ -58,6 +58,7 @@ public class WebController {
         return createHostedSessionModel("verify");
     }
 
+    /* essentials_exclude_start */
     /**
      * Display page for PayPal browser payment
      *
@@ -79,7 +80,9 @@ public class WebController {
 
         return mav;
     }
+    /* essentials_exclude_end*/
 
+    /* essentials_exclude_start */
     /**
      * Display page for UnionPay SecurePay browser payment
      *
@@ -101,7 +104,9 @@ public class WebController {
 
         return mav;
     }
+    /* essentials_exclude_end*/
 
+    /* essentials_exclude_start */
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
      * @param request used to determine context for return URL
@@ -130,6 +135,7 @@ public class WebController {
 
         return mav;
     }
+    /* essentials_exclude_end*/
 
     /**
      * Display CAPTURE operation page

@@ -26,6 +26,7 @@ public class ApiController {
     @Autowired
     public Config config;
 
+    /* essentials_exclude_start */
     /**
      * Create session and fetch Masterpass configuration details
      * 1. Create session
@@ -76,7 +77,9 @@ public class ApiController {
         }
         return mav;
     }
+    /* essentials_exclude_end */
 
+    /* essentials_exclude_start */
     /**
      * Handles the response from Masterpass. Retrieves the parameters and uses them to complete a payment or authorization.
      * @param oauthToken
@@ -135,6 +138,7 @@ public class ApiController {
         }
         return mav;
     }
+    /* essentials_exclude_end*/
 
     /**
      * This method receives the callback from the Hosted Checkout redirect. It looks up the order using the RETRIEVE_ORDER operation and
@@ -334,6 +338,7 @@ public class ApiController {
         return mav;
     }
 
+    /* essentials_exclude_start */
     /**
      * This method handles the callback from the payment provider (PayPal, UnionPay, etc). It looks up the transaction based on the transaction ID and order ID and displays
      * either a receipt page or an error page.
@@ -375,6 +380,7 @@ public class ApiController {
         }
         return mav;
     }
+    /* essentials_exclude_end*/
 
     /**
      * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into 3dSecurePayerAuthenticationForm.html.

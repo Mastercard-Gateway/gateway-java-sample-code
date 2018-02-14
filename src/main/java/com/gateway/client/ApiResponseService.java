@@ -104,6 +104,7 @@ public class ApiResponseService {
 
     }
 
+    /* essentials_exclude_start */
     /**
      * Parses JSON response from Masterpass transaction into TransactionResponse object
      *
@@ -128,11 +129,12 @@ public class ApiResponseService {
 
             return resp;
         } catch (Exception e) {
-            logger.error("Unable to parse Masterpass response", e);
+            logger.error("Unable to parse wallet response", e);
             throw e;
         }
 
     }
+    /* essentials_exclude_end*/
 
     /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object

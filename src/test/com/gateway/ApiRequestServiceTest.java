@@ -178,6 +178,7 @@ public class ApiRequestServiceTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    /* essentials_exclude_start */
     @Test
     public void parsePayPalRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -194,7 +195,9 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /* essentials_exclude_end */
 
+    /* essentials_exclude_start */
     @Test
     public void parseUnionPayRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -210,6 +213,7 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /* essentials_exclude_end */
 
     @Test
     public void parseCreateSessionRequest() throws Exception {
@@ -281,6 +285,7 @@ public class ApiRequestServiceTest {
         assertEquals(prettifyJson(data), result);
     }
 
+    /* essentials_exclude_start */
     @Test
     public void parseWalletRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -295,7 +300,9 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /* essentials_exclude_end */
 
+    /* essentials_exclude_start */
     @Test
     public void parseGetWalletDetailsRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -307,6 +314,7 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /* essentials_exclude_end */
 
     @Test
     public void parseNVPRequest() throws Exception {
