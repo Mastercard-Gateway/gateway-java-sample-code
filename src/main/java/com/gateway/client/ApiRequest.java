@@ -171,14 +171,6 @@ public class ApiRequest {
         this.returnUrl = returnUrl;
     }
 
-    public String getMasterpassOriginUrl() {
-        return masterpassOriginUrl;
-    }
-
-    public void setMasterpassOriginUrl(String originUrl) {
-        this.masterpassOriginUrl = originUrl;
-    }
-
     public String getBrowserPaymentOperation() {
         return browserPaymentOperation;
     }
@@ -244,6 +236,14 @@ public class ApiRequest {
     }
 
     /* essentials_exclude_start */
+    public String getMasterpassOriginUrl() {
+        return masterpassOriginUrl;
+    }
+
+    public void setMasterpassOriginUrl(String originUrl) {
+        this.masterpassOriginUrl = originUrl;
+    }
+
     public String getMasterpassOauthToken() {
         return masterpassOauthToken;
     }

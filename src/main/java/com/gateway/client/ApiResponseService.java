@@ -197,7 +197,7 @@ public class ApiResponseService {
             return wallet;
         }
         catch(Exception e) {
-            logger.error("Unable to parse Masterpass response", e);
+            logger.error("Unable to parse wallet response", e);
             throw e;
         }
     }
