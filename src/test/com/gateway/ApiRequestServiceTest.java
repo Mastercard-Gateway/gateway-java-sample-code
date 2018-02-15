@@ -155,17 +155,6 @@ public class ApiRequestServiceTest {
     }
 
     @Test
-    public void parseUpdateAuthRequest() throws Exception {
-        ApiRequest request = new ApiRequest();
-        request.setApiOperation("UPDATE_AUTHORIZATION");
-        String result = ApiRequestService.buildJSONPayload(request);
-
-        String data = "{\"apiOperation\":\"UPDATE_AUTHORIZATION\"}";
-
-        assertEquals(prettifyJson(data), result);
-    }
-
-    @Test
     public void parseConfirmBrowserPaymentRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("CONFIRM_BROWSER_PAYMENT");
