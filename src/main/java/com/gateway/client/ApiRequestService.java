@@ -153,7 +153,7 @@ public class ApiRequestService {
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
-        /* essentials_exclude_end*/
+        /* essentials_exclude_end */
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))
@@ -191,7 +191,7 @@ public class ApiRequestService {
             browserPayment.add("paypal", paypal);
         }
         /* targeted_exclude_end */
-        /* essentials_exclude_end*/
+        /* essentials_exclude_end */
 
         JsonObject interaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
@@ -273,7 +273,7 @@ public class ApiRequestService {
             throw e;
         }
     }
-    /* essentials_exclude_end*/
+    /* essentials_exclude_end */
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed

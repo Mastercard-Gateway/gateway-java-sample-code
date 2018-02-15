@@ -138,7 +138,7 @@ public class ApiController {
         }
         return mav;
     }
-    /* essentials_exclude_end*/
+    /* essentials_exclude_end */
 
     /**
      * This method receives the callback from the Hosted Checkout redirect. It looks up the order using the RETRIEVE_ORDER operation and
@@ -380,7 +380,7 @@ public class ApiController {
         }
         return mav;
     }
-    /* essentials_exclude_end*/
+    /* essentials_exclude_end */
 
     /**
      * This method handles the response from the CHECK_3DS_ENROLLMENT operation. If the card is enrolled, the response includes the HTML for the issuer's authentication form, to be injected into 3dSecurePayerAuthenticationForm.html.
