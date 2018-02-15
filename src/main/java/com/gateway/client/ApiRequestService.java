@@ -122,16 +122,19 @@ public class ApiRequestService {
 
         JsonObject secureId = new JsonObject();
         if (Utils.notNullOrEmpty(request.getPaymentAuthResponse())) {
+            // Used for 3DS Process ACS Result operation
             secureId.addProperty("paRes", request.getPaymentAuthResponse());
         }
 
         JsonObject authenticationRedirect = new JsonObject();
+        // Used for 3DS check enrollment operation
         if (Utils.notNullOrEmpty(request.getSecureIdResponseUrl())) {
             authenticationRedirect.addProperty("responseUrl", request.getSecureIdResponseUrl());
             authenticationRedirect.addProperty("pageGenerationMode", "CUSTOMIZED");
             secureId.add("authenticationRedirect", authenticationRedirect);
         }
 
+        // Used for hosted checkout - CREATE_CHECKOUT_SESSION operation
         JsonObject order = new JsonObject();
         if (Utils.notNullOrEmpty(request.getApiOperation()) && request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
             // Need to add order ID in the request body for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
@@ -144,6 +147,7 @@ public class ApiRequestService {
         /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
+            // Used for Masterpass operations
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
                 if(Utils.notNullOrEmpty(request.getMasterpassOriginUrl())) masterpass.addProperty("originUrl", request.getMasterpassOriginUrl());
