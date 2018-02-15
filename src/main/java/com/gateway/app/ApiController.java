@@ -340,12 +340,12 @@ public class ApiController {
 
     /* essentials_exclude_start */
     /**
-     * This method handles the callback from the payment provider (PayPal, UnionPay, etc). It looks up the transaction based on the transaction ID and order ID and displays
+     * This method handles the callback from the payment provider. It looks up the transaction based on the transaction ID and order ID and displays
      * either a receipt page or an error page.
      *
      * @param transactionId used to retrieve transaction
      * @param orderId       used to construct API endpoint
-     * @return ModelAndView for PayPal or UnionPay SecurePay receipt page or error page
+     * @return ModelAndView for browser payment receipt page or error page
      */
     @GetMapping("/browserPaymentReceipt")
     public ModelAndView browserPaymentReceipt(@RequestParam("transactionId") String transactionId, @RequestParam("orderId") String orderId) {

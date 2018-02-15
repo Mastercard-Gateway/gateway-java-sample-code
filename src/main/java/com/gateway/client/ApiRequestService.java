@@ -181,10 +181,10 @@ public class ApiRequestService {
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
         /* essentials_exclude_start */
-        /* targeted_exclude_start */
         JsonObject browserPayment = new JsonObject();
         if (Utils.notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
+        /* targeted_exclude_start */
         if (Utils.notNullOrEmpty(request.getSourceType()) && request.getSourceType().equals("PAYPAL")) {
             JsonObject paypal = new JsonObject();
             paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
@@ -246,11 +246,11 @@ public class ApiRequestService {
 
     /* essentials_exclude_start */
     /**
-     * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
+     * Constructs API request to initiate browser payment
      *
      * @param request   needed to determine the current context
      * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
-     * @param source    provider for the browser payment (PayPal, UnionPay SecurePay, etc)
+     * @param source    provider for the browser payment
      * @return ApiRequest
      * @throws MalformedURLException
      */
