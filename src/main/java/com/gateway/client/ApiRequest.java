@@ -36,12 +36,12 @@ public class ApiRequest {
 
     /* essentials_exclude_start */
     // Wallet properties
-    private String walletProvider;
     private String masterpassOriginUrl;
     private String masterpassOauthToken;
     private String masterpassOauthVerifier;
     private String masterpassCheckoutUrl;
     /* essentials_exclude_end */
+    private String walletProvider;
 
     public String getSourceToken() {
         return sourceToken;
