@@ -140,8 +140,8 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
-        /* essentials_exclude_start */
         JsonObject wallet = new JsonObject();
+        /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
@@ -180,8 +180,8 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getSourceToken())) sourceOfFunds.addProperty("token", request.getSourceToken());
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
-        /* essentials_exclude_start */
         JsonObject browserPayment = new JsonObject();
+        /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
         /* targeted_exclude_start */
