@@ -59,6 +59,7 @@ public class WebController {
     }
 
     /* essentials_exclude_start */
+    /* targeted_exclude_start */
     /**
      * Display page for PayPal browser payment
      *
@@ -80,6 +81,7 @@ public class WebController {
 
         return mav;
     }
+    /* targeted_exclude_end */
     /* essentials_exclude_end*/
 
     /* essentials_exclude_start */

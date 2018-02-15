@@ -30,8 +30,10 @@
             <h6><a th:class="${viewName == 'hostedCheckout'}? 'active'" href="/hostedCheckout">Hosted Checkout</a></h6>
             <h6><a th:class="${viewName == '3dSecure'}? 'active'" href="/3dSecure">Pay with 3DS</a></h6>
             <!--<essentials_exclude>-->
+            <!--<targeted_exclude>-->
             <h6><a th:class="${viewName == 'paypal'}? 'active'" href="/paypal">Pay with PayPal</a></h6>
             <!--</essentials_exclude>-->
+            <!--</targeted_exclude>-->
             <!--<essentials_exclude>-->
             <h6><a th:class="${viewName == 'unionpay'}? 'active'" href="/unionpay">Pay with UnionPay SecurePay</a></h6>
             <!--</essentials_exclude>-->

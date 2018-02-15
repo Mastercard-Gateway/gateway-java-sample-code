@@ -181,6 +181,7 @@ public class ApiRequestService {
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
         /* essentials_exclude_start */
+        /* targeted_exclude_start */
         JsonObject browserPayment = new JsonObject();
         if (Utils.notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
@@ -189,6 +190,7 @@ public class ApiRequestService {
             paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
             browserPayment.add("paypal", paypal);
         }
+        /* targeted_exclude_end */
         /* essentials_exclude_end*/
 
         JsonObject interaction = new JsonObject();

@@ -179,6 +179,7 @@ public class ApiRequestServiceTest {
     }
 
     /* essentials_exclude_start */
+    /* targeted_exclude_start */
     @Test
     public void parsePayPalRequest() throws Exception {
         ApiRequest request = new ApiRequest();
@@ -195,6 +196,7 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    /* targeted_exclude_end */
     /* essentials_exclude_end */
 
     /* essentials_exclude_start */
