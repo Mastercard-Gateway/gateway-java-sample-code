@@ -141,6 +141,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
         JsonObject wallet = new JsonObject();
+        /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
@@ -152,6 +153,7 @@ public class ApiRequestService {
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
         }
+        /* essentials_exclude_end */
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))
@@ -179,13 +181,17 @@ public class ApiRequestService {
         if (!provided.entrySet().isEmpty()) sourceOfFunds.add("provided", provided);
 
         JsonObject browserPayment = new JsonObject();
+        /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getBrowserPaymentOperation()))
             browserPayment.addProperty("operation", request.getBrowserPaymentOperation());
+        /* targeted_exclude_start */
         if (Utils.notNullOrEmpty(request.getSourceType()) && request.getSourceType().equals("PAYPAL")) {
             JsonObject paypal = new JsonObject();
             paypal.addProperty("paymentConfirmation", "CONFIRM_AT_PROVIDER");
             browserPayment.add("paypal", paypal);
         }
+        /* targeted_exclude_end */
+        /* essentials_exclude_end */
 
         JsonObject interaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
@@ -238,12 +244,13 @@ public class ApiRequestService {
         return keyValueMap;
     }
 
+    /* essentials_exclude_start */
     /**
-     * Constructs API request to initiate browser payment (PayPal or UnionPay SecurePay, for example)
+     * Constructs API request to initiate browser payment
      *
      * @param request   needed to determine the current context
      * @param operation indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
-     * @param source    provider for the browser payment (PayPal, UnionPay SecurePay, etc)
+     * @param source    provider for the browser payment
      * @return ApiRequest
      * @throws MalformedURLException
      */
@@ -266,6 +273,7 @@ public class ApiRequestService {
             throw e;
         }
     }
+    /* essentials_exclude_end */
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed

@@ -64,6 +64,7 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOrderDescription(), "Ordered goods");
     }
 
+    /* essentials_exclude_start */
     @Test
     public void parseMasterpassResponse() throws Exception {
         String data = "{\"order\":{\"amount\":\"5000.00\",\"currency\":\"USD\",\"id\":\"order-78oSgRzCqs\",\"status\":\"CAPTURED\",\"totalAuthorizedAmount\":5000,\"totalCapturedAmount\":5000,\"totalRefundedAmount\":0,\"walletIndicator\":\"101\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"response\":{\"acquirerCode\":\"00\",\"acquirerMessage\":\"Approved\",\"gatewayCode\":\"APPROVED\"},\"result\":\"SUCCESS\"}";
@@ -75,6 +76,7 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOrderCurrency(), "USD");
         assertEquals(response.getOrderId(), "order-78oSgRzCqs");
     }
+    /* essentials_exclude_end */
 
     @Test
     public void parseBrowserPaymentResponse() throws Exception {
@@ -89,6 +91,7 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOrderId(), "order-E5AaY8Hsuo");
     }
 
+    /* essentials_exclude_start */
     @Test
     public void parseWalletResponse() throws Exception {
         String data = "{\"merchant\":\"TESTCSTESTMID\",\"order\":{\"amount\":\"50.00\",\"currency\":\"USD\",\"walletProvider\":\"MASTERPASS_ONLINE\"},\"session\":{\"id\":\"SESSION0002798226376L35023121J8\",\"updateStatus\":\"SUCCESS\",\"version\":\"831cb86303\"},\"version\":\"45\",\"wallet\":{\"masterpass\":{\"allowedCardTypes\":\"visa,master\",\"merchantCheckoutId\":\"MERCHANT_CHECKOUT_ID\",\"originUrl\":\"http://localhost:5000/masterpassResponse\",\"requestToken\":\"REQUEST_TOKEN\"}}}";
@@ -101,6 +104,7 @@ public class ApiResponseServiceTest {
         assertEquals(response.getOriginUrl(), "http://localhost:5000/masterpassResponse");
         assertEquals(response.getRequestToken(), "REQUEST_TOKEN");
     }
+    /* essentials_exclude_end */
 
     @Test
     public void parseNVPResponse() throws Exception {
@@ -131,11 +135,13 @@ public class ApiResponseServiceTest {
         }
     }
 
+    /* essentials_exclude_start */
     @Test
     public void getBrowserPaymentRedirectUrl() throws Exception {
-        String data = "{\"browserPayment\":{\"interaction\":{\"status\":\"INITIATED\",\"timeInitiated\":\"2018-01-29T16:08:39.299Z\"},\"operation\":\"PAY\",\"paypal\":{\"displayShippingAddress\":true,\"overrideShippingAddress\":true,\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"redirectUrl\":\"https://test-gateway.com/bpui/pp/out/BP-4652f0dd79cade57ba6726992464c994\",\"returnUrl\":\"http://localhost:5000/browserPaymentReceipt?transactionId=oZRL5sU3Fm&orderId=Qcgkl4EGnR\"},\"gatewayEntryPoint\":\"WEB_SERVICES_API\",\"merchant\":\"TESTSIMPLIFYDEV1\",\"order\":{\"amount\":50.00,\"creationTime\":\"2018-01-29T16:08:39.296Z\",\"currency\":\"USD\",\"id\":\"Qcgkl4EGnR\",\"status\":\"INITIATED\",\"totalAuthorizedAmount\":0,\"totalCapturedAmount\":0,\"totalRefundedAmount\":0},\"response\":{\"gatewayCode\":\"SUBMITTED\"},\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"type\":\"PAYPAL\"},\"timeOfRecord\":\"2018-01-29T16:08:39.296Z\",\"transaction\":{\"acquirer\":{\"date\":\"2018-01-29\",\"id\":\"PAYPAL\",\"merchantId\":\"test.sandbox@paypal.com\",\"time\":\"16:08:39\"},\"amount\":50.00,\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"oZRL5sU3Fm\",\"source\":\"CALL_CENTRE\",\"type\":\"PAYMENT\"},\"version\":\"45\"}";
+        String data = "{\"browserPayment\":{\"interaction\":{\"status\":\"INITIATED\"},\"operation\":\"PAY\",\"browserPayment\":{\"displayShippingAddress\":true,\"overrideShippingAddress\":true,\"paymentConfirmation\":\"CONFIRM_AT_PROVIDER\"},\"redirectUrl\":\"https://test-gateway.com/bpui/pp/out/BP-4652f0dd79cade57ba6726992464c994\",\"returnUrl\":\"http://localhost:5000/browserPaymentReceipt?transactionId=oZRL5sU3Fm&orderId=Qcgkl4EGnR\"},\"gatewayEntryPoint\":\"WEB_SERVICES_API\",\"merchant\":\"TESTSIMPLIFYDEV1\",\"order\":{\"amount\":50.00,\"creationTime\":\"2018-01-29T16:08:39.296Z\",\"currency\":\"USD\",\"id\":\"Qcgkl4EGnR\",\"status\":\"INITIATED\",\"totalAuthorizedAmount\":0,\"totalCapturedAmount\":0,\"totalRefundedAmount\":0},\"response\":{\"gatewayCode\":\"SUBMITTED\"},\"result\":\"SUCCESS\",\"sourceOfFunds\":{\"type\":\"UNION_PAY\"},\"timeOfRecord\":\"2018-01-29T16:08:39.296Z\",\"transaction\":{\"acquirer\":{\"date\":\"2018-01-29\",\"id\":\"UNION_PAY\",\"merchantId\":\"test.sandbox@unionpay.com\",\"time\":\"16:08:39\"},\"amount\":50.00,\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"oZRL5sU3Fm\",\"source\":\"CALL_CENTRE\",\"type\":\"PAYMENT\"},\"version\":\"45\"}";
 
         assertEquals(ApiResponseService.getBrowserPaymentRedirectUrl(data), "https://test-gateway.com/bpui/pp/out/BP-4652f0dd79cade57ba6726992464c994");
 
     }
+    /* essentials_exclude_end */
 }
