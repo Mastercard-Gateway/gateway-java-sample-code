@@ -41,9 +41,6 @@ This is a sample application to help developers start building Java applications
 
 1. Navigate to *http://localhost:5000* to test locally
 
-## Running Hosted Checkout locally
-In order to test Hosted Checkout locally, you'll need to use a tunneling tool like [ngrok](https://ngrok.com/). Run the command ```./ngrok http 5000``` and navigate to the https tunnel referenced in the output.
-
 ## Disclaimer
 This software is intended for **TEST/REFERENCE** purposes **ONLY** and is not intended to be used in a production environment.
 

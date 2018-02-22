@@ -1,7 +1,8 @@
+dist
 target
 .env
 .idea/
 .mvn/
-*.iml
+**/*.iml
 mvnw
 mvnw.cmd
