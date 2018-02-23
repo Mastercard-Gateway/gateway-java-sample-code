@@ -26,9 +26,10 @@
 
     // RETRIEVE PARAMETERS FROM THE LIGHTBOX INTERACTION
     function onSuccessfulCheckout(data) {
-        document.getElementById('oauthToken').value=data.oauth_token;
-        document.getElementById('oauthVerifier').value=data.oauth_verifier;
-        document.getElementById('checkoutUrl').value=data.checkout_resource_url;
+        document.getElementById('oauthToken').value = data.oauth_token;
+        document.getElementById('oauthVerifier').value = data.oauth_verifier;
+        document.getElementById('checkoutUrl').value = data.checkout_resource_url;
+        window.location.href = "/masterpassResponse?oauth_token=" + data.oauth_token + "&oauth_verifier=" + data.oauth_verifier + "&checkout_resource_url=" + data.checkout_resource_url;
     }
     function onCancel() {
         // do something to tell you the cardholder cancelled
