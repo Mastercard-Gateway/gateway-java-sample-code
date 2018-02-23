@@ -23,10 +23,11 @@
         <div class="contents col-12">
             <div class="col-md-12">
                 <h3>Pay with Token</h3>
-                <!--<div class="alert alert-warning" role="alert">-->
-                    <!--<p class="mb-0">In order to run the Payment API operation, please make sure the merchant is configured to "Purchase" payment mode.</p>-->
-                    <!--<p>You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>-->
-                <!--</div>-->
+                <div class="alert alert-warning" role="alert">
+                    <p>This example demonstrates how to tokenize card data using a system-generated token. You may also provide your own
+                        token. For full details, see the <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/tokenization/tokenization.html'}" target="_blank">API documentation</a>.</p>
+                    <p>Your merchant account must also be configured to accept tokens before performing this operation.</p>
+                </div>
                 <div id="error-alert" class="alert alert-danger" role="alert">
                     <p>The following error(s) occurred:</p>
                 </div>
