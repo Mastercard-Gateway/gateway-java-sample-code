@@ -91,13 +91,11 @@ public class ApiController {
     public ModelAndView completeMasterpassPayment(HttpServletRequest request, @RequestParam("oauth_token") String oauthToken, @RequestParam("oauth_verifier") String oauthVerifier,
                                                   @RequestParam("checkout_resource_url") String checkoutResourceUrl) {
 
-        System.out.println("############## completeMasterpassPayment");
         ModelAndView mav = new ModelAndView();
 
         // Retrieve Checkout Session ID from HttpServletRequest session (saved earlier in the Masterpass process)
         HttpSession session = request.getSession();
         String sessionId = (String) session.getAttribute("sessionId");
-        System.out.println("sessionId = " + sessionId);
 
         try {
             // UPDATE_SESSION_FROM_WALLET - Retrieve payment details from wallet using session ID
