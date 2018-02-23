@@ -475,7 +475,7 @@ public class ApiController {
 
             if (!secureIdEnrollmentResponseObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
-                ApiRequest apiReq = ApiRequestService.createApiRequest("AUTHORIZE", config);
+                ApiRequest apiReq = ApiRequestService.createApiRequest("PAY", config);
                 apiReq.setSessionId(sessionId);
                 apiReq.setSecureId(secureId);
 
