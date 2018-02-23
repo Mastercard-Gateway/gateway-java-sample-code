@@ -39,6 +39,16 @@ public class WebController {
     }
 
     /**
+     * Display page for PAY operation page using tokenization
+     *
+     * @return ModelAndView for payWithToken.html
+     */
+    @GetMapping("/payWithToken")
+    public ModelAndView showPayWithToken() {
+        return createHostedSessionModel("payWithToken");
+    }
+
+    /**
      * Display PAY operation page for NVP mode
      *
      * @return ModelAndView for pay.html
