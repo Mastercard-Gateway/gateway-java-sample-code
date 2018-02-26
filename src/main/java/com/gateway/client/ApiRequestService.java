@@ -148,7 +148,7 @@ public class ApiRequestService {
         // Used for hosted checkout - CREATE_CHECKOUT_SESSION operation
         JsonObject order = new JsonObject();
         if (Utils.notNullOrEmpty(request.getApiOperation()) && request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
-            // Need to add order ID in the request body for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
+            // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
         }
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
@@ -289,6 +289,30 @@ public class ApiRequestService {
         }
     }
     /* essentials_exclude_end */
+
+    /**
+     * This method updates the Hosted Session with order info
+     *
+     * @param
+     */
+    public static void updateSessionWithOrderInfo(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+        RESTApiClient connection = new RESTApiClient();
+
+        try {
+            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
+            ApiRequest updateSessionRequest = new ApiRequest();
+            updateSessionRequest.setOrderAmount(request.getOrderAmount());
+            updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
+            updateSessionRequest.setOrderId(request.getOrderId());
+            String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
+            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+        }
+        catch (Exception e) {
+            logger.error("Unable to update session", e);
+            throw e;
+        }
+
+    }
 
     /**
      * This helper method gets the current context so that an appropriate return URL can be constructed
