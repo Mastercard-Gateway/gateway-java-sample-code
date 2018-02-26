@@ -81,6 +81,17 @@ public class ApiRequestService {
     }
 
     /**
+     * Constructs API endpoint to create a new token
+     *
+     * @param apiProtocol REST or NVP
+     * @param config      contains frequently used information like Merchant ID, API password, etc.
+     * @return url
+     */
+    public static String getTokenRequestUrl(ApiProtocol apiProtocol, Config config) {
+        return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/token";
+    }
+
+    /**
      * Constructs API endpoint for session-based requests with an existing session ID
      *
      * @param apiProtocol REST or NVP

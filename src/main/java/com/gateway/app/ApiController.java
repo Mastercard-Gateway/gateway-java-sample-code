@@ -235,6 +235,37 @@ public class ApiController {
         return mav;
     }
 
+    @PostMapping("/tokenize")
+    public ModelAndView tokenizeAndPay(@RequestBody ApiRequest request) {
+        ModelAndView mav = new ModelAndView();
+
+        String requestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
+        String jsonPayload = ApiRequestService.buildJSONPayload(request);
+
+        String resp = "";
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            resp = connection.postTransaction(jsonPayload, requestUrl, config);
+
+            ObjectMapper mapper = new ObjectMapper();
+            Object prettyResp = mapper.readValue(resp, Object.class);
+            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
+
+            mav.setViewName("apiResponse");
+            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+            mav.addObject("operation", request.getApiOperation());
+            mav.addObject("method", request.getApiMethod());
+            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+            mav.addObject("requestUrl", requestUrl);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
     /**
      * This method processes the API request using NVP (Name-Value Pair) protocol for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
      *

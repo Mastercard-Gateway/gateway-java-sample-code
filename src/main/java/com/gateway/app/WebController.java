@@ -45,7 +45,25 @@ public class WebController {
      */
     @GetMapping("/payWithToken")
     public ModelAndView showPayWithToken() {
-        return createHostedSessionModel("payWithToken");
+
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            ApiRequest req = new ApiRequest();
+            req.setSourceType("CARD");
+            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setOrderAmount("50.00");
+            req.setOrderCurrency(config.getCurrency());
+            req.setOrderDescription("Wonderful product that you should buy!");
+            req.setTransactionId(Utils.createUniqueId("trans-"));
+            mav.setViewName("payWithToken");
+            mav.addObject("request", req);
+            mav.addObject("config", config);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+
+        return mav;
     }
 
     /**
