@@ -45,7 +45,7 @@ public class ApiService {
     public static String executeHTTPMethod(HttpRequestBase httpMethod, Config config, ApiProtocol protocol) throws Exception {
         String body = "";
         try {
-            // Set the proper authentication type, username/password or certificate authentication
+            // Set the proper authentication type - username/password or certificate authentication
             if(config.getAuthenticationType().equals(Config.AuthenticationType.PASSWORD)) {
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpClientContext httpClientContext = HttpClientContext.create();

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -48,13 +47,7 @@ public class ApiController {
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(sessionResponse);
 
             // Call UPDATE_SESSION to add order information to session
-            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, hostedSession.getId());
-            ApiRequest updateSessionRequest = new ApiRequest();
-            updateSessionRequest.setOrderAmount(request.getOrderAmount());
-            updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
-            updateSessionRequest.setOrderId(request.getOrderId());
-            String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
-            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, request, config, hostedSession.getId());
 
             // Call OPEN_WALLET to retrieve Masterpass configuration
             String walletRequestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, hostedSession.getId());
@@ -197,7 +190,8 @@ public class ApiController {
     }
 
     /**
-     * This method processes the API request for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
+     * This method processes the API request for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY).
+     * Whenever card details need to be collected from the browser, Hosted Session is the preferred method.
      *
      * @param apiRequest needed to retrieve various data to complete API operation
      * @return ModelAndView for API response page or error page
@@ -208,6 +202,8 @@ public class ApiController {
         ModelAndView mav = new ModelAndView();
 
         try {
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, apiRequest, config, apiRequest.getSessionId());
+
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
             String requestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiRequest);
 
@@ -235,6 +231,59 @@ public class ApiController {
         return mav;
     }
 
+    @PostMapping("/tokenize")
+    public ModelAndView tokenizeAndPay(@RequestBody ApiRequest tokenRequest) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, tokenRequest, config, tokenRequest.getSessionId());
+
+            String tokenRequestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
+
+            // We need to delete the order info from the token request. We'll need it later for the payment request, so we'll add it to the payment request here
+            ApiRequest payRequest = new ApiRequest();
+            payRequest.setApiOperation("PAY");
+            payRequest.setSessionId(tokenRequest.getSessionId());
+            payRequest.setOrderId(tokenRequest.getOrderId());
+            payRequest.setTransactionId(tokenRequest.getTransactionId());
+
+            // We've already updated the session with the order information, so we need to remove it from the token request, which only requires the session ID (if additional fields are present the API will return an error)
+            tokenRequest.setOrderAmount(null);
+            tokenRequest.setOrderDescription(null);
+            tokenRequest.setOrderCurrency(null);
+            tokenRequest.setOrderId(null);
+
+            String tokenPayload = ApiRequestService.buildJSONPayload(tokenRequest);
+
+            RESTApiClient tokenConnection = new RESTApiClient();
+            String tokenResponse = tokenConnection.postTransaction(tokenPayload, tokenRequestUrl, config);
+            String token = ApiResponseService.parseTokenResponse(tokenResponse);
+
+            payRequest.setSourceToken(token);
+            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, payRequest);
+
+            String paymentPayload = ApiRequestService.buildJSONPayload(payRequest);
+            RESTApiClient paymentConnection = new RESTApiClient();
+            String paymentResponse = paymentConnection.sendTransaction(paymentPayload, paymentRequestUrl, config);
+
+            ObjectMapper mapper = new ObjectMapper();
+            Object prettyResp = mapper.readValue(paymentResponse, Object.class);
+            Object prettyPayload = mapper.readValue(paymentPayload, Object.class);
+
+            mav.setViewName("apiResponse");
+            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+            mav.addObject("operation", payRequest.getApiOperation());
+            mav.addObject("method", payRequest.getApiMethod());
+            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+            mav.addObject("requestUrl", paymentRequestUrl);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
     /**
      * This method processes the API request using NVP (Name-Value Pair) protocol for Hosted Session (browser) operations (PAY, AUTHORIZE, VERIFY). Any time card details need to be collected, Hosted Session is the preferred method.
      *
@@ -246,6 +295,8 @@ public class ApiController {
         ModelAndView mav = new ModelAndView();
 
         try {
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, apiRequest, config, apiRequest.getSessionId());
+
             apiRequest.setApiMethod("POST");
 
             String requestUrl = ApiRequestService.getRequestUrl(ApiProtocol.NVP, config, apiRequest);
@@ -270,7 +321,8 @@ public class ApiController {
     }
 
     /**
-     * This method processes the API request for server-to-server operations. These are operations that would not commonly be invoked via a user interacting with the browser, but a system event (CAPTURE, REFUND, VOID).
+     * This method processes the API request for server-to-server operations.
+     * These are operations that would not commonly be invoked via a user interacting with the browser, but a system event (CAPTURE, REFUND, VOID).
      *
      * @param request contains info on how to construct API call
      * @return ModelAndView for api response page or error page
@@ -458,6 +510,8 @@ public class ApiController {
             HttpSession session = request.getSession();
             String secureId = (String) session.getAttribute("secureId");
             String sessionId = (String) session.getAttribute("sessionId");
+
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, req, config, sessionId);
 
             // Remove from session after using
             session.removeAttribute("secureId");
