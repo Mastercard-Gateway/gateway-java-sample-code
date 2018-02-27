@@ -135,6 +135,13 @@ public class ApiResponseServiceTest {
         }
     }
 
+    @Test
+    public void parseTokenResponse() throws Exception {
+        String data = "{\"token\":\"MYTOKEN\"}";
+
+        assertEquals(ApiResponseService.parseTokenResponse(data), "MYTOKEN");
+    }
+
     /* essentials_exclude_start */
     @Test
     public void getBrowserPaymentRedirectUrl() throws Exception {
@@ -144,6 +151,4 @@ public class ApiResponseServiceTest {
 
     }
     /* essentials_exclude_end */
-
-    // TODO - Parse token response
 }
