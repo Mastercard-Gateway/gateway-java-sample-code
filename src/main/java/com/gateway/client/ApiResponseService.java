@@ -228,6 +228,17 @@ public class ApiResponseService {
         return responseMap;
     }
 
+    public static String parseTokenResponse(String response) {
+        try {
+            String token = "";
+            return token;
+        }
+        catch(Exception e) {
+            logger.error("Unable to parse token response", e);
+            throw e;
+        }
+    }
+
     /**
      * Retrieve a Gateway session using the RETRIEVE_SESSION API
      * @param config    contains frequently used information like Merchant ID, API password, etc.

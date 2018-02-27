@@ -232,34 +232,49 @@ public class ApiController {
     }
 
     @PostMapping("/tokenize")
-    public ModelAndView tokenizeAndPay(@RequestBody ApiRequest request) {
+    public ModelAndView tokenizeAndPay(@RequestBody ApiRequest tokenRequest) {
         ModelAndView mav = new ModelAndView();
 
         try {
 
-            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, request, config, request.getSessionId());
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, tokenRequest, config, tokenRequest.getSessionId());
 
-        // TODO - 2 - Tokenize session
-        // TODO - 3 - Pay
+            String tokenRequestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
 
-            String requestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
-            String jsonPayload = ApiRequestService.buildJSONPayload(request);
+            // We've already updated the session with the order information, so we need to remove it from the token request, which only requires the session ID (if additional fields are present the API will return an error)
+            tokenRequest.setOrderAmount(null);
+            tokenRequest.setOrderDescription(null);
+            tokenRequest.setOrderCurrency(null);
+            tokenRequest.setOrderId(null);
 
-            String resp = "";
+            String tokenPayload = ApiRequestService.buildJSONPayload(tokenRequest);
 
-            RESTApiClient connection = new RESTApiClient();
-            resp = connection.postTransaction(jsonPayload, requestUrl, config);
+            RESTApiClient tokenConnection = new RESTApiClient();
+            String tokenResponse = tokenConnection.postTransaction(tokenPayload, tokenRequestUrl, config);
+
+            // TODO - parse token response to get token
+            String token = ApiResponseService.parseTokenResponse(tokenResponse);
+
+            // TODO - 3 - Pay
+            ApiRequest payRequest = new ApiRequest();
+            payRequest.setApiMethod("PAY");
+            String paymentRequestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
+
+            // TODO - Add token to payload builder
+            String paymentPayload = ApiRequestService.buildJSONPayload(payRequest);
+            RESTApiClient paymentConnection = new RESTApiClient();
+            String paymentResponse = paymentConnection.postTransaction(tokenPayload, tokenRequestUrl, config);
 
             ObjectMapper mapper = new ObjectMapper();
-            Object prettyResp = mapper.readValue(resp, Object.class);
-            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
+            Object prettyResp = mapper.readValue(paymentResponse, Object.class);
+            Object prettyPayload = mapper.readValue(paymentPayload, Object.class);
 
             mav.setViewName("apiResponse");
             mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getApiMethod());
+            mav.addObject("operation", payRequest.getApiOperation());
+            mav.addObject("method", payRequest.getApiMethod());
             mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", requestUrl);
+            mav.addObject("requestUrl", paymentRequestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {

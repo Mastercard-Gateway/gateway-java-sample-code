@@ -131,6 +131,8 @@ public class ApiRequestService {
      */
     public static String buildJSONPayload(ApiRequest request) {
 
+        // TODO - Can probably remove all order info from hosted session payloads since we've already updated the session with that info
+
         JsonObject secureId = new JsonObject();
         if (Utils.notNullOrEmpty(request.getPaymentAuthResponse())) {
             // Used for 3DS Process ACS Result operation
@@ -291,9 +293,13 @@ public class ApiRequestService {
     /* essentials_exclude_end */
 
     /**
-     * This method updates the Hosted Session with order info
+     * This method updates the Hosted Session with order info (description, amount, currency, ID)
      *
-     * @param
+     * @param protocol  REST or NVP
+     * @param request   contains info on what data the payload should include (order ID, amount, currency, etc) depending on the operation (PAY, AUTHORIZE, CAPTURE, etc)
+     * @param config    contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId used to target a specific session
+     * @throws Exception
      */
     public static void updateSessionWithOrderInfo(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
         RESTApiClient connection = new RESTApiClient();
@@ -334,7 +340,7 @@ public class ApiRequestService {
      * Returns the base URL for the API call (either REST or NVP)
      *
      * @param gatewayHost
-     * @param apiProtocol
+     * @param apiProtocol (REST or NVP)
      * @return base url or throw exception
      */
     private static String getApiBaseURL(String gatewayHost, ApiProtocol apiProtocol) {
