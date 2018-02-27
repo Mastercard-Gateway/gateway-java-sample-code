@@ -131,8 +131,6 @@ public class ApiRequestService {
      */
     public static String buildJSONPayload(ApiRequest request) {
 
-        // TODO - Can probably remove all order info from hosted session payloads since we've already updated the session with that info
-
         JsonObject secureId = new JsonObject();
         if (Utils.notNullOrEmpty(request.getPaymentAuthResponse())) {
             // Used for 3DS Process ACS Result operation

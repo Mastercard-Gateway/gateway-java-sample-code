@@ -236,7 +236,6 @@ public class ApiController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            // TODO - This controller is really bloated - can we break out some of this stuff into services?
             ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, tokenRequest, config, tokenRequest.getSessionId());
 
             String tokenRequestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
