@@ -34,8 +34,8 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
-    /* essentials_exclude_start */
     // Wallet properties
+    /* essentials_exclude_start */
     private String masterpassOriginUrl;
     private String masterpassOauthToken;
     private String masterpassOauthVerifier;

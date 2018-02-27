@@ -230,8 +230,8 @@ public class ApiResponseService {
 
     public static String parseTokenResponse(String response) {
         try {
-            String token = "";
-            return token;
+            JsonObject json = new Gson().fromJson(response, JsonObject.class);
+            return json.get("token").getAsString();
         }
         catch(Exception e) {
             logger.error("Unable to parse token response", e);

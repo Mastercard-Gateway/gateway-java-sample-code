@@ -331,8 +331,6 @@ public class ApiRequestServiceTest {
         assertEquals(requestMap, result);
     }
 
-    // TODO - Update session with order info
-
     private String prettifyJson(String data) {
         JsonParser parser = new JsonParser();
         JsonObject json = parser.parse(data).getAsJsonObject();

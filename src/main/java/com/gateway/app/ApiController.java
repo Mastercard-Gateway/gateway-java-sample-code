@@ -236,10 +236,17 @@ public class ApiController {
         ModelAndView mav = new ModelAndView();
 
         try {
-
+            // TODO - This controller is really bloated - can we break out some of this stuff into services?
             ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, tokenRequest, config, tokenRequest.getSessionId());
 
             String tokenRequestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
+
+            // We need to delete the order info from the token request. We'll need it later for the payment request, so we'll add it to the payment request here
+            ApiRequest payRequest = new ApiRequest();
+            payRequest.setApiOperation("PAY");
+            payRequest.setSessionId(tokenRequest.getSessionId());
+            payRequest.setOrderId(tokenRequest.getOrderId());
+            payRequest.setTransactionId(tokenRequest.getTransactionId());
 
             // We've already updated the session with the order information, so we need to remove it from the token request, which only requires the session ID (if additional fields are present the API will return an error)
             tokenRequest.setOrderAmount(null);
@@ -251,19 +258,14 @@ public class ApiController {
 
             RESTApiClient tokenConnection = new RESTApiClient();
             String tokenResponse = tokenConnection.postTransaction(tokenPayload, tokenRequestUrl, config);
-
-            // TODO - parse token response to get token
             String token = ApiResponseService.parseTokenResponse(tokenResponse);
 
-            // TODO - 3 - Pay
-            ApiRequest payRequest = new ApiRequest();
-            payRequest.setApiMethod("PAY");
-            String paymentRequestUrl = ApiRequestService.getTokenRequestUrl(ApiProtocol.REST, config);
+            payRequest.setSourceToken(token);
+            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, payRequest);
 
-            // TODO - Add token to payload builder
             String paymentPayload = ApiRequestService.buildJSONPayload(payRequest);
             RESTApiClient paymentConnection = new RESTApiClient();
-            String paymentResponse = paymentConnection.postTransaction(tokenPayload, tokenRequestUrl, config);
+            String paymentResponse = paymentConnection.sendTransaction(paymentPayload, paymentRequestUrl, config);
 
             ObjectMapper mapper = new ObjectMapper();
             Object prettyResp = mapper.readValue(paymentResponse, Object.class);
