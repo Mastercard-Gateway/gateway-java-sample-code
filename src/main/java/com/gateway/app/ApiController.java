@@ -212,17 +212,7 @@ public class ApiController {
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
             // Format request/response for easy viewing
-            ObjectMapper mapper = new ObjectMapper();
-            Object prettyResp = mapper.readValue(apiResponse, Object.class);
-            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
-
-            mav.setViewName("apiResponse");
-            mav.addObject("config", config);
-            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", apiRequest.getApiOperation());
-            mav.addObject("method", apiRequest.getApiMethod());
-            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", requestUrl);
+            mav = ApiResponseService.formatApiResponse(mav, apiResponse, jsonPayload, config, apiRequest, requestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -266,16 +256,8 @@ public class ApiController {
             RESTApiClient paymentConnection = new RESTApiClient();
             String paymentResponse = paymentConnection.sendTransaction(paymentPayload, paymentRequestUrl, config);
 
-            ObjectMapper mapper = new ObjectMapper();
-            Object prettyResp = mapper.readValue(paymentResponse, Object.class);
-            Object prettyPayload = mapper.readValue(paymentPayload, Object.class);
-
-            mav.setViewName("apiResponse");
-            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", payRequest.getApiOperation());
-            mav.addObject("method", payRequest.getApiMethod());
-            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", paymentRequestUrl);
+            // Format request/response for easy viewing
+            mav = ApiResponseService.formatApiResponse(mav, paymentResponse, paymentPayload, config, payRequest, paymentRequestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -344,16 +326,9 @@ public class ApiController {
             } else if (request.getApiMethod().equals("GET")) {
                 resp = connection.getTransaction(requestUrl, config);
             }
-            ObjectMapper mapper = new ObjectMapper();
-            Object prettyResp = mapper.readValue(resp, Object.class);
-            Object prettyPayload = mapper.readValue(jsonPayload, Object.class);
 
-            mav.setViewName("apiResponse");
-            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", request.getApiOperation());
-            mav.addObject("method", request.getApiMethod());
-            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", requestUrl);
+            // Format request/response for easy viewing
+            mav = ApiResponseService.formatApiResponse(mav, resp, jsonPayload, config, request, requestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -501,53 +476,45 @@ public class ApiController {
 
         ModelAndView mav = new ModelAndView();
 
-        ApiRequest req = new ApiRequest();
-        req.setApiOperation("PROCESS_ACS_RESULT");
+        ApiRequest processAcsRequest = new ApiRequest();
+        processAcsRequest.setApiOperation("PROCESS_ACS_RESULT");
         // Retrieve Payment Authentication Response (PaRes) from request
-        req.setPaymentAuthResponse(request.getParameter("PaRes"));
+        processAcsRequest.setPaymentAuthResponse(request.getParameter("PaRes"));
 
         try {
             HttpSession session = request.getSession();
             String secureId = (String) session.getAttribute("secureId");
             String sessionId = (String) session.getAttribute("sessionId");
 
-            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, req, config, sessionId);
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, processAcsRequest, config, sessionId);
 
             // Remove from session after using
             session.removeAttribute("secureId");
             session.removeAttribute("sessionId");
 
             // Process Access Control Server (ACS) result
-            String requestUrl = ApiRequestService.getSecureIdRequest(ApiProtocol.REST, config, secureId);
-            RESTApiClient connection = new RESTApiClient();
+            String processAcsRequestUrl = ApiRequestService.getSecureIdRequest(ApiProtocol.REST, config, secureId);
+            RESTApiClient processAcsConnection = new RESTApiClient();
 
-            String data = ApiRequestService.buildJSONPayload(req);
-            String resp = connection.postTransaction(data, requestUrl, config);
-            SecureIdEnrollmentResponse secureIdEnrollmentResponseObject = ApiResponseService.parse3DSecureResponse(resp);
+            String data = ApiRequestService.buildJSONPayload(processAcsRequest);
+            String processAcsResponse = processAcsConnection.postTransaction(data, processAcsRequestUrl, config);
+            SecureIdEnrollmentResponse secureIdEnrollmentResponseObject = ApiResponseService.parse3DSecureResponse(processAcsResponse);
 
             if (!secureIdEnrollmentResponseObject.getStatus().equals(ApiResponses.AUTHENTICATION_FAILED.toString())) {
                 // Construct API request
-                ApiRequest apiReq = ApiRequestService.createApiRequest("PAY", config);
-                apiReq.setSessionId(sessionId);
-                apiReq.setSecureId(secureId);
+                ApiRequest paymentRequest = ApiRequestService.createApiRequest("PAY", config);
+                paymentRequest.setSessionId(sessionId);
+                paymentRequest.setSecureId(secureId);
 
-                String payload = ApiRequestService.buildJSONPayload(apiReq);
-                String reqUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiReq);
+                String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
+                String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
 
                 // Perform API operation
-                RESTApiClient apiConnection = new RESTApiClient();
-                String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+                RESTApiClient paymentConnection = new RESTApiClient();
+                String apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
 
-                ObjectMapper mapper = new ObjectMapper();
-                Object prettyResp = mapper.readValue(apiResponse, Object.class);
-                Object prettyPayload = mapper.readValue(payload, Object.class);
-
-                mav.setViewName("apiResponse");
-                mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-                mav.addObject("operation", apiReq.getApiOperation());
-                mav.addObject("method", apiReq.getApiMethod());
-                mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-                mav.addObject("requestUrl", reqUrl);
+                // Format request/response for easy viewing
+                mav = ApiResponseService.formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
             } else {
                 mav.setViewName("error");
                 mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
