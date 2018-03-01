@@ -4,7 +4,6 @@ import com.gateway.app.Config;
 import com.google.gson.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -12,7 +11,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
@@ -25,9 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ApiService {
 
@@ -45,7 +40,7 @@ public class ApiService {
     public static String executeHTTPMethod(HttpRequestBase httpMethod, Config config, ApiProtocol protocol) throws Exception {
         String body = "";
         try {
-            // Set the proper authentication type, username/password or certificate authentication
+            // Set the proper authentication type - username/password or certificate authentication
             if(config.getAuthenticationType().equals(Config.AuthenticationType.PASSWORD)) {
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpClientContext httpClientContext = HttpClientContext.create();

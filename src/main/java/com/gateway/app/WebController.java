@@ -39,6 +39,34 @@ public class WebController {
     }
 
     /**
+     * Display page for PAY operation page using tokenization
+     *
+     * @return ModelAndView for payWithToken.html
+     */
+    @GetMapping("/payWithToken")
+    public ModelAndView showPayWithToken() {
+
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            ApiRequest req = new ApiRequest();
+            req.setSourceType("CARD");
+            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setOrderAmount("50.00");
+            req.setOrderCurrency(config.getCurrency());
+            req.setOrderDescription("Wonderful product that you should buy!");
+            req.setTransactionId(Utils.createUniqueId("trans-"));
+            mav.setViewName("payWithToken");
+            mav.addObject("request", req);
+            mav.addObject("config", config);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+
+        return mav;
+    }
+
+    /**
      * Display PAY operation page for NVP mode
      *
      * @return ModelAndView for pay.html

@@ -4,8 +4,8 @@ import com.gateway.app.Config;
 import com.gateway.client.ApiException;
 import com.gateway.client.ApiResponseService;
 import com.gateway.client.HostedSession;
-import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.BrowserPaymentResponse;
+import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
 import org.junit.Before;
@@ -133,6 +133,13 @@ public class ApiResponseServiceTest {
             assertEquals(e.getField(), "apiOperation");
             assertEquals(e.getValidationType(), "INVALID");
         }
+    }
+
+    @Test
+    public void parseTokenResponse() throws Exception {
+        String data = "{\"token\":\"MYTOKEN\"}";
+
+        assertEquals(ApiResponseService.parseTokenResponse(data), "MYTOKEN");
     }
 
     /* essentials_exclude_start */

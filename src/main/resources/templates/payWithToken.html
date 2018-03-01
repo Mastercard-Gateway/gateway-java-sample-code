@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'authorize')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'payWithToken')}">
 <body>
 <script type="text/javascript">
     var JavaSample = {
         operation: function() {
-            return "AUTHORIZE";
+            return null;
         },
         endpoint: function() {
-            return "/processHostedSession/";
+            return "tokenize";
         },
         secureIdResponseUrl: function() {
             return null;
@@ -17,15 +17,20 @@
 <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
 <style id="antiClickjack">body{display:none !important;}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
+<script th:src="@{${config.apiBaseURL} + '/form/version/'+ ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
-                <h3>Authorize</h3>
+                <h3>Pay with Token</h3>
                 <div class="alert alert-warning" role="alert">
-                    <p>In order to run the Authorize API operation, please make sure the merchant is configured to "Authorize and Capture" payment mode.</p>
+                    <p>This example demonstrates how to tokenize card data using a system-generated token. You may also provide your own
+                        token. For full details, see the <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/tokenization/tokenization.html'}" target="_blank">API documentation</a>.</p>
+                    <p>Your merchant account must also be configured to accept tokens before performing this operation.</p>
                     <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
+                </div>
+                <div id="error-alert" class="alert alert-danger" role="alert">
+                    <p>The following error(s) occurred:</p>
                 </div>
                 <div class="mb-4">
                     <h6>Payment details</h6>
@@ -87,7 +92,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Authorize</button>
+                <button type="submit" class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay</button>
             </div>
         </div>
     </div> <!-- row -->
