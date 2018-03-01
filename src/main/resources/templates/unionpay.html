@@ -7,7 +7,7 @@
             <h3>Pay with UnionPay SecurePay</h3>
             <div class="alert alert-warning" role="alert">
                 <p><strong>NOTE:</strong> You can also do an authorization via SecurePay, depending on your merchant settings.</p>
-                <p>You can access test card numbers <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/testDetails.html#x_SecurePayTest'}" target="_blank">here</a>.</p>
+                <p class="mb-0">You can access test card numbers <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/testDetails.html#x_SecurePayTest'}" target="_blank">here</a>.</p>
             </div>
             <fieldset>
                 <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />

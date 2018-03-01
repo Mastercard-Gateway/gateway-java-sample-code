@@ -75,9 +75,6 @@
 
             window.location.href = "/hostedCheckout/" + data.orderId + "/" + data.successIndicator + "/" + data.sessionId;
         }
-
-//        var result = (resultIndicator === data.successIndicator) ? "SUCCESS" : "ERROR";
-//        window.location.href = "/hostedCheckout/" + data.orderId + "/" + result;
     }
 
     function errorCallback(error) {
@@ -100,13 +97,6 @@
         resultIndicator = response;
         var result = (resultIndicator === successIndicator) ? "SUCCESS" : "ERROR";
         window.location.href = "/hostedCheckout/" + orderId + "/" + result;
-    }
-
-    function randomId() {
-        var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", length = 10;
-        var result = '';
-        for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-        return result;
     }
 
     Checkout.configure({
