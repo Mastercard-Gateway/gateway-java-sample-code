@@ -21,6 +21,7 @@
     <div class="row">
         <div class="col-3 sidebar">
             <h6><a th:class="${viewName == 'pay'}? 'active'" href="/pay">Pay</a></h6>
+            <h6><a th:class="${viewName == 'payWithToken'}? 'active'" href="/payWithToken">Pay with Token</a></h6>
             <h6><a th:class="${viewName == 'authorize'}? 'active'" href="/authorize">Authorize</a></h6>
             <h6><a th:class="${viewName == 'capture'}? 'active'" href="/capture">Capture</a></h6>
             <h6><a th:class="${viewName == 'refund'}? 'active'" href="/refund">Refund</a></h6>
@@ -32,15 +33,14 @@
             <!--<essentials_exclude>-->
             <!--<targeted_exclude>-->
             <h6><a th:class="${viewName == 'paypal'}? 'active'" href="/paypal">Pay with PayPal</a></h6>
-            <!--</essentials_exclude>-->
             <!--</targeted_exclude>-->
+            <!--</essentials_exclude>-->
             <!--<essentials_exclude>-->
             <h6><a th:class="${viewName == 'unionpay'}? 'active'" href="/unionpay">Pay with UnionPay SecurePay</a></h6>
             <!--</essentials_exclude>-->
             <!--<essentials_exclude>-->
             <h6><a th:class="${viewName == 'masterpass'}? 'active'" href="/masterpass">Pay with Masterpass</a></h6>
             <!--</essentials_exclude>-->
-            <h6><a th:class="${viewName == 'payWithToken'}? 'active'" href="/payWithToken">Pay with Token</a></h6>
             <h6><a th:class="${viewName == 'payThroughNVP'}? 'active'" href="/payThroughNVP">Pay through NVP</a></h6>
             <h6><a th:class="${viewName == 'webhooks'}? 'active'" href="/webhooks">Webhooks</a></h6>
         </div>
