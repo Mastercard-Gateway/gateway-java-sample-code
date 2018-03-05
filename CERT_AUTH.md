@@ -19,8 +19,8 @@ NOTE: The following parameters are required for certificate authentication: keys
             prompt> export GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
             prompt> export GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
             prompt> export GATEWAY_CERT_HOST_URL=YOUR_GATEWAY_CERT_HOST_URL
-            prompt> export KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
-            prompt> export KEYSTORE_PATH=PATH_TO_PKCS12
+            prompt> export GATEWAY_KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
+            prompt> export GATEWAY_KEYSTORE_PATH=PATH_TO_PKCS12
             prompt> export GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
             prompt> export GATEWAY_VERSION=YOUR_VERSION (optional - default is version 45)
     - On Windows, use the ```set``` command:
@@ -28,8 +28,8 @@ NOTE: The following parameters are required for certificate authentication: keys
             prompt> set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
             prompt> set GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
             prompt> set GATEWAY_CERT_HOST_URL=YOUR_GATEWAY_CERT_HOST_URL
-            prompt> set KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
-            prompt> set KEYSTORE_PATH=PATH_TO_PKCS12
+            prompt> set GATEWAY_KEYSTORE_PASSWORD=YOUR_KEYSTORE_PASSWORD (the keystore password is the same as the test merchant ID, e.g. TESTMERCHANTID)
+            prompt> set GATEWAY_KEYSTORE_PATH=PATH_TO_PKCS12
             prompt> set GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
             prompt> set GATEWAY_VERSION=YOUR_VERSION (optional - default is version 45)
 
