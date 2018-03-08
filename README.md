@@ -1,4 +1,4 @@
-# Gateway Java Sample Code [![Build Status](https://travis-ci.org/simplifycom/gateway-java-sample-code.svg?branch=master)](https://travis-ci.org/simplifycom/gateway-java-sample-code)
+# Gateway Java Sample Code
 This is a sample application to help developers start building Java applications using the Gateway Java SDK.
 
 ## Prerequisites 
