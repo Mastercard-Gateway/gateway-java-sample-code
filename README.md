@@ -6,11 +6,6 @@ This is a sample application to help developers start building Java applications
 1. Maven
 1. Registered account with MPGS Gateway system
 
-## Steps for running in Heroku
-1. Register with [Heroku](https://www.heroku.com) (if you don't have an account already). A free account will be enough. 
-1. Click here to -> [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-1. Fill in the details such as Merchant Id, API Password & Gateway Base URL
-
 ## Authentication
 1. You can authenticate in one of two ways:
 - Using your API key and password (available from the merchant portal). To do this, see instructions below. The following fields are required for password authentication: merchant ID, API password, currency, and gateway base URL.
