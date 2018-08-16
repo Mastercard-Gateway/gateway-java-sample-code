@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <script src="https://dl01aspall19v.qabri.mastercard.int/checkout/version/45/checkout.js"
+                data-error="errorCallback"
+                data-cancel="cancelCallback">
+        </script>
+
+        <script  type="text/javascript">
+            function errorCallback(error) {
+                  console.log(JSON.stringify(error));
+            }
+            function cancelCallback() {
+                  console.log('Payment cancelled');
+            }
+
+            Checkout.configure({
+                merchant: 'TESTHPP_AMEX',
+				//merchant: 'TESTEVALAXIS01',
+				//merchant: 'TESTAB2894354',
+                order: {
+                    amount: function() {
+                        //Dynamic calculation of amount
+                        return 80 + 20;
+                    },
+                    currency: 'USD',
+                    description: 'Ordered goods',
+
+                },
+                interaction: {
+                    merchant: {
+                        name: 'Your merchant name',
+                        address: {
+                            line1: '200 Sample St',
+                            line2: '1234 Example Town'
+                        }
+                    }
+                                                                }
+            });
+        </script>
+    </head>
+    <body>
+
+        <input type="button" value="Pay with Lightbox" onclick="Checkout.showLightbox();" />
+
+    </body>
+</html>
