@@ -136,6 +136,37 @@ public class WebController {
     }
     /* essentials_exclude_end */
 
+    /**
+     * Display page for iDEAL browser payment
+     *
+     * @return ModelAndView for ideal.html
+     */
+    @GetMapping("/ideal")
+    public ModelAndView showIdeal() {
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("CREATE_SESSION");
+
+        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            String resp = connection.postTransaction(requestUrl, config);
+
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+
+            mav.setViewName("ideal");
+            mav.addObject("config", config);
+            mav.addObject("hostedSession", hostedSession);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
     /* essentials_exclude_start */
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details

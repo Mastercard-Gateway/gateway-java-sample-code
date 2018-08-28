@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'ideal')}">
+<head>
+    <script type="text/javascript" src="http://localhost:4200/src/assets/scripts/apm.js"></script>
+    <style>
+        #idealButton {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>iDEAL</h3>
+                <div id="mc-apm-container"></div>
+                <button type="submit" class="mt-4 btn btn-primary" id="idealButton" onclick="pay();">Pay with iDEAL</button>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+<script th:inline="javascript">
+
+    /*<![CDATA[*/
+    var merchantId = /*[[${config.merchantId}]]*/ null;
+    var sessionId = /*[[${hostedSession.id}]]*/ null;
+    /*]]>*/
+console.log(sessionId);
+    APM.configure({
+        merchantId: merchantId,
+        hostedSessionId: sessionId,
+        containerId: "mc-apm-container",
+        //paymentOptions: null,
+        configuration: {wsVersion: 49, userLanguage: "en-US"},
+        callback: function (data){
+            if (data && data.response && data.response.error) {
+                var error = data.response.error;
+                //Something bad happened, the error value will match what is returned by the REST API
+                console.error("error.cause : ", error.cause);
+                console.error("error.explanation : ", error.explanation);
+                console.error("error.field : ", error.field);
+            }
+            else {
+                var paymentOptions = data.response;
+                console.log("Payment Options merchant : ", paymentOptions.merchant);
+                console.log("Payment Types Supported by Gateway : ", paymentOptions.paymentTypes);
+            }
+        }
+    });
+    // APM.initiatePayment(APM.METHOD_IDEAL, {order: {amount: 123, currency: "USD"}}, function (data) {
+    //
+    //   var response = data.response;
+    //   //transaction id
+    //   console.log("Transaction Id : " + response.transaction.id);
+    //
+    //   //order id
+    //   console.log("Order Id : " + response.order.id);
+    // });
+    // var paymentInfo = null;
+    // APM.retrievePayment("transaction123" , "order123", function (data) {
+    //   //raw response for the payment
+    //   if (data && data.result !== "ERROR") {
+    //     paymentInfo = data;
+    //     console.log("Payment Info : ", paymentInfo);
+    //   }
+    // });
+    // APM.isSuccessfulPayment(APM.METHOD_IDEAL, paymentInfo, function (data){
+    //   if (data && data.result !== "ERROR" && data.success) {
+    //     console.log("Payment was successful!");
+    //   }
+    //   else {
+    //     console.log("Payment was not successful!");
+    //   }
+    // });
+</script>
+</body>
+</html>
