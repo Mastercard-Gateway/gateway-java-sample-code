@@ -137,12 +137,12 @@ public class WebController {
     /* essentials_exclude_end */
 
     /**
-     * Display page for iDEAL browser payment
+     * Display page for alternate payments methods using apm.js
      *
-     * @return ModelAndView for ideal.html
+     * @return ModelAndView for apm.html
      */
-    @GetMapping("/ideal")
-    public ModelAndView showIdeal() {
+    @GetMapping("/apm")
+    public ModelAndView showAPMs() {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
@@ -156,7 +156,7 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            mav.setViewName("ideal");
+            mav.setViewName("apm");
             mav.addObject("config", config);
             mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
