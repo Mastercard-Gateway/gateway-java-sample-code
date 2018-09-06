@@ -37,7 +37,9 @@
             }
             else {
                 var paymentOptions = data.response;
-                $("#idealButton").show();
+                if(APM.isSupported(APM.METHOD_IDEAL)) {
+                    $("#idealButton").show();
+                }
                 console.log("Callback triggered with data: ", data);
                 console.log(APM.configured());
                 console.log("Webservice API Version : " + APM.wsVersion());
