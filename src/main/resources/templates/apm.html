@@ -3,7 +3,7 @@
 <body>
 <script type="text/javascript" src="http://localhost:4200/src/assets/scripts/apm.js"></script>
 <style>
-    #idealButton {
+    #idealButton, #sofortButton, #giropayButton {
         display: none;
     }
 </style>
@@ -12,10 +12,12 @@
         <div class="contents col-12">
             <div class="col-md-12">
                 <h3>Alternate Payment Methods</h3>
-                <h4>Hosted Checkout integration</h4>
-                <h4>Other integration</h4>
+                <!--<h4>Hosted Checkout integration</h4>-->
+                <!--<h4>Other integration</h4>-->
                 <div id="mc-apm-container" style="width:0px;height:0px;"></div>
                 <button type="submit" class="mt-4 btn btn-primary" id="idealButton" onclick="payWithIdeal();">Pay with iDEAL</button>
+                <button type="submit" class="mt-4 btn btn-primary" id="sofortButton" onclick="payWithSofort();">Pay with Sofort</button>
+                <button type="submit" class="mt-4 btn btn-primary" id="giropayButton" onclick="payWithGiropay();">Pay with Giropay</button>
             </div>
         </div>
     </div> <!-- row -->
@@ -36,24 +38,40 @@
                 console.error("error.field : ", error.field);
             }
             else {
-                var paymentOptions = data.response;
                 if(APM.isSupported(APM.METHOD_IDEAL)) {
                     $("#idealButton").show();
                 }
-                console.log("Callback triggered with data: ", data);
-                console.log(APM.configured());
-                console.log("Webservice API Version : " + APM.wsVersion());
-                console.log("APM JS API Version : " + APM.version());
-                console.log("User Language: " + APM.userLanguage());
-                console.log(APM.paymentOptions());
-                console.log(APM.configuration());
-//                console.log("Payment Options merchant : ", paymentOptions.merchant);
-//                console.log("Payment Types Supported by Gateway : ", paymentOptions.paymentTypes);
+                if(APM.isSupported(APM.METHOD_SOFORT)) {
+                    $("#sofortButton").show();
+                }
+                if(APM.isSupported(APM.METHOD_GIROPAY)) {
+                    $("#giropayButton").show();
+                }
             }
         }
     );
     function payWithIdeal() {
         APM.initiatePayment(APM.METHOD_IDEAL, "http://localhost:5000/apmReceipt", {order: {id: "ORDER12345678", amount: 123, currency: "USD"}, transaction: {id: "TRANS12345678"}}, function (data) {
+
+            //transaction id
+            console.log("Transaction Id : " + data.transaction.id);
+
+            //order id
+            console.log("Order Id : " + data.order.id);
+        });
+    }
+    function payWithSofort() {
+        APM.initiatePayment(APM.METHOD_SOFORT, "http://localhost:5000/apmReceipt", {order: {id: "ORDER12345678", amount: 123, currency: "USD"}, transaction: {id: "TRANS12345678"}}, function (data) {
+
+            //transaction id
+            console.log("Transaction Id : " + data.transaction.id);
+
+            //order id
+            console.log("Order Id : " + data.order.id);
+        });
+    }
+    function payWithGiropay() {
+        APM.initiatePayment(APM.METHOD_GIROPAY, "http://localhost:5000/apmReceipt", {order: {id: "ORDER12345678", amount: 123, currency: "USD"}, transaction: {id: "TRANS12345678"}}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);
