@@ -29,6 +29,9 @@
     var sessionId = /*[[${hostedSession.id}]]*/ null;
     /*]]>*/
 
+    var orderId = "ORDER1000";
+    var transactionId = "TRANS1000";
+
     APM.configure(merchantId, sessionId, {configuration: {wsVersion: '49', userLanguage: 'en-US'}}, function (data) {
             if (data && data.response && data.response.error) {
                 var error = data.response.error;
@@ -51,7 +54,7 @@
         }
     );
     function payWithIdeal() {
-        APM.initiatePayment(APM.METHOD_IDEAL, "http://localhost:5000/apmReceipt", {order: {id: "ORDER12345678", amount: 123, currency: "USD"}, transaction: {id: "TRANS12345678"}}, function (data) {
+        APM.initiatePayment(APM.METHOD_IDEAL, "http://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "USD"}, transaction: {id: transactionId}}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);
@@ -61,7 +64,7 @@
         });
     }
     function payWithSofort() {
-        APM.initiatePayment(APM.METHOD_SOFORT, "http://localhost:5000/apmReceipt", {order: {id: "ORDER12345678", amount: 123, currency: "USD"}, transaction: {id: "TRANS12345678"}}, function (data) {
+        APM.initiatePayment(APM.METHOD_SOFORT, "http://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "USD"}, transaction: {id: transactionId}}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);
@@ -71,7 +74,7 @@
         });
     }
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, "http://localhost:5000/apmReceipt", {order: {id: "ORDER12345678", amount: 123, currency: "USD"}, transaction: {id: "TRANS12345678"}}, function (data) {
+        APM.initiatePayment(APM.METHOD_GIROPAY, "http://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "USD"}, transaction: {id: transactionId}}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);

@@ -2,11 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apmReceipt')}">
 <body>
 <script type="text/javascript" src="http://localhost:4200/src/assets/scripts/apm.js"></script>
-<style>
-    #idealButton {
-        display: none;
-    }
-</style>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
@@ -18,7 +13,40 @@
 </div>
 <script th:inline="javascript">
      var paymentInfo = null;
-     APM.retrievePayment("transaction123" , "order123", function (data) {
+     var correlationId = getParameterByName('correlationId');
+     var orderId = getParameterByName('orderId');
+     var transactionId = getParameterByName('transactionId');
+
+     /*<![CDATA[*/
+     var merchantId = /*[[${config.merchantId}]]*/ null;
+     var sessionId = /*[[${hostedSession.id}]]*/ null;
+     /*]]>*/
+
+     APM.configure(merchantId, sessionId, {configuration: {wsVersion: '49', userLanguage: 'en-US'}}, function (data) {
+             if (data && data.response && data.response.error) {
+                 var error = data.response.error;
+                 //Something bad happened, the error value will match what is returned by the REST API
+                 console.error("error.cause : ", error.cause);
+                 console.error("error.explanation : ", error.explanation);
+                 console.error("error.field : ", error.field);
+             }
+             else {
+                 if(APM.isSupported(APM.METHOD_IDEAL)) {
+                     $("#idealButton").show();
+                 }
+                 if(APM.isSupported(APM.METHOD_SOFORT)) {
+                     $("#sofortButton").show();
+                 }
+                 if(APM.isSupported(APM.METHOD_GIROPAY)) {
+                     $("#giropayButton").show();
+                 }
+             }
+         }
+     );
+
+     // TODO: Should it be up to the client to grab the params and pass them to the API?
+
+     APM.retrievePayment(transactionId, orderId, function (data) {
        //raw response for the payment
        if (data && data.result !== "ERROR") {
          paymentInfo = data;
@@ -33,6 +61,17 @@
 //         console.log("Payment was not successful!");
 //       }
 //     });
+
+     // Pure Javascript query parameters parser
+     function getParameterByName(name, url) {
+         if (!url) url = window.location.href;
+         name = name.replace(/[\[\]]/g, '\\$&');
+         var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+             results = regex.exec(url);
+         if (!results) return null;
+         if (!results[2]) return '';
+         return decodeURIComponent(results[2].replace(/\+/g, ' '));
+     }
 </script>
 </body>
 </html>
