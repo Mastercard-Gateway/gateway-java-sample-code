@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apmReceipt')}">
+<body>
+<script type="text/javascript" src="http://localhost:4200/src/assets/scripts/apm.js"></script>
+<style>
+    #idealButton {
+        display: none;
+    }
+</style>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>Receipt</h3>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+<script th:inline="javascript">
+     var paymentInfo = null;
+     APM.retrievePayment("transaction123" , "order123", function (data) {
+       //raw response for the payment
+       if (data && data.result !== "ERROR") {
+         paymentInfo = data;
+         console.log("Payment Info : ", paymentInfo);
+       }
+     });
+//     APM.isSuccessfulPayment(APM.METHOD_IDEAL, paymentInfo, function (data){
+//       if (data && data.result !== "ERROR" && data.success) {
+//         console.log("Payment was successful!");
+//       }
+//       else {
+//         console.log("Payment was not successful!");
+//       }
+//     });
+</script>
+</body>
+</html>

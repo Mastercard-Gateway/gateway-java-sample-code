@@ -167,6 +167,18 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * APM receipt page
+     *
+     * @return ModelAndView for apmReceipt.html
+     */
+    @GetMapping("/apmReceipt")
+    public ModelAndView showAPMReceipt() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("apmReceipt");
+        return mav;
+    }
+
     /* essentials_exclude_start */
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
