@@ -7,6 +7,7 @@
         <div class="contents col-12">
             <div class="col-md-12">
                 <h3>Receipt</h3>
+                <div id="mc-apm-container" style="width:0px;height:0px;"></div>
             </div>
         </div>
     </div> <!-- row -->
@@ -16,43 +17,35 @@
      var correlationId = getParameterByName('correlationId');
      var orderId = getParameterByName('orderId');
      var transactionId = getParameterByName('transactionId');
+     var merchantId = getParameterByName('merchantId');
+     var sessionId = getParameterByName('sessionId');
+     var method = getParameterByName('method');
+     var options = {configuration: {wsVersion: '49', userLanguage: 'en-US'}};
 
-     /*<![CDATA[*/
-     var merchantId = /*[[${config.merchantId}]]*/ null;
-     var sessionId = /*[[${hostedSession.id}]]*/ null;
-     /*]]>*/
-
-     APM.configure(merchantId, sessionId, {configuration: {wsVersion: '49', userLanguage: 'en-US'}}, function (data) {
-             if (data && data.response && data.response.error) {
-                 var error = data.response.error;
-                 //Something bad happened, the error value will match what is returned by the REST API
-                 console.error("error.cause : ", error.cause);
-                 console.error("error.explanation : ", error.explanation);
-                 console.error("error.field : ", error.field);
-             }
-             else {
-                 if(APM.isSupported(APM.METHOD_IDEAL)) {
-                     $("#idealButton").show();
+     APM.configure(merchantId, sessionId, options, function (data) {
+         if (data && data.response && data.response.error) {
+             var error = data.response.error;
+             //Something bad happened, the error value will match what is returned by the REST API
+             console.error("error.cause : ", error.cause);
+             console.error("error.explanation : ", error.explanation);
+             console.error("error.field : ", error.field);
+         }
+         else {
+             APM.retrievePayment(transactionId, orderId, function (data) {
+                 //raw response for the payment
+                 console.log("TRANSACTION RETRIEVED!");
+                 if (data && data.result !== "ERROR") {
+                     paymentInfo = data;
+                     console.log("Payment Info : ", paymentInfo);
                  }
-                 if(APM.isSupported(APM.METHOD_SOFORT)) {
-                     $("#sofortButton").show();
-                 }
-                 if(APM.isSupported(APM.METHOD_GIROPAY)) {
-                     $("#giropayButton").show();
-                 }
-             }
+             });
+         }
          }
      );
 
      // TODO: Should it be up to the client to grab the params and pass them to the API?
 
-     APM.retrievePayment(transactionId, orderId, function (data) {
-       //raw response for the payment
-       if (data && data.result !== "ERROR") {
-         paymentInfo = data;
-         console.log("Payment Info : ", paymentInfo);
-       }
-     });
+
 //     APM.isSuccessfulPayment(APM.METHOD_IDEAL, paymentInfo, function (data){
 //       if (data && data.result !== "ERROR" && data.success) {
 //         console.log("Payment was successful!");
