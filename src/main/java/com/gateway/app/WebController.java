@@ -147,6 +147,8 @@ public class WebController {
 
         ApiRequest req = new ApiRequest();
         req.setApiOperation("CREATE_SESSION");
+        req.setOrderId(Utils.createUniqueId("order-"));
+        req.setTransactionId(Utils.createUniqueId("trans-"));
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -159,6 +161,7 @@ public class WebController {
             mav.setViewName("apm");
             mav.addObject("config", config);
             mav.addObject("hostedSession", hostedSession);
+            mav.addObject("request", req);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {

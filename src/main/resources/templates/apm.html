@@ -27,10 +27,9 @@
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
     var sessionId = /*[[${hostedSession.id}]]*/ null;
+    var orderId = /*[[${request.orderId}]]*/ null;
+    var transactionId = /*[[${request.transactionId}]]*/ null;
     /*]]>*/
-
-    var orderId = "ORDER1002";
-    var transactionId = "TRANS1002";
 
     APM.configure(merchantId, sessionId, {configuration: {wsVersion: '49', userLanguage: 'en-US'}}, function (data) {
             if (data && data.response && data.response.error) {
@@ -54,7 +53,7 @@
         }
     );
     function payWithIdeal() {
-        APM.initiatePayment(APM.METHOD_IDEAL, "http://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "USD"}, transaction: {id: transactionId}}, function (data) {
+            APM.initiatePayment(APM.METHOD_IDEAL, "http://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);

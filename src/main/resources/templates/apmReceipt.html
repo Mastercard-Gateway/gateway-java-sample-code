@@ -5,8 +5,32 @@
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
-            <div class="col-md-12">
+            <div id="receipt" class="col-md-12">
                 <h3>Receipt</h3>
+                <div class="row">
+                    <div class="col">
+                        Order Status
+                    </div>
+                    <div class="col">
+                        <p id="orderStatus"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Order ID
+                    </div>
+                    <div class="col">
+                        <p id="orderId"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Amount
+                    </div>
+                    <div class="col">
+                        <p id="amount"></p>
+                    </div>
+                </div>
                 <div id="mc-apm-container" style="width:0px;height:0px;"></div>
             </div>
         </div>
@@ -33,11 +57,10 @@
          else {
              APM.retrievePayment(transactionId, orderId, function (data) {
                  //raw response for the payment
-                 console.log("TRANSACTION RETRIEVED!");
-                 if (data && data.result !== "ERROR") {
-                     paymentInfo = data;
-                     console.log("Payment Info : ", paymentInfo);
-                 }
+                 console.log("TRANSACTION RETRIEVED!", data);
+                 $("#orderStatus").text(data.response.gatewayCode);
+                 $("#orderId").text(data.order.id);
+                 $("#amount").text(data.order.amount);
              });
          }
          }
