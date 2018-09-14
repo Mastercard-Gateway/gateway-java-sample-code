@@ -162,6 +162,7 @@ public class WebController {
             mav.addObject("config", config);
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
+            mav.addObject("correlationId", Utils.createUniqueId("APM_"));
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {

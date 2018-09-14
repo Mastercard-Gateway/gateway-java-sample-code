@@ -55,7 +55,7 @@
              console.error("error.field : ", error.field);
          }
          else {
-             APM.retrievePayment(transactionId, orderId, function (data) {
+             APM.retrievePayment(transactionId, orderId, {correlationId: correlationId}, function (data) {
                  //raw response for the payment
                  console.log("TRANSACTION RETRIEVED!", data);
                  $("#orderStatus").text(data.response.gatewayCode);
