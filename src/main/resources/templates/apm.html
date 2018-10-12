@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apm')}">
 <body>
-<script type="text/javascript" src="http://localhost:4200/src/assets/scripts/apm.js"></script>
+<script type="text/javascript" src="http://localhost/apm/src/assets/scripts/apm.js"></script>
 <style>
     #idealButton, #sofortButton, #giropayButton {
         display: none;
@@ -54,7 +54,7 @@
         }
     );
     function payWithIdeal() {
-            APM.initiatePayment(APM.METHOD_IDEAL, "https://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
+            APM.initiatePayment(APM.METHOD_IDEAL, "https://localhost/sample/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);
@@ -64,7 +64,7 @@
         });
     }
     function payWithSofort() {
-        APM.initiatePayment(APM.METHOD_SOFORT, "https://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
+        APM.initiatePayment(APM.METHOD_SOFORT, "https://localhost/sample/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);
@@ -74,7 +74,7 @@
         });
     }
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, "https://localhost:5000/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
+        APM.initiatePayment(APM.METHOD_GIROPAY, "https://localhost/sample/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
 
             //transaction id
             console.log("Transaction Id : " + data.transaction.id);
