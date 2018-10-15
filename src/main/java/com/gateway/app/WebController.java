@@ -158,6 +158,9 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
+            req.setOrderAmount("50.00");
+            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, req, config, hostedSession.getId());
+
             mav.setViewName("apm");
             mav.addObject("config", config);
             mav.addObject("hostedSession", hostedSession);

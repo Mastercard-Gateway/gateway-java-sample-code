@@ -54,33 +54,22 @@
         }
     );
     function payWithIdeal() {
-            APM.initiatePayment(APM.METHOD_IDEAL, "https://localhost/sample/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
+            APM.initiatePayment(APM.METHOD_IDEAL, "https://localhost/sample/apmReceipt", {order: {id: orderId, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
 
-            //transaction id
-            console.log("Transaction Id : " + data.transaction.id);
+            console.log("Initiate browser payment response : ", data);
 
-            //order id
-            console.log("Order Id : " + data.order.id);
         });
     }
     function payWithSofort() {
-        APM.initiatePayment(APM.METHOD_SOFORT, "https://localhost/sample/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
+        APM.initiatePayment(APM.METHOD_SOFORT, "https://localhost/sample/apmReceipt", {order: {id: orderId, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
 
-            //transaction id
-            console.log("Transaction Id : " + data.transaction.id);
-
-            //order id
-            console.log("Order Id : " + data.order.id);
+            console.log("Initiate browser payment response : ", data);
         });
     }
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, "https://localhost/sample/apmReceipt", {order: {id: orderId, amount: 123, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
+        APM.initiatePayment(APM.METHOD_GIROPAY, "https://localhost/sample/apmReceipt", {order: {id: orderId, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
 
-            //transaction id
-            console.log("Transaction Id : " + data.transaction.id);
-
-            //order id
-            console.log("Order Id : " + data.order.id);
+            console.log("Initiate browser payment response : ", data);
         });
     }
 </script>
