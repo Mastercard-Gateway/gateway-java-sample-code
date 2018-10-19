@@ -200,6 +200,7 @@ public class WebController {
         req.setApiOperation("CREATE_CHECKOUT_SESSION");
         req.setOrderId(Utils.createUniqueId("order-"));
         req.setOrderCurrency(config.getCurrency());
+        req.setOrderAmount("50.00");
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
