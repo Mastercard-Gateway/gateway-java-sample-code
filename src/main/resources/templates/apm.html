@@ -54,17 +54,17 @@
         }
     );
     function payWithIdeal() {
-        APM.initiatePayment(APM.METHOD_IDEAL, orderId, transactionId, correlationId, function (data) {
+        APM.initiatePayment(APM.METHOD_IDEAL, orderId, transactionId, function (data) {
             handleResponse(data, APM.METHOD_IDEAL);
         });
     }
     function payWithSofort() {
-        APM.initiatePayment(APM.METHOD_SOFORT, orderId, transactionId, correlationId, function (data) {
+        APM.initiatePayment(APM.METHOD_SOFORT, orderId, transactionId, function (data) {
             handleResponse(data, APM.METHOD_SOFORT);
         });
     }
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, correlationId, function (data) {
+        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, function (data) {
             handleResponse(data, APM.METHOD_GIROPAY);
         });
     }

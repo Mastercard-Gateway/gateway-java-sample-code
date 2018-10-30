@@ -23,7 +23,6 @@
                         <p id="amount"></p>
                     </div>
                 </div>
-                <div id="mc-apm-container" style="width:0px;height:0px;"></div>
             </div>
         </div>
     </div> <!-- row -->
@@ -39,15 +38,16 @@
 
      APM.configure(merchantId, sessionId, options, function () {
          if (APM.isConfigured()) {
-             APM.retrievePayment(orderId, transactionId, correlationId, function (data) {
+             APM.retrievePayment(orderId, transactionId, function (data) {
                  //raw response for the payment
                  paymentInfo = data;
-                 var method = sessionStorage.getItem('paymentMethod');
+                 var method = sessionStorage.getItem("paymentMethod");
                  APM.isSuccessfulPayment(method, paymentInfo, function (data){
-                     if (data && data.result === "SUCCESS") {
-                         console.log("Payment was successful!");
+                     if (data) {
                          $("#orderStatus").text(data.restApiResponse.response.gatewayCode);
-                         $("#amount").text(data.restApiResponse.order.amount);
+                         if(data.result === "SUCCESS") {
+                             $("#amount").text(data.restApiResponse.order.amount);
+                         }
                      }
                      else {
                          console.log("Payment was not successful");
