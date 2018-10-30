@@ -17,14 +17,6 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        Order ID
-                    </div>
-                    <div class="col">
-                        <p id="orderId"></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
                         Amount
                     </div>
                     <div class="col">
@@ -52,7 +44,7 @@
                  paymentInfo = data;
                  var method = sessionStorage.getItem('paymentMethod');
                  APM.isSuccessfulPayment(method, paymentInfo, function (data){
-                     if (data && data.success) {
+                     if (data && data.result === "SUCCESS") {
                          console.log("Payment was successful!");
                          $("#orderStatus").text(data.restApiResponse.response.gatewayCode);
                          $("#amount").text(data.restApiResponse.order.amount);
