@@ -33,8 +33,8 @@
     /*]]>*/
 
     APM.configure(merchantId, sessionId, {configuration: {wsVersion: '50', userLanguage: 'en-US'}}, function (data) {
-            if (data && data.response && data.response.error) {
-                var error = data.response.error;
+            if (data && data.result === "ERROR") {
+                var error = data;
                 //Something bad happened, the error value will match what is returned by the REST API
                 console.error("error.cause : ", error.cause);
                 console.error("error.explanation : ", error.explanation);
@@ -54,23 +54,28 @@
         }
     );
     function payWithIdeal() {
-            APM.initiatePayment(APM.METHOD_IDEAL, "https://localhost/sample/apmReceipt", {order: {id: orderId, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
-
-            console.log("Initiate browser payment response : ", data);
-
+        APM.initiatePayment(APM.METHOD_IDEAL, orderId, transactionId, correlationId, function (data) {
+            handleResponse(data, APM.METHOD_IDEAL);
         });
     }
     function payWithSofort() {
-        APM.initiatePayment(APM.METHOD_SOFORT, "https://localhost/sample/apmReceipt", {order: {id: orderId, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
-
-            console.log("Initiate browser payment response : ", data);
+        APM.initiatePayment(APM.METHOD_SOFORT, orderId, transactionId, correlationId, function (data) {
+            handleResponse(data, APM.METHOD_SOFORT);
         });
     }
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, "https://localhost/sample/apmReceipt", {order: {id: orderId, currency: "EUR"}, transaction: {id: transactionId}}, {correlationId: correlationId}, function (data) {
-
-            console.log("Initiate browser payment response : ", data);
+        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, correlationId, function (data) {
+            handleResponse(data, APM.METHOD_GIROPAY);
         });
+    }
+    function handleResponse(data, method) {
+        if(data && data.result === "SUCCESS") {
+            sessionStorage.setItem('paymentMethod', method);
+            window.location.href = data.restApiResponse.browserPayment.redirectUrl;
+        }
+        else {
+            console.log("There was an error initiating browser payment.")
+        }
     }
 </script>
 </body>

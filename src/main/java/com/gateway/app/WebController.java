@@ -142,7 +142,7 @@ public class WebController {
      * @return ModelAndView for apm.html
      */
     @GetMapping("/apm")
-    public ModelAndView showAPMs() {
+    public ModelAndView showAPMs(HttpServletRequest httpServletRequest) {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
@@ -158,14 +158,21 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
+            String correlationId = Utils.createUniqueId("APM_");
+            req.setApiOperation("UPDATE_SESSION");
             req.setOrderAmount("50.00");
-            ApiRequestService.updateSessionWithOrderInfo(ApiProtocol.REST, req, config, hostedSession.getId());
+            req.setOrderCurrency("EUR");
+            req.setBrowserPaymentOperation("PAY");
+            // TODO - Don't hardcode hostname for return URL
+            //req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "/apmReceipt?sessionId=" + hostedSession + "&correlationId=" + correlationId);
+            req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
+            ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
             mav.setViewName("apm");
             mav.addObject("config", config);
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
-            mav.addObject("correlationId", Utils.createUniqueId("APM_"));
+            mav.addObject("correlationId", correlationId);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -192,7 +199,7 @@ public class WebController {
      * @return ModelAndView for apmHostedCheckout.html
      */
     @GetMapping("/apmHostedCheckout")
-    public ModelAndView showApmHostedCheckout() {
+    public ModelAndView showApmHostedCheckout(HttpServletRequest httpServletRequest) {
 
         ModelAndView mav = new ModelAndView();
 
@@ -200,7 +207,6 @@ public class WebController {
         req.setApiOperation("CREATE_CHECKOUT_SESSION");
         req.setOrderId(Utils.createUniqueId("order-"));
         req.setOrderCurrency(config.getCurrency());
-        req.setOrderAmount("50.00");
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -211,6 +217,13 @@ public class WebController {
             String resp = connection.postTransaction(data, requestUrl, config);
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+
+            req.setApiOperation("UPDATE_SESSION");
+            req.setOrderAmount("50.00");
+            req.setOrderCurrency("EUR");
+            req.setBrowserPaymentOperation("PAY");
+            req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "/apmHostedCheckout");
+            ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
             mav.setViewName("apmHostedCheckout");
             mav.addObject("config", config);

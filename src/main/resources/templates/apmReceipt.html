@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apmReceipt')}">
 <body>
-<script type="text/javascript" src="https://localhost:4200/src/assets/scripts/apm.js"></script>
+<script type="text/javascript" src="http://localhost/apm/src/assets/scripts/apm.js"></script>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
@@ -43,27 +43,19 @@
      var transactionId = getParameterByName('transactionId');
      var merchantId = getParameterByName('merchantId');
      var sessionId = getParameterByName('sessionId');
-     var method = getParameterByName('method');
      var options = {configuration: {wsVersion: '49', userLanguage: 'en-US'}};
 
-     APM.configure(merchantId, sessionId, options, function (data) {
-         if (data && data.response && data.response.error) {
-             var error = data.response.error;
-             //Something bad happened, the error value will match what is returned by the REST API
-             console.error("error.cause : ", error.cause);
-             console.error("error.explanation : ", error.explanation);
-             console.error("error.field : ", error.field);
-         }
-         else {
-             APM.retrievePayment(transactionId, orderId, {correlationId: correlationId}, function (data) {
+     APM.configure(merchantId, sessionId, options, function () {
+         if (APM.isConfigured()) {
+             APM.retrievePayment(orderId, transactionId, correlationId, function (data) {
                  //raw response for the payment
                  paymentInfo = data;
+                 var method = sessionStorage.getItem('paymentMethod');
                  APM.isSuccessfulPayment(method, paymentInfo, function (data){
                      if (data && data.success) {
                          console.log("Payment was successful!");
-                         $("#orderStatus").text(data.apiResponse.response.gatewayCode);
-                         $("#orderId").text(data.apiResponse.order.id);
-                         $("#amount").text(data.apiResponse.order.amount);
+                         $("#orderStatus").text(data.restApiResponse.response.gatewayCode);
+                         $("#amount").text(data.restApiResponse.order.amount);
                      }
                      else {
                          console.log("Payment was not successful");
@@ -71,18 +63,10 @@
                  });
              });
          }
+         else {
+            console.log("Error configuring APM");
          }
-     );
-
-
-//     APM.isSuccessfulPayment(APM.METHOD_IDEAL, paymentInfo, function (data){
-//       if (data && data.result !== "ERROR" && data.success) {
-//         console.log("Payment was successful!");
-//       }
-//       else {
-//         console.log("Payment was not successful!");
-//       }
-//     });
+     });
 
      // Pure Javascript query parameters parser
      function getParameterByName(name, url) {
