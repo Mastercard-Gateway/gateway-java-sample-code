@@ -32,18 +32,18 @@
         </div>
     </div> <!-- row -->
 </div>
-<!--<script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"-->
-    <!--data-error="errorCallback"-->
-    <!--data-cancel="cancelCallback"-->
-    <!--data-beforeRedirect="Checkout.saveFormFields"-->
-    <!--data-afterRedirect="Checkout.restoreFormFields">-->
-<!--</script>-->
-<script src="https://localhost/checkout/version/50/checkout.js"
-        data-error="errorCallback"
-        data-cancel="cancelCallback"
-        data-beforeRedirect="getPageState"
-        data-afterRedirect="restorePageState">
+<script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
+    data-error="errorCallback"
+    data-cancel="cancelCallback"
+    data-beforeRedirect="Checkout.saveFormFields"
+    data-afterRedirect="Checkout.restoreFormFields">
 </script>
+<!--<script src="https://localhost/checkout/version/50/checkout.js"-->
+        <!--data-error="errorCallback"-->
+        <!--data-cancel="cancelCallback"-->
+        <!--data-beforeRedirect="getPageState"-->
+        <!--data-afterRedirect="restorePageState">-->
+<!--</script>-->
 <script th:inline="javascript">
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
