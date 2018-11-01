@@ -218,13 +218,6 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            req.setApiOperation("UPDATE_SESSION");
-            req.setOrderAmount("50.00");
-            req.setOrderCurrency("EUR");
-            req.setBrowserPaymentOperation("PAY");
-            req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "/apmHostedCheckout");
-            ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
-
             mav.setViewName("apmHostedCheckout");
             mav.addObject("config", config);
             mav.addObject("orderId", req.getOrderId());
