@@ -54,17 +54,17 @@
         }
     );
     function payWithIdeal() {
-        APM.initiatePayment(APM.METHOD_IDEAL, orderId, transactionId, function (data) {
+        APM.initiatePayment(APM.METHOD_IDEAL, orderId, transactionId, null, function (data) {
             handleResponse(data, APM.METHOD_IDEAL);
         });
     }
     function payWithSofort() {
-        APM.initiatePayment(APM.METHOD_SOFORT, orderId, transactionId, function (data) {
+        APM.initiatePayment(APM.METHOD_SOFORT, orderId, transactionId, null, function (data) {
             handleResponse(data, APM.METHOD_SOFORT);
         });
     }
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, function (data) {
+        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, {giropay: {bankIdentifier: "12345679"}}, function (data) {
             handleResponse(data, APM.METHOD_GIROPAY);
         });
     }

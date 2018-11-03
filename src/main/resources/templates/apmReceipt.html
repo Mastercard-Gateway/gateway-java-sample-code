@@ -38,7 +38,7 @@
 
      APM.configure(merchantId, sessionId, options, function () {
          if (APM.isConfigured()) {
-             APM.retrievePayment(orderId, transactionId, function (data) {
+             APM.retrievePayment(orderId, transactionId, null, function (data) {
                  //raw response for the payment
                  paymentInfo = data;
                  var method = sessionStorage.getItem("paymentMethod");
