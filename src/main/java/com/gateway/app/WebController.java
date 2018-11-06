@@ -231,6 +231,16 @@ public class WebController {
     }
 
     /**
+     * Display 3DSecure operation page
+     *
+     * @return ModelAndView for 3dSecure.html
+     */
+    @GetMapping("/3dSecure2")
+    public ModelAndView showSecureId2() {
+        return createHostedSessionModel("3dSecure2");
+    }
+
+    /**
      * Display page for Hosted Checkout operation
      *
      * @return ModelAndView for hostedCheckout.html
