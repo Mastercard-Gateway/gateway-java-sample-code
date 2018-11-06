@@ -163,13 +163,12 @@ public class WebController {
             req.setOrderAmount("50.00");
             req.setOrderCurrency("EUR");
             req.setBrowserPaymentOperation("PAY");
-            // TODO - Don't hardcode hostname for return URL
-            //req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "/apmReceipt?sessionId=" + hostedSession + "&correlationId=" + correlationId);
-            req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
+            req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
             mav.setViewName("apm");
             mav.addObject("config", config);
+            mav.addObject("apmApiVersion", "1.0.0");
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
             mav.addObject("correlationId", correlationId);
@@ -189,6 +188,8 @@ public class WebController {
     @GetMapping("/apmReceipt")
     public ModelAndView showAPMReceipt() {
         ModelAndView mav = new ModelAndView();
+        mav.addObject("config", config);
+        mav.addObject("apmApiVersion", "1.0.0");
         mav.setViewName("apmReceipt");
         return mav;
     }
@@ -199,14 +200,12 @@ public class WebController {
      * @return ModelAndView for apmHostedCheckout.html
      */
     @GetMapping("/apmHostedCheckout")
-    public ModelAndView showApmHostedCheckout(HttpServletRequest httpServletRequest) {
+    public ModelAndView showApmHostedCheckout() {
 
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_CHECKOUT_SESSION");
-        req.setOrderId(Utils.createUniqueId("order-"));
-        req.setOrderCurrency(config.getCurrency());
+        req.setApiOperation("CREATE_SESSION");
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -220,7 +219,6 @@ public class WebController {
 
             mav.setViewName("apmHostedCheckout");
             mav.addObject("config", config);
-            mav.addObject("orderId", req.getOrderId());
             mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);

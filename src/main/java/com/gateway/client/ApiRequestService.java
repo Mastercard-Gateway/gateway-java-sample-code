@@ -40,7 +40,7 @@ public class ApiRequestService {
             req.setOrderId(null);
             req.setTransactionId(null);
         }
-        if (apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
+        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals("CREATE_SESSION")) {
             req.setApiMethod("POST");
         }
         return req;
@@ -223,7 +223,7 @@ public class ApiRequestService {
 
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals("UPDATE_SESSION")) data.addProperty("apiOperation", request.getApiOperation());
+        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals("UPDATE_SESSION") && !request.getApiOperation().equals("CREATE_SESSION")) data.addProperty("apiOperation", request.getApiOperation());
         if (Utils.notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
         if (!wallet.entrySet().isEmpty()) data.add("wallet", wallet);

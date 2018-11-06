@@ -38,21 +38,11 @@
     data-beforeRedirect="Checkout.saveFormFields"
     data-afterRedirect="Checkout.restoreFormFields">
 </script>
-<!--<script src="https://localhost/checkout/version/50/checkout.js"-->
-        <!--data-error="errorCallback"-->
-        <!--data-cancel="cancelCallback"-->
-        <!--data-beforeRedirect="getPageState"-->
-        <!--data-afterRedirect="restorePageState">-->
-<!--</script>-->
 <script th:inline="javascript">
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
     var sessionId = /*[[${hostedSession.id}]]*/ null;
-    var sessionVersion = /*[[${hostedSession.version}]]*/ null;
-    var successIndicator = /*[[${hostedSession.successIndicator}]]*/ null;
-    var orderId = /*[[${orderId}]]*/ null;
     /*]]>*/
-    var resultIndicator = null;
 
     // This method preserves the current state of successIndicator and orderId, so they're not overwritten when we return to this page after redirect
     function getPageState() {
@@ -91,8 +81,9 @@
     Checkout.configure({
         merchant: merchantId,
         order: {
-            currency: 'USD',
-            description: 'Ordered goods'
+            currency: 'EUR',
+            description: 'Ordered goods',
+            amount: '50.00'
         },
         session: {
             id: sessionId
