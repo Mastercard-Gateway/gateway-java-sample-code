@@ -7,10 +7,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mastercard.gateway</groupId>
-  <artifactId>frontend-__APP_NAME__</artifactId>
+  <artifactId>frontend-gateway-java-sample-code</artifactId>
   <packaging>pom</packaging>
   <version>1.0.0-SNAPSHOT</version>
-  <name>frontend-__APP_NAME__</name>
+  <name>frontend-gateway-java-sample-code</name>
   <description>
     A gateway tier application that provides a page for merchants to redirect customers to for payment processing.
   </description>
