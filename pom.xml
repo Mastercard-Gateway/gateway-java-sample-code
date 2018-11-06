@@ -9,7 +9,7 @@
   <groupId>com.mastercard.gateway</groupId>
   <artifactId>frontend-gateway-java-sample-code</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>frontend-gateway-java-sample-code</name>
   <description>
     A gateway tier application that provides a page for merchants to redirect customers to for payment processing.
@@ -101,6 +101,6 @@
     <connection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</connection>
     <url>https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</url>
     <developerConnection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>frontend-gateway-java-sample-code-1.0.0</tag>
   </scm>
 </project>
