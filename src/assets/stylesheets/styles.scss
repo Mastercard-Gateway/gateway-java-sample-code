@@ -1,0 +1,22 @@
+@import "reset";
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #fafafa;
+    color: #333;
+}
+
+app-root {
+    background-color: white;
+    border-radius: 3px;
+    box-shadow: 0 0 5px 0 #aaa;;
+    display: block;
+    margin: 0 auto;
+    margin-top: 50px;
+    max-width: 500px;
+    width: 100%;
+}

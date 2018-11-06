@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='ASCII'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>com.mastercard.gateway</groupId>
+    <artifactId>mpgs-infrastructure-parent</artifactId>
+    <version>1.0.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mastercard.gateway</groupId>
+  <artifactId>frontend-__APP_NAME__</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>frontend-__APP_NAME__</name>
+  <description>
+    A gateway tier application that provides a page for merchants to redirect customers to for payment processing.
+  </description>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.6</version>
+
+        <executions>
+
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <!-- See https://nodejs.org/en/download/ for latest node and npm (lts) versions -->
+              <nodeVersion>v8.10.0</nodeVersion>
+
+              <!-- Do not commit changes the below URLs, it will break builds. Add a host file entry instead -->
+              <nodeDownloadRoot>http://artifactory.tse.int/nexus/repository/node-dist/</nodeDownloadRoot>
+              <npmDownloadRoot>http://artifactory.tse.int/nexus/repository/node-dist/npm/</npmDownloadRoot>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <!-- Optional configuration which provides for running any npm command -->
+            <configuration>
+              <!-- Do not commit changes the below URLs, it will break builds. Add a host file entry instead -->
+              <arguments>install --strict-ssl=false --registry=http://artifactory.tse.int/nexus/repository/npm-remote/
+              </arguments>
+            </configuration>
+          </execution>
+
+          <!-- Run Webpack build -->
+          <execution>
+            <id>npm run build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>dist</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <descriptors>
+            <descriptor>assembly.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- bind to the packaging phase -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <scm>
+    <connection>scm:git:__REPO_URL__</connection>
+    <url>__REPO_URL__</url>
+    <developerConnection>scm:git:__REPO_URL__</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+</project>

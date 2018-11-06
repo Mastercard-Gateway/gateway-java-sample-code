@@ -1,0 +1,11 @@
+#enable HTML 5 Mode for the app
+RewriteEngine on
+
+# Don't allow app to be iFramed
+Header set X-Frame-Options DENY
+
+# Redirect to default locale app
+RewriteCond %{HTTP_COOKIE} ^.*user.locale=([\w_]+).*$ [NC]
+RewriteRule ^(.*)$ /account/%1/$1 [P,L]
+
+RewriteRule ^ en_US/index.html [L]

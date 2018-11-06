@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en_US" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="headerHomeLink" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/header/header.component.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <note priority="1" from="description">link to stores homepage in the header</note>
+      </trans-unit>
+      <trans-unit id="headerShopLink" datatype="html">
+        <source>Shop</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/header/header.component.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <note priority="1" from="description">link to stores category page in the header</note>
+      </trans-unit>
+      <trans-unit id="headerAboutLink" datatype="html">
+        <source>About</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/header/header.component.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <note priority="1" from="description">link to stores about page in the header</note>
+      </trans-unit>
+      <trans-unit id="footerNavigationLabel" datatype="html">
+        <source>Navigation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">label for navigation links in footer</note>
+      </trans-unit>
+      <trans-unit id="footerHomeLink" datatype="html">
+        <source>Home</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <note priority="1" from="description">footer link to stores homepage in footer</note>
+      </trans-unit>
+      <trans-unit id="footerHome" datatype="html">
+        <source>Shop</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">link to stores category page in footer</note>
+      </trans-unit>
+      <trans-unit id="footerInformationLabel" datatype="html">
+        <source>Information</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">label for information links in footer</note>
+      </trans-unit>
+      <trans-unit id="footerAboutUsLabel" datatype="html">
+        <source>About Us</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">link to stores about page in footer</note>
+      </trans-unit>
+      <trans-unit id="footerLocationLabel" datatype="html">
+        <source>Location</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <note priority="1" from="description">label for stores location in footer</note>
+      </trans-unit>
+      <trans-unit id="footerPoweredBy" datatype="html">
+        <source>Powered by Simplify Commerce</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/_core/footer/footer.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <note priority="1" from="description">powered by Simplify Commerce label in footer</note>
+      </trans-unit>
+      <trans-unit id="loginValidationError" datatype="html">
+        <source>Your username or password do not match our records. Please try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <note priority="1" from="description">validation error for username/password</note>
+      </trans-unit>
+      <trans-unit id="loginTitleText" datatype="html">
+        <source>Log In</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">login page title</note>
+      </trans-unit>
+      <trans-unit id="loginInstructionText" datatype="html">
+        <source>Sign in using your registered account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">login page instruction text</note>
+      </trans-unit>
+      <trans-unit id="loginEmailAddressLabel" datatype="html">
+        <source>Email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <note priority="1" from="description">email address label in login page</note>
+      </trans-unit>
+      <trans-unit id="loginEmailRequired" datatype="html">
+        <source>A valid email address is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">required validation text for email address during login</note>
+      </trans-unit>
+      <trans-unit id="loginPasswordLabel" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <note priority="1" from="description">password label in login page</note>
+      </trans-unit>
+      <trans-unit id="loginPasswordRequired" datatype="html">
+        <source>Password is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">required validation text for password during login</note>
+      </trans-unit>
+      <trans-unit id="loginButton" datatype="html">
+        <source>Log in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">text for login button</note>
+      </trans-unit>
+      <trans-unit id="orTextLogin" datatype="html">
+        <source>or</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">text in between login and signup buttons</note>
+      </trans-unit>
+      <trans-unit id="loginSignupButton" datatype="html">
+        <source>Sign up</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <note priority="1" from="description">text for signup button</note>
+      </trans-unit>
+      <trans-unit id="loginResetPassword" datatype="html">
+        <source>Forgot your password? <x id="START_LINK" ctype="x-a" equiv-text="&lt;a>"/>Reset Password<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/login/login.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">text for reset password</note>
+      </trans-unit>
+      <trans-unit id="addressDefaultText" datatype="html">
+        <source>Default</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/address/address-list.component.ts</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">default label address table</note>
+      </trans-unit>
+      <trans-unit id="addressAddressText" datatype="html">
+        <source>Address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/address/address-list.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">address label address table</note>
+      </trans-unit>
+      <trans-unit id="addressPhoneText" datatype="html">
+        <source>Phone</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/address/address-list.component.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">phone label address table</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordLabel" datatype="html">
+        <source>Forgot your password?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">Reset Password page title</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordInstructionText" datatype="html">
+        <source>Enter your email address to receive password reset instructions.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">password reset intruction text</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordEmailLabel" datatype="html">
+        <source>Email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <note priority="1" from="description">reset password email address label</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordEmailErrorMessage" datatype="html">
+        <source>A valid email address is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <note priority="1" from="description">reset password email error message</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordSubmitButtonText" datatype="html">
+        <source>Submit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">reset password submit button text</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordEmailSuccessLabel" datatype="html">
+        <source>Reset password email sent!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <note priority="1" from="description">reset password email sent successfully</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordEmailSuccessInstruction1" datatype="html">
+        <source>We have sent the password reset intructions to your email address.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <note priority="1" from="description">reset password email first instruction</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordEmailSuccessInstruction2" datatype="html">
+        <source>Your email may take a few minutes to arrive, so please be patient.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">reset password email second instruction</note>
+      </trans-unit>
+      <trans-unit id="resetPasswordEmailSuccessSpamInstruction" datatype="html">
+        <source>Don't forget to check your spam or junk folder.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/reset-password.component.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <note priority="1" from="description">reset password email spam folder instruction</note>
+      </trans-unit>
+      <trans-unit id="newPasswordLabel" datatype="html">
+        <source>Reset your Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <note priority="1" from="description">New Password page title</note>
+      </trans-unit>
+      <trans-unit id="newPasswordError" datatype="html">
+        <source>There was an error while resetting your password, please try again! </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">New Password error message</note>
+      </trans-unit>
+      <trans-unit id="newPasswordInstruction" datatype="html">
+        <source>Enter your new account password.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">New Password instruction</note>
+      </trans-unit>
+      <trans-unit id="newPasswordFirstInputLabel" datatype="html">
+        <source>New Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <note priority="1" from="description">New Password first input label</note>
+      </trans-unit>
+      <trans-unit id="newPasswordFirstInputPatternError" datatype="html">
+        <source>Password must be 8-20 characters, with at least 1 uppercase and lowercase character, number and special character.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <note priority="1" from="description">New Password first input pattern error</note>
+      </trans-unit>
+      <trans-unit id="newPasswordFirstInputRequiredError" datatype="html">
+        <source>Password is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">New Password firsti nput required error </note>
+      </trans-unit>
+      <trans-unit id="newPasswordSecondInputLabel" datatype="html">
+        <source>Confirm Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <note priority="1" from="description">New Password second input label</note>
+      </trans-unit>
+      <trans-unit id="newPasswordSecondInputMatchError" datatype="html">
+        <source>Password does not match</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">New Password second input match error</note>
+      </trans-unit>
+      <trans-unit id="newPasswordButton" datatype="html">
+        <source>Reset Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/reset-password/new-password/new-password.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <note priority="1" from="description">New Password page reset button text</note>
+      </trans-unit>
+      <trans-unit id="signupCreateAccountText" datatype="html">
+        <source>Create an account</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <note priority="1" from="description">create account text</note>
+      </trans-unit>
+      <trans-unit id="signupCreateAccountInstruction" datatype="html">
+        <source>Enter your details to get started.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">create account instruction text</note>
+      </trans-unit>
+      <trans-unit id="signupAccountCreationError" datatype="html">
+        <source>Error encountered while creating account. Please try again.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">create account error text</note>
+      </trans-unit>
+      <trans-unit id="signupFirstNameLabel" datatype="html">
+        <source>First name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <note priority="1" from="description">first name label</note>
+      </trans-unit>
+      <trans-unit id="signupFirstNameRequiredError" datatype="html">
+        <source>First name is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">first name required error text</note>
+      </trans-unit>
+      <trans-unit id="signupFirstNameMinlengthError" datatype="html">
+        <source>First name must be at least 2 characters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <note priority="1" from="description">first name minlength error text</note>
+      </trans-unit>
+      <trans-unit id="signupFirstNamePatternError" datatype="html">
+        <source>Must be a valid first name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <note priority="1" from="description">first name pattern error text</note>
+      </trans-unit>
+      <trans-unit id="signupLastNameLabel" datatype="html">
+        <source>Last name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <note priority="1" from="description">last name label</note>
+      </trans-unit>
+      <trans-unit id="signupLastNameRequiredError" datatype="html">
+        <source>Last name is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <note priority="1" from="description">last name required error text</note>
+      </trans-unit>
+      <trans-unit id="signupLastNameMinlengthError" datatype="html">
+        <source>Last name must be at least 2 characters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">last name minlength error text</note>
+      </trans-unit>
+      <trans-unit id="signupLastNamePatternError" datatype="html">
+        <source>Must be a valid last name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <note priority="1" from="description">last name pattern error text</note>
+      </trans-unit>
+      <trans-unit id="signupEmailLabel" datatype="html">
+        <source>Email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <note priority="1" from="description">email address label</note>
+      </trans-unit>
+      <trans-unit id="signupEmailError" datatype="html">
+        <source>Must be a valid email address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <note priority="1" from="description">email error text</note>
+      </trans-unit>
+      <trans-unit id="signupEmailRequiredError" datatype="html">
+        <source>Email address is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <note priority="1" from="description">email required error text</note>
+      </trans-unit>
+      <trans-unit id="signupPasswordLabel" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <note priority="1" from="description">Password label</note>
+      </trans-unit>
+      <trans-unit id="signupPasswordPatternError" datatype="html">
+        <source>Password must be 8-20 characters, with at least 1 uppercase and lowercase character, number and special character.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <note priority="1" from="description">password pattern error text</note>
+      </trans-unit>
+      <trans-unit id="signupPasswordRequiredError" datatype="html">
+        <source>Password is required</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <note priority="1" from="description">password required error text</note>
+      </trans-unit>
+      <trans-unit id="signupPolicyText" datatype="html">
+        <source>By creating an account, you agree to the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a>"/>Terms &amp; Conditions<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> and the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a>"/>Privacy Policy<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <note priority="1" from="description">Password label</note>
+      </trans-unit>
+      <trans-unit id="signupExistingAccountText" datatype="html">
+        <source>Already have an account?</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <note priority="1" from="description">already have an account text to sign inl</note>
+      </trans-unit>
+      <trans-unit id="signupSignInLabel" datatype="html">
+        <source>Sign In</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+        <note priority="1" from="description">sign in label</note>
+      </trans-unit>
+      <trans-unit id="signupSuccessText" datatype="html">
+        <source>Account creation successful!</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <note priority="1" from="description">sign up successful text</note>
+      </trans-unit>
+      <trans-unit id="signupSuccessInstruction" datatype="html">
+        <source>Please check your email to confirm your email address.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <note priority="1" from="description">sign up successful instruction</note>
+      </trans-unit>
+      <trans-unit id="signupSuccessSpamInstruction" datatype="html">
+        <source>Don't forget to check your spam or junk folder.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/auth/signup/signup.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <note priority="1" from="description">sign up successful spam folder instruction</note>
+      </trans-unit>
+      <trans-unit id="cardDefaultText" datatype="html">
+        <source>Default</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/card/card-list.component.ts</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">default label in card table</note>
+      </trans-unit>
+      <trans-unit id="cardCardText" datatype="html">
+        <source>Card</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/card/card-list.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">card label in card table</note>
+      </trans-unit>
+      <trans-unit id="cardExpiryText" datatype="html">
+        <source>Expiry</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/card/card-list.component.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">expiry label card table</note>
+      </trans-unit>
+      <trans-unit id="homeWelcomeUserText" datatype="html">
+        <source>Hi <x id="INTERPOLATION" equiv-text="{{user.name}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.ts</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <note priority="1" from="description">home welcome text</note>
+      </trans-unit>
+      <trans-unit id="homeLogoutLink" datatype="html">
+        <source>Log out</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.ts</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">logout button text</note>
+      </trans-unit>
+      <trans-unit id="homeOrdersLink" datatype="html">
+        <source>Orders</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <note priority="1" from="description">orders button text</note>
+      </trans-unit>
+      <trans-unit id="homeAddressLink" datatype="html">
+        <source>Addresses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+        <note priority="1" from="description">address button text</note>
+      </trans-unit>
+      <trans-unit id="profileLink" datatype="html">
+        <source>Profile</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/home/home.component.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <note priority="1" from="description">profile button text</note>
+      </trans-unit>
+      <trans-unit id="orderListOrderLabel" datatype="html">
+        <source>Order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/order-list.component.ts</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <note priority="1" from="description">order label in order table</note>
+      </trans-unit>
+      <trans-unit id="orderListDateLabel" datatype="html">
+        <source>Date</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/order-list.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">date label in order table</note>
+      </trans-unit>
+      <trans-unit id="orderListPaymentStatusLabel" datatype="html">
+        <source>Payment Status</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/order-list.component.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <note priority="1" from="description">payment status label in order table</note>
+      </trans-unit>
+      <trans-unit id="orderListTotalLabel" datatype="html">
+        <source>Total</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/order-list.component.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <note priority="1" from="description">total label in order table</note>
+      </trans-unit>
+      <trans-unit id="orderDetailIDLabel" datatype="html">
+        <source>Order: <x id="INTERPOLATION" equiv-text="{{order.id}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <note priority="1" from="description">order statuslabel</note>
+      </trans-unit>
+      <trans-unit id="orderDetailOrderPlacedLabel" datatype="html">
+        <source>Placed on <x id="INTERPOLATION" equiv-text="{{order.dateCreated | date: 'MMM d, y'}}"/> at <x id="INTERPOLATION_1" equiv-text="{{order.dateCreated | date: 'h:mm a'}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">order statuslabel</note>
+      </trans-unit>
+      <trans-unit id="orderDetailOrderStatusLabel" datatype="html">
+        <source>Status: <x id="INTERPOLATION" equiv-text="{{order.status}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <note priority="1" from="description">order statuslabel</note>
+      </trans-unit>
+      <trans-unit id="orderDetailShippingAddressLabel" datatype="html">
+        <source>Shipping address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <note priority="1" from="description">shipping address label</note>
+      </trans-unit>
+      <trans-unit id="orderDetailShippingMethodLabel" datatype="html">
+        <source>Shipping method</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <note priority="1" from="description">shipping method label</note>
+      </trans-unit>
+      <trans-unit id="orderDetailBillingAddressLabel" datatype="html">
+        <source>Billing address</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <note priority="1" from="description">billing address label</note>
+      </trans-unit>
+      <trans-unit id="orderDetailPaymentMethodLabel" datatype="html">
+        <source>Payment method</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <note priority="1" from="description">payment method label</note>
+      </trans-unit>
+      <trans-unit id="orderDetailOrderSummary" datatype="html">
+        <source>Your order summary</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <note priority="1" from="description">order summary text</note>
+      </trans-unit>
+      <trans-unit id="orderDetailSubtotal" datatype="html">
+        <source>Subtotal <x id="INTERPOLATION" equiv-text="{{order.subTotal | currency:order.currency:'symbol'}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <note priority="1" from="description">subtotal text</note>
+      </trans-unit>
+      <trans-unit id="orderDetailShipping" datatype="html">
+        <source>Shipping <x id="INTERPOLATION" equiv-text="{{order.totalShipping | currency:order.currency:'symbol'}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+        <note priority="1" from="description">shipping text</note>
+      </trans-unit>
+      <trans-unit id="orderDetailTax" datatype="html">
+        <source>Tax <x id="INTERPOLATION" equiv-text="{{order.totalTax | currency:order.currency:'symbol'}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <note priority="1" from="description">tax text</note>
+      </trans-unit>
+      <trans-unit id="orderDetailTotal" datatype="html">
+        <source>Total <x id="INTERPOLATION" equiv-text="{{order.total | currency:order.currency:'symbol'}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/order/detail/order-detail.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <note priority="1" from="description">total text</note>
+      </trans-unit>
+      <trans-unit id="userDetailNameLabel" datatype="html">
+        <source>Name</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/user/user-detail.component.ts</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <note priority="1" from="description">name label</note>
+      </trans-unit>
+      <trans-unit id="userDetailEmailLabel" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{user.email}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/user/user-detail.component.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <note priority="1" from="description">name label</note>
+      </trans-unit>
+      <trans-unit id="userDetailPasswordLabel" datatype="html">
+        <source>Password</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/user/user-detail.component.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <note priority="1" from="description">name label</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

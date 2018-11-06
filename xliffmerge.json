@@ -1,0 +1,19 @@
+{
+  "xliffmergeOptions": {
+    "srcDir": "src/assets/locale/",
+    "genDir": "src/assets/locale/",
+    "i18nFile": "messages.xlf",
+    "i18nFormat": "xlf",
+    "encoding": "UTF-8",
+    "defaultLanguage": "en_US",
+    "languages": ["en_US", "en_AU"],
+    "removeUnusedIds": true,
+    "supportNgxTranslate": false,
+    "useSourceAsTarget": true,
+    "autotranslate": false,
+    "apikey": "",
+    "apikeyfile": "",
+    "verbose": false,
+    "quiet": false
+  }
+}
