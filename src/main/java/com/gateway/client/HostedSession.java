@@ -9,6 +9,7 @@ public class HostedSession {
     private String id;
     private String version;
     private String successIndicator;
+    private String updateStatus;
 
     public HostedSession() {}
 
@@ -36,4 +37,12 @@ public class HostedSession {
         this.successIndicator = successIndicator;
     }
 
+    public HostedSession setUpdateStatus(String updateStatus) {
+        this.updateStatus = updateStatus;
+        return this;
+    }
+
+    public String getUpdateStatus() {
+        return updateStatus;
+    }
 }

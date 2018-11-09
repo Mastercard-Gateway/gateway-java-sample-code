@@ -43,6 +43,8 @@ public class ApiResponseService {
             hostedSession.setVersion(jsonSession.get("version").getAsString());
             if (json.get("successIndicator") != null)
                 hostedSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+            if (jsonSession.get("updateStatus") != null)
+                hostedSession.setUpdateStatus(jsonSession.get("updateStatus").getAsString());
 
             return hostedSession;
         } catch (Exception e) {
