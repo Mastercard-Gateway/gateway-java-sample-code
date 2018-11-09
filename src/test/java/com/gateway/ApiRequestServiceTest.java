@@ -251,17 +251,31 @@ public class ApiRequestServiceTest {
 
     @Test
     public void parse3ds2Request() throws Exception {
-//        ApiRequest request = new ApiRequest();
-//        request.setApiOperation("CHECK_3DS_ENROLLMENT");
-//        request.setOrderAmount("10.00");
-//        request.setOrderCurrency("USD");
-//        request.setSessionId("SESSION0002647025380I5651515F86");
-//        request.setSecureIdResponseUrl("http://www.mysite.com/receipt");
-//        String result = ApiRequestService.buildJSONPayload(request);
-//
-//        String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\",\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
-//
-//        assertEquals(prettifyJson(data), result);
+        //TODO
+        String ApiOperation = "PAY";
+        String orderAmount = "10.00";
+        String orderCurrency = "USD";
+        String sessionId = "SESSION0002647025380I5651515F86";
+        String transactionId = "H9JK29SM0J";
+        String secureIdResponseUrl = "http://www.mybank.com/receipt";
+
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation(ApiOperation);
+        request.setOrderAmount(orderAmount);
+        request.setOrderCurrency(orderCurrency);
+        request.setSessionId(sessionId);
+        request.setTransactionId(transactionId);
+        request.setSecureIdResponseUrl(secureIdResponseUrl);
+        String result = ApiRequestService.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\""+ApiOperation+"\"," +
+                "\"order\":{\"amount\":\""+orderAmount+"\"," +
+                "\"currency\":\""+orderCurrency+"\"}," +
+                "\"session\":{\"id\":\""+sessionId+"\"}," +
+                "\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\""+secureIdResponseUrl+"\"," +
+                "\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
+
+        assertEquals(prettifyJson(data), result);
         //TODO
     }
     @Test

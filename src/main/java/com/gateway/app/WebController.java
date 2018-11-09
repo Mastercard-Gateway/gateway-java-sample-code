@@ -236,8 +236,39 @@ public class WebController {
      * @return ModelAndView for 3dSecure.html
      */
     @GetMapping("/3dSecure2")
-    public ModelAndView showSecureId2() {
-        return createHostedSessionModel("3dSecure2");
+    public ModelAndView showSecure2Id(HttpServletRequest httpServletRequest) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+            String resp = connection.postTransaction(requestUrl, config);
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+
+            ApiRequest req = new ApiRequest();
+            req.setApiOperation("CREATE_SESSION");
+            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setTransactionId(Utils.createUniqueId("trans-"));
+            req.setBrowserPaymentOperation("PAY");
+            req.setReturnUrl(
+                    ApiRequestService.getCurrentContext(httpServletRequest)
+                            + "?merchantId=" + config.getMerchantId()
+                            + "&sessionId=" + hostedSession.getId()
+                            + "&orderId=" + req.getOrderId()
+                            + "&transactionId=" + req.getTransactionId());
+            String updateResp = ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
+            hostedSession = ApiResponseService.parseSessionResponse(updateResp);
+
+            mav.setViewName("3dSecure2");
+            mav.addObject("config", config)
+                    .addObject("hostedSession", hostedSession)
+                    .addObject("request", req);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
     }
 
     /**
