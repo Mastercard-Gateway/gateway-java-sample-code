@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'refund')}">
+
+<body>
+<div class="col-9">
+    <div class="row">
+        <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
+            <h3>Refund</h3>
+            <div class="alert alert-warning" role="alert">
+                This API operation is typically not a browser initiated action. However, we are calling this action from browser only as a reference to get an idea of how it can be done through your application.
+            </div>
+            <fieldset>
+                <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />
+                <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
+                <input type="hidden" th:field="*{apiMethod}" th:value="PUT" name="apiMethod" />
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                    <div class="col-md-7">
+                        <input id="order-id" th:field="*{orderId}" type="text" placeholder="[Order ID for existing order]" class="form-control input-md" required=""/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="transaction-amount">Amount</label>
+                    <div class="col-md-7">
+                        <input id="transaction-amount" th:field="*{transactionAmount}" type="text" placeholder="[Amount less than or equal to the transaction amount]" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="transaction-currency">Currency</label>
+                    <div class="col-md-7">
+                        <input id="transaction-currency" th:field="*{transactionCurrency}" type="text" placeholder="[Currency from existing order]" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="process"></label>
+                    <div class="col-md-7">
+                        <button id="process" name="process" class="btn btn-primary">Process Refund</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div> <!-- row -->
+</div>
+
+</body>
+</html>

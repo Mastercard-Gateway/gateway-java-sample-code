@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure')}">
+<body>
+<script th:inline="javascript">
+    var JavaSample = {
+        operation: function() {
+            return "CHECK_3DS_ENROLLMENT";
+        },
+        endpoint: function() {
+            return "check3dsEnrollment";
+        },
+        secureIdResponseUrl: function() {
+            return encodeURI(window.location.protocol + "//" + window.location.host + "/process3ds");
+        }
+    };
+</script>
+<!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
+<style id="antiClickjack">body{display:none !important;}</style>
+<!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
+<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>Pay with 3DS</h3>
+                <div class="alert alert-warning" role="alert">
+                    <p><strong>NOTE:</strong> You can also do an authorization using 3D Secure, depending on your merchant settings.</p>
+                    <p>Here are the processes that occur for this transaction:</p>
+                    <ol>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Checkout%20Session.html'}" target="_blank">CREATE_CHECKOUT_SESSION</a> operation to collect sensitive card data.</li>
+                        <li><a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20%20Check%203DS%20Enrollment.html'}" target="_blank">Check</a> if the card is enrolled in 3D Secure. If the card is enrolled, the call will return the HTML of the authentication form of the issuer, to which you will redirect the user. This example uses a simulator.</li>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}" target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.</li>
+                        <li>Use session.id and 3DSecureId to complete the transaction using <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html'}" target="_blank">PAY</a> or <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html'}" target="_blank">AUTHORIZE</a>.</li>
+                    </ol>
+                    <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
+                </div>
+                <div class="mb-4">
+                    <h6>Payment details</h6>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="card-number">Card number</label>
+                        <div class="col-md-7">
+                            <input id="card-number" type="text" placeholder="" class="form-control input-md" required="" readonly/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
+                        <div class="col-md-7">
+                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
+                        <div class="col-md-7">
+                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="security-code">Security code</label>
+                        <div class="col-md-7">
+                            <input id="security-code" type="text" placeholder="" class="form-control input-md" required="" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h6>Order details</h6>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                        <div class="col-md-7">
+                            <input id="order-id" type="text" th:value="${request.orderId}" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-amount">Order amount</label>
+                        <div class="col-md-7">
+                            <input id="order-amount" type="text" th:value="${request.orderAmount}" maxlength="14" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-currency">Order currency</label>
+                        <div class="col-md-7">
+                            <input id="order-currency" type="text" th:value="${request.orderCurrency}" maxlength="3" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-description">Order description</label>
+                        <div class="col-md-7">
+                            <input id="order-description" type="text" th:value="${request.orderDescription}" maxlength="127" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="transaction-id">Transaction ID</label>
+                        <div class="col-md-7">
+                            <input id="transaction-id" type="text" th:value="${request.transactionId}" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                </div>
+                <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay with 3DS</button>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+<script src="/scripts/hostedSession.js"></script>
+</body>
+</html>

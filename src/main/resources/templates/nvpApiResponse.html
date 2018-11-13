@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'nvpApiResponse')}">
+
+<body>
+
+<div class="col-9 pl-4">
+    <h3 th:text="|${operation} Operation|">Operation</h3>
+    <p class="endpoint" th:text="|${method} ${requestUrl}|"></p>
+
+    <h5>Payload</h5>
+    <pre th:text="${request}">Request</pre>
+
+    <h5>Response</h5>
+    <div class="mt-4">
+        <p th:each="key: ${responseMap.keySet()}">
+            <span th:text="${key}"></span> = <span th:text="${responseMap.get(key)}"></span>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

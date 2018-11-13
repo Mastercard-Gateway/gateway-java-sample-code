@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'masterpass')}">
+<body>
+<script src="https://sandbox.masterpass.com/lightbox/Switch/integration/MasterPass.client.js"></script>
+<script th:inline="javascript">
+
+    /*<![CDATA[*/
+    var requestToken = /*[[${wallet.requestToken}]]*/ null;
+    var merchantCheckoutId = /*[[${wallet.merchantCheckoutId}]]*/ null;
+    var allowedCardTypes = /*[[${wallet.allowedCardTypes}]]*/ null;
+    /*]]>*/
+
+    function launchMasterpass() {
+        // INITIALIZE and INVOKE THE MASTERPASS LIGHTBOX
+        MasterPass.client.checkout({
+            "version":"v6",
+            "successCallback": onSuccessfulCheckout,
+            "cancelCallback": onCancel,
+            "failureCallback": onFailure,
+            // USE PARAMETERS FROM THE OPEN WALLET RESPONSE
+            "requestToken": requestToken,
+            "merchantCheckoutId": merchantCheckoutId,
+            "allowedCardTypes": allowedCardTypes
+        });
+    }
+
+    // RETRIEVE PARAMETERS FROM THE LIGHTBOX INTERACTION
+    function onSuccessfulCheckout(data) {
+        document.getElementById('oauthToken').value = data.oauth_token;
+        document.getElementById('oauthVerifier').value = data.oauth_verifier;
+        document.getElementById('checkoutUrl').value = data.checkout_resource_url;
+        window.location.href = "/masterpassResponse?oauth_token=" + data.oauth_token + "&oauth_verifier=" + data.oauth_verifier + "&checkout_resource_url=" + data.checkout_resource_url;
+    }
+    function onCancel() {
+        // do something to tell you the cardholder cancelled
+        alert('cancelled');
+    }
+    function onFailure() {
+        // do something to tell you things have gone wrong
+        alert('failure');
+    }
+</script>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-7">
+                <h3>Masterpass</h3>
+                <img id="masterpass-button" src="https://static.masterpass.com/dyn/img/btn/global/mp_chk_btn_147x034px.svg" onclick="launchMasterpass()"/>
+                <div id="oauthToken"></div>
+                <div id="oauthVerifier"></div>
+                <div id="checkoutUrl"></div>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+</body>
+</html>
