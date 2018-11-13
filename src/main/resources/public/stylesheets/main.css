@@ -1,0 +1,150 @@
+@font-face {
+    font-family: 'MarkForMC';
+    src: url('../fonts/MarkWebW01Regular.eot');
+    src: url('../fonts/MarkWebW01Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MarkWebW01Regular.woff') format('woff'),
+    url('../fonts/MarkWebW01Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'MarkForMC';
+    src: url('../fonts/MarkWebPro-LightW01Regular.eot');
+    src: url('../fonts/MarkWebPro-LightW01Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MarkWebPro-LightW01Regular.woff') format('woff'),
+    url('../fonts/MarkWebPro-LightW01Regular.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+body {
+    margin-bottom: 50px;
+    font-family: "MarkForMC", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+a {
+    color: black;
+}
+a:hover {
+    color: #FF6600;
+    text-decoration: none;
+}
+pre {
+    white-space: pre-wrap;
+    background-color: #6A6A6A;
+    color: #FFF;
+    padding: 15px;
+    border-radius: 10px;
+}
+h3 {
+    margin-bottom: 32px;
+    font-weight: 300;
+}
+h6 {
+    line-height: 22px;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+form, .contents {
+    padding: 15px;
+}
+.form-control[readonly] {
+    background-color: #ffffff;
+}
+form label {
+    font-weight: 400;
+}
+form label + span {
+    font-weight: 300;
+    color: #6A6A6A;
+}
+form input[type="text"] {
+    font-weight: 300;
+    border: 1px solid #6A6A6A;
+}
+form h3, form .alert-warning {
+    margin-left: 15px;
+}
+input {
+    border: 1px solid #CCCCCC !important;
+    border-radius: 4px !important;
+}
+.alert-danger {
+    display: none;
+}
+.active {
+    color: #FF6600;
+}
+.error {
+    color: red;
+}
+.alert-warning {
+    margin-bottom: 40px;
+}
+.logo {
+    margin-bottom: 50px;
+}
+.row .sidebar {
+    padding: 30px;    
+}
+.sidebar {
+    border-right: 1px solid #CCC;
+}
+.btn-primary {
+    color: #fff;
+    background-color: #FF6600;
+    border-color: #FF6600;
+    cursor: pointer;
+}
+.btn-primary:hover, .btn-primary:focus {
+    color: #fff;
+    background-color: #E55C00;
+    border-color: #E55C00;
+    cursor: pointer;
+}
+.endpoint {
+    word-wrap: break-word;
+}
+/* essentials_exclude_start */
+#masterpass-button {
+    cursor: pointer;
+}
+/* essentials_exclude_end */
+.input-block {
+    height: 50px;
+    display: flex;
+    align-items: center
+}
+.input-block label {
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+.input-field {
+    padding: 5px;
+}
+
+/* Loading gif */
+#loading-bar-spinner.spinner {
+    display: none;
+    left: 50%;
+    margin-left: -20px;
+    top: 50%;
+    margin-top: -20px;
+    position: absolute;
+    z-index: 19 !important;
+    animation: loading-bar-spinner 400ms linear infinite;
+}
+
+#loading-bar-spinner.spinner .spinner-icon {
+    width: 40px;
+    height: 40px;
+    border:  solid 4px transparent;
+    border-top-color:  #FF6600 !important;
+    border-left-color: #FF6600 !important;
+    border-radius: 50%;
+}
+
+@keyframes loading-bar-spinner {
+    0%   { transform: rotate(0deg);   transform: rotate(0deg); }
+    100% { transform: rotate(360deg); transform: rotate(360deg); }
+}

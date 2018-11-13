@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'unionpay')}">
+<body>
+<div class="col-9">
+    <div class="row">
+        <form action="#" class="col-12 form-horizontal" th:action="@{/processBrowserPayment}" th:object="${apiRequest}" method="post">
+            <h3>Pay with UnionPay SecurePay</h3>
+            <div class="alert alert-warning" role="alert">
+                <p><strong>NOTE:</strong> You can also do an authorization via SecurePay, depending on your merchant settings.</p>
+                <p class="mb-0">You can access test card numbers <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/browserPayments/testDetails.html#x_SecurePayTest'}" target="_blank">here</a>.</p>
+            </div>
+            <fieldset>
+                <input type="hidden" th:field="*{transactionId}" th:value="${transactionId}" name="transactionId" />
+                <input type="hidden" th:field="*{apiOperation}" th:value="${apiOperation}" name="apiOperation" />
+                <input type="hidden" th:field="*{apiMethod}" th:value="${apiMethod}" name="apiMethod" />
+                <input type="hidden" th:field="*{sourceType}" th:value="${sourceType}" name="sourceType" />
+                <input type="hidden" th:field="*{browserPaymentOperation}" th:value="${browserPaymentOperation}" name="browserPaymentOperation" />
+                <input type="hidden" th:field="*{returnUrl}" th:value="${returnUrl}" name="returnUrl" />
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                    <div class="col-md-7">
+                        <input id="order-id" th:field="*{orderId}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-amount">Amount</label>
+                    <div class="col-md-7">
+                        <input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-currency">Currency</label>
+                    <div class="col-md-7">
+                        <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-description">Description</label>
+                    <div class="col-md-7">
+                        <input id="order-description" th:field="*{orderDescription}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="process"></label>
+                    <div class="col-md-7">
+                        <button id="process" name="process" class="btn btn-primary">Pay with SecurePay</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div> <!-- row -->
+</div>
+
+</body>
+</html>

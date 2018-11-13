@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'webhooks')}">
+<body>
+<div class="col-9 webhooks">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>Webhooks Notifications</h3>
+                <div class="alert alert-info" role="alert">
+                    <!-- Info about Webhooks Endpoint -->
+                </div>
+            </div>
+        </div>
+    </div> <!-- row -->
+    <div class="row">
+        <div class="contents col-12">
+            <table class="table invisible notifications">
+                <thead>
+                <tr>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">Order Id</th>
+                    <th scope="col">Transaction Id</th>
+                    <th scope="col">Order Status</th>
+                    <th scope="col">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="/scripts/webhooks.js"></script>
+</body>
+</html>

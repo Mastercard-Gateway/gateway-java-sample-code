@@ -1,0 +1,22 @@
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecurePayerAuthenticationForm')}">
+<body>
+<!-- Populate the form action attribute with the value returned in the 3DSecure.authenticationRedirect.customized.acsUrl response parameter -->
+<form name="3dsRedirect" th:action="${secureId.acsUrl}" method="POST" accept-charset="UTF-8">
+    <p>This is the ACS redirection page. In your integration you should redirect the payer automatically.</p>
+    <!-- Populate the mandatory PaReq parameter with the value returned in the 3DSecure.authenticationRedirect.customized.paReq response parameter.  -->
+
+    <input type="hidden" name="PaReq" th:value="${secureId.paReq}"/>
+
+    <!-- Populate the mandatory TermUrl value with the URL to which you want the payer returned when the authentication process has completed. This should be the same value as supplied in the 3DSecure.authenticationRedirect.responseUrl  parameter to the CHECK_ENROLLMENT request. -->
+
+    <input type="hidden" name="TermUrl" th:value="${secureId.responseUrl}"/>
+
+    <!-- The ACS will echo the contents of the mandatory MD parameter when the payer is returned to the URL specified in the TermUrl parameter.  You can use this parameter to establish a link between the ACS request and response. -->
+
+    <input type="hidden" name="MD" th:value="${secureId.mdValue}"/>
+
+    <button class="btn btn-primary">Click here to continue</button>
+
+</form>
+</body>
+</html>

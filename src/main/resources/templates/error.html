@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'error')}">
+
+<body>
+<div class="col-9 pl-4">
+    <h3>Error</h3>
+    <div class="container mt-4 ml-0">
+        <th:block th:if="${cause != null}">
+            <div class="row">
+                <div class="col">Cause</div>
+                <div class="col">
+                    <p th:text="${cause}"></p>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:if="${message != null}">
+            <div class="row">
+                <div class="col">Message</div>
+                <div class="col">
+                    <p th:text="${message}"></p>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:if="${errorCode != null}">
+            <div class="row">
+                <div class="col">Error code</div>
+                <div class="col">
+                    <p th:text="${errorCode}"></p>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:if="${explanation != null}">
+            <div class="row">
+                <div class="col">Explanation</div>
+                <div class="col">
+                    <p th:text="${explanation}"></p>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:if="${field != null}">
+            <div class="row">
+                <div class="col">Field</div>
+                <div class="col">
+                    <p th:text="${field}"></p>
+                </div>
+            </div>
+        </th:block>
+        <th:block th:if="${validationType != null}">
+            <div class="row">
+                <div class="col">Validation type</div>
+                <div class="col">
+                    <p th:text="${validationType}"></p>
+                </div>
+            </div>
+        </th:block>
+    </div>
+</div>
+</body>
+</html>

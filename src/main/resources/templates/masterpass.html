@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'masterpass')}">
+
+<body>
+<div class="col-9">
+    <div class="row">
+        <form action="#" class="col-12 form-horizontal" th:action="@{/processMasterpass}" th:object="${apiRequest}" method="post">
+            <h3>Pay with Masterpass</h3>
+            <div class="alert alert-warning" role="alert">
+                <p><strong>NOTE:</strong> You can also do an authorization via Masterpass, depending on your merchant settings.</p>
+                <p>This page is for demonstration purposes only, to collect information like order amount and currency in order to generate the Masterpass button. In practical use this would be collected behind the scenes.</p>
+                <p>Here are the steps to complete this transaction:</p>
+                <ol>
+                    <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}" target="_blank">CREATE_SESSION</a> operation to create a session.</li>
+                    <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}" target="_blank">UPDATE_SESSION</a> operation to update the session with information about the order (like amount, description, currency, etc).</li>
+                    <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Wallet%3a%20Open%20Wallet.html'}" target="_blank">OPEN_WALLET</a> operation to initiate the Masterpass interaction.</li>
+                    <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/masterPassOnline.html'}" target="_blank">Masterpass JavaScript library</a> to launch the Masterpass interaction.</li>
+                    <li>Use the URL parameters included in the Masterpass callback with the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Wallet%3a%20Update%20Session%20From%20Wallet.html'}" target="_blank">UPDATE_SESSION_FROM_WALLET</a> operation to retrieve the payment details from Masterpass. </li>
+                    <li>Use the payment details to complete the transaction using <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html'}" target="_blank">PAY</a> or <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html'}" target="_blank">AUTHORIZE</a>.</li>
+                </ol>
+                <p class="mb-0">View the full Masterpass documentation <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/pickPaymentMethod/masterPassOnline.html'}" target="_blank">here</a>.</p>
+            </div>
+            <fieldset>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="wallet-provider">Wallet Provider</label>
+                    <div class="col-md-7">
+                        <input id="wallet-provider" th:field="*{walletProvider}" value="MASTERPASS_ONLINE" type="text" placeholder="" class="form-control input-md" readonly/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="origin-url">Origin URL (where Masterpass will redirect after transaction is complete)</label>
+                    <div class="col-md-7">
+                        <input id="origin-url" th:field="*{masterpassOriginUrl}" type="text" placeholder="" class="form-control input-md" readonly/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-id">Order ID</label>
+                    <div class="col-md-7">
+                        <input id="order-id" th:field="*{orderId}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-amount">Amount</label>
+                    <div class="col-md-7">
+                        <input id="order-amount" th:field="*{orderAmount}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="order-currency">Currency</label>
+                    <div class="col-md-7">
+                        <input id="order-currency" th:field="*{orderCurrency}" type="text" placeholder="" class="form-control input-md" required=""/>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-7 control-label" for="process"></label>
+                    <div class="col-md-7">
+                        <button id="process" name="process" class="btn btn-primary">Generate Masterpass button</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div> <!-- row -->
+</div>
+
+</body>
+</html>

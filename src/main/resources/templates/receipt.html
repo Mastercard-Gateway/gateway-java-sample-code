@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'browserPaymentReceipt')}">
+
+<body>
+
+<div class="col-9 pl-4">
+    <h3>Payment complete!</h3>
+    <div th:text="'Your payment was ' + ${response.gatewayCode}"></div>
+    <div class="container mt-4 ml-0">
+        <div class="row">
+            <div class="col">
+                Order ID
+            </div>
+            <div class="col">
+                <p th:text="${response.orderId}"></p>
+            </div>
+        </div>
+        <th:block th:if="${response.orderDescription != null}">
+            <div class="row">
+                <div class="col">
+                    Description
+                </div>
+                <div class="col">
+                    <p th:text="${response.orderDescription}"></p>
+                </div>
+            </div>
+        </th:block>
+        <div class="row">
+            <div class="col">
+                Amount
+            </div>
+            <div class="col">
+                <p th:text="${response.orderAmount} + ' ' + ${response.orderCurrency}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

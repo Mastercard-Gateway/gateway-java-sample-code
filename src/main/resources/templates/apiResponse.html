@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apiResponse')}">
+
+<body>
+
+    <div class="col-9 pl-4">
+        <h3 th:text="|${operation} Operation|">Operation</h3>
+        <p class="endpoint" th:text="|${method} ${requestUrl}|"></p>
+
+        <h5>Payload</h5>
+        <pre th:text="${request}">Request</pre>
+
+        <h5>Response</h5>
+        <pre th:text="${resp}">Response</pre>
+    </div>
+
+</body>
+</html>
