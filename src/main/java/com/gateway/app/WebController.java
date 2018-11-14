@@ -262,7 +262,8 @@ public class WebController {
             mav.setViewName("3dSecure2");
             mav.addObject("config", config)
                     .addObject("hostedSession", hostedSession)
-                    .addObject("request", req);
+                    .addObject("request", req)
+                    .addObject("threeDSApiVersion", config.getApiThreeDsVersion());
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
