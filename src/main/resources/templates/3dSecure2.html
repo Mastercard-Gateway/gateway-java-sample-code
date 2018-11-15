@@ -3,6 +3,7 @@
 <body>
 <!-- <script src="/scripts/hostedSession.js"></script> -->
 <script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${threeDSApiVersion} + '/three-ds.min.js'}"></script>-
+<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${threeDSApiVersion} + '/three-ds.min.js'}"></script>
 
 <script th:inline="javascript">
     var JavaSample = {
@@ -41,18 +42,18 @@
                 <div class="mb-4">
                     <input type="hidden" readonly="readonly" name="method" value="PUT" size="20" maxlength="80"/>
                     <!--<input name="sessionId" th:value="${hostedSession.id}" size="20" maxlength="80" readonly/>-->
-                    <div class="form-group"> 
-                        <label class="col-md-7 control-label" for="session[id]">Session Id</label>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="session-id">Session Id</label>
                         <div class="col-md-7">
-                            <input id="session[id]" required="" class="form-control input-md" type="text"
-                                   name="session[id]" th:value="${hostedSession.id}" size="8" maxlength="13" readonly/>
+                            <input id="session-id" required="" class="form-control input-md" type="text"
+                                   name="session-id" th:value="${hostedSession.id}" size="8" maxlength="13" readonly/>
                         </div>
                     </div>
                     <h6>Payment details</h6>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="card-number">Card number</label>
                         <div class="col-md-7">
-                            <input id="card-number" type="text" placeholder="" class="form-control input-md" required="" readonly/>
+                            <input id="card-number" type="text" placeholder="" class="form-control input-md" required=""/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -189,8 +190,8 @@
             "cardNumber": document.getElementById("card-number").value,
             "expiryMonth": document.getElementById("expiry-month").value,
             "expiryYear": document.getElementById("expiry-year").value,
-            "orderId": document.getElementById("order[id]").value,
-            "transactionId": document.getElementById("transaction[id]").value,
+            "orderId": document.getElementById("order-id").value,
+            "transactionId": document.getElementById("transaction-id").value,
             "hostedSession": false,
             "protocol": 'REST'
         };
@@ -224,7 +225,7 @@
 
     function authenticatePayer() {
         var cardNumber = document.getElementById("card-number").value;
-        var orderAmount = document.getElementById("order[amount]").value;
+        var orderAmount = document.getElementById("order-amount").value;
         THREEDS.authenticatePayer(orderAmount, cardNumber, '05', '2021', 'AUD', orderId, transactionId, "http://localhost:5000/process3dsRedirect",{}, function (data) {
             processAuthenticatePayerResponse(data);
         });
@@ -252,7 +253,7 @@
     function pay() {
         // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
         var cardNumber = document.getElementById("card-number").value;
-        var orderAmount = document.getElementById("order[amount]").value;
+        var orderAmount = document.getElementById("order-amount").value;
 
         THREEDS.initiate3DS(cardNumber, orderId, transactionId, function (data) {
                 if (data && data.response && data.response.error) {
@@ -277,6 +278,6 @@
         );
     }
 </script>
-<!--<script src="/scripts/threeDS.js"></script>-->
+<script src="/scripts/threeDS.js"></script>
 </body>
 </html>
