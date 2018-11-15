@@ -256,7 +256,8 @@ public class WebController {
                             + "&sessionId=" + hostedSession.getId()
                             + "&orderId=" + req.getOrderId()
                             + "&transactionId=" + req.getTransactionId());
-            String updateResp = ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
+            String updateResp = ApiRequestService.updateSession(
+              ApiProtocol.REST, req, config, hostedSession.getId());
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
 
             mav.setViewName("3dSecure2");
