@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway.client;
 
 import org.apache.commons.lang.RandomStringUtils;
