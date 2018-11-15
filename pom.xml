@@ -149,5 +149,10 @@
       </plugin>
     </plugins>
   </build>
-
+  <scm>
+    <connection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</connection>
+    <url>https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</url>
+    <developerConnection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 </project>
