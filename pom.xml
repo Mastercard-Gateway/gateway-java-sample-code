@@ -2,17 +2,18 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
+  <parent>
+    <groupId>com.mastercard.gateway</groupId>
+    <artifactId>mpgs-infrastructure-parent</artifactId>
+    <version>1.0.1</version>
+  </parent>
+  <name>gateway-java-sample-code</name>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>gateway-java-sample-code</artifactId>
   <version>1.0</version>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.5.2.RELEASE</version>
-  </parent>
-  <name>gateway-java-sample-code</name>
 
   <properties>
     <start-class>com.gateway.app.Main</start-class>
@@ -30,24 +31,31 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
+      <version>1.5.2.RELEASE</version>
+
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+      <version>1.5.2.RELEASE</version>
+
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
+      <version>1.5.2.RELEASE</version>
+
       <exclusions>
       	<exclusion>
       		<groupId>nz.net.ultraq.thymeleaf</groupId>
       		<artifactId>thymeleaf-layout-dialect</artifactId>
-      	</exclusion>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <version>1.5.2.RELEASE</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -63,6 +71,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>webjars-locator</artifactId>
+      <version>0.34</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -82,6 +91,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
+      <version>1.5.2.RELEASE</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -120,6 +130,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.2.RELEASE</version>
         <executions>
           <execution>
             <goals>
