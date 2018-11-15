@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

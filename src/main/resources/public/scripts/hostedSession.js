@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 if (self === top) {
     var antiClickjack = document.getElementById("antiClickjack");
     if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
