@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>gateway-java-sample-code</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <properties>
     <start-class>com.gateway.app.Main</start-class>
@@ -164,6 +164,6 @@
     <connection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</connection>
     <url>https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</url>
     <developerConnection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</developerConnection>
-    <tag>gateway-java-sample-code-1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
