@@ -260,15 +260,13 @@ public class WebController {
                             + "&sessionId=" + hostedSession.getId()
                             + "&orderId=" + req.getOrderId()
                             + "&transactionId=" + req.getTransactionId());
-            String updateResp = ApiRequestService.updateSession(
-              ApiProtocol.REST, req, config, hostedSession.getId());
+            String updateResp = ApiRequestService.update3DSSession(ApiProtocol.REST, req, config, hostedSession.getId());
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
 
             mav.setViewName("3dSecure2");
             mav.addObject("config", config)
                     .addObject("hostedSession", hostedSession)
-                    .addObject("request", req)
-                    .addObject("threeDSApiVersion", config.getApiThreeDsVersion());
+                    .addObject("request", req);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -276,6 +274,21 @@ public class WebController {
         }
         return mav;
     }
+
+
+    @GetMapping(value = "/process3dsRedirect")
+    public ModelAndView process3dsRedirect(@RequestParam String simple) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            mav.setViewName("process3dsRedirect");
+            mav.addObject("simple", simple);
+        }  catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
 
     /**
      * Display page for Hosted Checkout operation

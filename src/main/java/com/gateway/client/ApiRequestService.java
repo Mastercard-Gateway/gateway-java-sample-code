@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2018 MasterCard. All rights reserved.
- */
-
 package com.gateway.client;
 
 import com.gateway.app.Config;
@@ -157,6 +153,12 @@ public class ApiRequestService {
         }
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
+        if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
+
+
+        //3DS2
+        JsonObject authentication = new JsonObject();
+        if (Utils.notNullOrEmpty(request.getAuthenticationChannel())) authentication.addProperty("channel", request.getAuthenticationChannel());
 
         JsonObject wallet = new JsonObject();
         /* essentials_exclude_start */
@@ -230,6 +232,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals("UPDATE_SESSION") && !request.getApiOperation().equals("CREATE_SESSION")) data.addProperty("apiOperation", request.getApiOperation());
         if (Utils.notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
+        if (!authentication.entrySet().isEmpty()) data.add("authentication", authentication);
         if (!wallet.entrySet().isEmpty()) data.add("wallet", wallet);
         if (!transaction.entrySet().isEmpty()) data.add("transaction", transaction);
         if (!sourceOfFunds.entrySet().isEmpty()) data.add("sourceOfFunds", sourceOfFunds);
@@ -294,37 +297,54 @@ public class ApiRequestService {
     }
     /* essentials_exclude_end */
 
-  /**
-   * This method updates the Hosted Session
-   *
-   * @param protocol  REST or NVP
-   * @param request   contains info on what data the payload should include
-   * @param config    contains frequently used information like Merchant ID, API password, etc.
-   * @param sessionId used to target a specific session
-   *
-   * @return the body response of the transaction
-   * @throws Exception
-   */
+    /**
+     * This method updates the Hosted Session
+     *
+     * @param protocol  REST or NVP
+     * @param request   contains info on what data the payload should include
+     * @param config    contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId used to target a specific session
+     *
+     * @return the body response of the transaction
+     * @throws Exception
+     */
     public static String updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
-      RESTApiClient connection = new RESTApiClient();
+        RESTApiClient connection = new RESTApiClient();
 
-      try {
-        String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
-        ApiRequest updateSessionRequest = new ApiRequest();
-        updateSessionRequest.setApiOperation(request.getApiOperation());
-        updateSessionRequest.setOrderAmount(request.getOrderAmount());
-        updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
-        updateSessionRequest.setOrderId(request.getOrderId());
-        updateSessionRequest.setReturnUrl(request.getReturnUrl());
-        updateSessionRequest.setBrowserPaymentOperation(request.getBrowserPaymentOperation());
-        String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
-        connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-        return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-      }
-      catch (Exception e) {
-        logger.error("Unable to update session", e);
-        throw e;
-      }
+        try {
+            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
+            ApiRequest updateSessionRequest = new ApiRequest();
+//            updateSessionRequest.setApiOperation(request.getApiOperation());
+            updateSessionRequest.setOrderAmount("100");
+            updateSessionRequest.setOrderCurrency("AUD");
+            updateSessionRequest.setOrderId(request.getOrderId());
+            String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
+            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+        }
+        catch (Exception e) {
+            logger.error("Unable to update session", e);
+            throw e;
+        }
+    }
+
+
+    public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+        RESTApiClient connection = new RESTApiClient();
+
+        try {
+            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
+            ApiRequest updateSessionRequest = new ApiRequest();
+            updateSessionRequest.setOrderAmount("100");
+            updateSessionRequest.setOrderCurrency("AUD");
+            updateSessionRequest.setOrderId(request.getOrderId());
+            updateSessionRequest.setAuthenticationChannel("MERCHANT_REQUESTED");
+            String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
+            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+        }
+        catch (Exception e) {
+            logger.error("Unable to update session", e);
+            throw e;
+        }
     }
 
     /**

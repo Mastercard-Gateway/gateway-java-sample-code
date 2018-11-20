@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-
-  <parent>
-    <groupId>com.mastercard.gateway</groupId>
-    <artifactId>mpgs-infrastructure-parent</artifactId>
-    <version>1.0.1</version>
-  </parent>
-  <name>gateway-java-sample-code</name>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>gateway-java-sample-code</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0</version>
+  <packaging>war</packaging>
+
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.2.RELEASE</version>
+  </parent>
+  <name>gateway-java-sample-code</name>
 
   <properties>
     <start-class>com.gateway.app.Main</start-class>
@@ -22,8 +25,6 @@
     <webjars-jquery-ui.version>1.11.4</webjars-jquery-ui.version>
     <webjars-jquery.version>2.2.4</webjars-jquery.version>
     <thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -31,31 +32,29 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
-      <version>1.5.2.RELEASE</version>
-
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <version>1.5.2.RELEASE</version>
-
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
-      <version>1.5.2.RELEASE</version>
-
       <exclusions>
       	<exclusion>
       		<groupId>nz.net.ultraq.thymeleaf</groupId>
       		<artifactId>thymeleaf-layout-dialect</artifactId>
-        </exclusion>
+      	</exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <version>1.5.2.RELEASE</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -71,7 +70,6 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>webjars-locator</artifactId>
-      <version>0.34</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -91,7 +89,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
-      <version>1.5.2.RELEASE</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -126,11 +123,11 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>${artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>1.5.2.RELEASE</version>
         <executions>
           <execution>
             <goals>
@@ -160,10 +157,5 @@
       </plugin>
     </plugins>
   </build>
-  <scm>
-    <connection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</connection>
-    <url>https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</url>
-    <developerConnection>scm:git:https://fusion4iseek.tse.int/stash/scm/MPGSCA/gateway-java-sample-code.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
+
 </project>

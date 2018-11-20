@@ -38,6 +38,9 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
+    //3DS2 properties
+    private String authenticationChannel;
+
     // Wallet properties
     /* essentials_exclude_start */
     private String masterpassOriginUrl;
@@ -46,6 +49,7 @@ public class ApiRequest {
     private String masterpassCheckoutUrl;
     /* essentials_exclude_end */
     private String walletProvider;
+
 
     public String getSourceToken() {
         return sourceToken;
@@ -239,6 +243,15 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
+
+    public String getAuthenticationChannel() {
+        return authenticationChannel;
+    }
+
+    public void setAuthenticationChannel(String authenticationChannel) {
+        this.authenticationChannel = authenticationChannel;
+    }
+
     /* essentials_exclude_start */
     public String getMasterpassOriginUrl() {
         return masterpassOriginUrl;
@@ -271,5 +284,6 @@ public class ApiRequest {
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
+
     /* essentials_exclude_end */
 }

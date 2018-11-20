@@ -14,15 +14,20 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
+import javax.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +51,19 @@ public class ApiService {
         try {
             // Set the proper authentication type - username/password or certificate authentication
             if(config.getAuthenticationType().equals(Config.AuthenticationType.PASSWORD)) {
-                CloseableHttpClient httpClient = HttpClients.createDefault();
+
+                CloseableHttpClient httpClient =  HttpClients.custom()
+                    .setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
+                            .loadTrustMaterial(null, new TrustStrategy() {
+                                @Override
+                                public boolean isTrusted(X509Certificate[] chain, String authType)
+                                    throws java.security.cert.CertificateException {
+                                    return true;
+                                }
+                            })
+                            .build()
+                        )
+                    ).build();
                 HttpClientContext httpClientContext = HttpClientContext.create();
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
