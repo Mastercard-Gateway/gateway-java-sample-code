@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
 <body>
 <!-- <script src="/scripts/hostedSession.js"></script> -->
-<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.threeDSApiVersion} + '/three-ds.min.js'}"></script>
+<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"></script>
 
 <script th:inline="javascript">
     var JavaSample = {

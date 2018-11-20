@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway.client;
 
 import com.gateway.app.Config;
@@ -306,7 +310,7 @@ public class ApiRequestService {
      * @param sessionId used to target a specific session
      * @throws Exception
      */
-    public static void updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+    public static String updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
         RESTApiClient connection = new RESTApiClient();
 
         try {
@@ -337,7 +341,7 @@ public class ApiRequestService {
             updateSessionRequest.setOrderId(request.getOrderId());
             updateSessionRequest.setAuthenticationChannel("MERCHANT_REQUESTED");
             String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
-            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
         }
         catch (Exception e) {
             logger.error("Unable to update session", e);

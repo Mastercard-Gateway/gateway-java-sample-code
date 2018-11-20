@@ -114,7 +114,7 @@ public class Config {
         this.apiThreeDsVersion = apiThreeDsVersion;
     }
 
-    String getApiThreeDsVersion() {
+    public String getApiThreeDsVersion() {
         return apiThreeDsVersion;
     }
 }
