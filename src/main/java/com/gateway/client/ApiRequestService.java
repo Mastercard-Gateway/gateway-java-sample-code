@@ -304,11 +304,9 @@ public class ApiRequestService {
      * @param request   contains info on what data the payload should include
      * @param config    contains frequently used information like Merchant ID, API password, etc.
      * @param sessionId used to target a specific session
-     *
-     * @return the body response of the transaction
      * @throws Exception
      */
-    public static String updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+    public static void updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
         RESTApiClient connection = new RESTApiClient();
 
         try {
@@ -339,7 +337,7 @@ public class ApiRequestService {
             updateSessionRequest.setOrderId(request.getOrderId());
             updateSessionRequest.setAuthenticationChannel("MERCHANT_REQUESTED");
             String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
-            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
         }
         catch (Exception e) {
             logger.error("Unable to update session", e);

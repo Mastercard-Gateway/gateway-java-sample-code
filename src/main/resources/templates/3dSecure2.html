@@ -2,8 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
 <body>
 <!-- <script src="/scripts/hostedSession.js"></script> -->
-<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${threeDSApiVersion} + '/three-ds.min.js'}"></script>-
-<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${threeDSApiVersion} + '/three-ds.min.js'}"></script>
+<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.threeDSApiVersion} + '/three-ds.min.js'}"></script>
 
 <script th:inline="javascript">
     var JavaSample = {
@@ -19,7 +18,6 @@
     };
 </script>
 <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
-<style id="antiClickjack">body{display:none !important;}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
 <!--<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>-->
 <div class="col-9">
@@ -226,7 +224,7 @@
     function authenticatePayer() {
         var cardNumber = document.getElementById("card-number").value;
         var orderAmount = document.getElementById("order-amount").value;
-        THREEDS.authenticatePayer(orderAmount, cardNumber, '05', '2021', 'AUD', orderId, transactionId, "http://localhost:5000/process3dsRedirect",{}, function (data) {
+        THREEDS.authenticatePayer(orderAmount, cardNumber, '05', '2021', 'AUD', orderId, transactionId, "http://localhost/sample/process3dsRedirect",{}, function (data) {
             processAuthenticatePayerResponse(data);
         });
     }
