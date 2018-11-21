@@ -9,7 +9,7 @@
   </parent>
   <name>gateway-java-sample-code</name>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.example</groupId>
+  <groupId>com.mastercard.gateway</groupId>
   <artifactId>gateway-java-sample-code</artifactId>
   <version>1.0.1-SNAPSHOT</version>
 
