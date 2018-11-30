@@ -22,12 +22,21 @@ public class ApiRequestService {
     private static final Logger logger = LoggerFactory.getLogger(ApiRequestService.class);
 
     /**
+     * The available operations from the API
+     */
+    public enum ApiOperation {
+        CREATE_SESSION,
+        UPDATE_SESSION;
+    }
+
+    /**
      * Constructs an object used to complete the API.
      * Contains information about which operation to target and what info is needed in the request body.
      * Also populates with some pre-filled test data (such as order amount, currency, etc).
      *
-     * @param apiOperation  indicates API operation to target (PAY, AUTHORIZE, CAPTURE, etc)
-     * @return ApiRequest
+     * @param apiOperation  indicates API operation to target of type com.gateway.client.ApiRequestService.ApiOperation
+     * (PAY, AUTHORIZE, CAPTURE, CREATE_SESSION, UPDATE_SESSION, etc.)
+     * @return ApiRequest ApiRequest with updated orderId, transactionId, ApiOperation and ApiMethod
      */
     public static ApiRequest createApiRequest(String apiOperation, Config config) {
         ApiRequest req = new ApiRequest();
@@ -36,7 +45,8 @@ public class ApiRequestService {
         req.setOrderCurrency(config.getCurrency());
         req.setOrderId(Utils.createUniqueId("order-"));
         req.setTransactionId(Utils.createUniqueId("trans-"));
-        if (apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND") || apiOperation.equals("VOID") || apiOperation.equals("UPDATE_AUTHORIZATION")) {
+        if (apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND") || apiOperation.equals("VOID")
+                || apiOperation.equals("UPDATE_AUTHORIZATION")) {
             req.setOrderId(null);
         }
         if (apiOperation.equals("RETRIEVE_ORDER") || apiOperation.equals("RETRIEVE_TRANSACTION")) {
@@ -44,8 +54,11 @@ public class ApiRequestService {
             req.setOrderId(null);
             req.setTransactionId(null);
         }
-        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals("CREATE_SESSION")) {
+        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals(ApiOperation.CREATE_SESSION.name())) {
             req.setApiMethod("POST");
+        }
+        if (apiOperation.equals(ApiOperation.UPDATE_SESSION.name())) {
+            req.setApiMethod("PUT");
         }
         return req;
     }
@@ -329,21 +342,26 @@ public class ApiRequestService {
         }
     }
 
-
+    /**
+     * This method updates the Hosted Session for 3DS-2.0
+     *
+     * @param protocol REST or NVP
+     * @param request contains info on what data the payload should not include. Should include sessionID
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @throws Exception
+     */
     public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
-        RESTApiClient connection = new RESTApiClient();
+        request.setApiOperation(ApiOperation.UPDATE_SESSION.name());
+        request.setApiMethod("PUT");
 
+        request.setAuthenticationChannel("MERCHANT_REQUESTED");
+
+        String updateSessionPayload = ApiRequestService.buildJSONPayload(request);
         try {
+            RESTApiClient connection = new RESTApiClient();
             String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
-            ApiRequest updateSessionRequest = new ApiRequest();
-            updateSessionRequest.setOrderAmount("100");
-            updateSessionRequest.setOrderCurrency("AUD");
-            updateSessionRequest.setOrderId(request.getOrderId());
-            updateSessionRequest.setAuthenticationChannel("MERCHANT_REQUESTED");
-            String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
             return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Unable to update session", e);
             throw e;
         }

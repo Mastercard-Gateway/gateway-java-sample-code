@@ -245,28 +245,22 @@ public class WebController {
 
         try {
             RESTApiClient connection = new RESTApiClient();
+
+            //CREATE_SESSION
             String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
             String resp = connection.postTransaction(requestUrl, config);
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            ApiRequest req = new ApiRequest();
-            req.setApiOperation("CREATE_SESSION");
-            req.setOrderId(Utils.createUniqueId("order-"));
-            req.setTransactionId(Utils.createUniqueId("trans-"));
-            req.setBrowserPaymentOperation("PAY");
-            req.setReturnUrl(
-                    ApiRequestService.getCurrentContext(httpServletRequest)
-                            + "?merchantId=" + config.getMerchantId()
-                            + "&sessionId=" + hostedSession.getId()
-                            + "&orderId=" + req.getOrderId()
-                            + "&transactionId=" + req.getTransactionId());
-            String updateResp = ApiRequestService.update3DSSession(ApiProtocol.REST, req, config, hostedSession.getId());
+            //UPDATE_SESSION
+            ApiRequest sessionRequest = ApiRequestService.createApiRequest(ApiRequestService.ApiOperation.UPDATE_SESSION.name(),config);
+            String updateResp = ApiRequestService.update3DSSession(ApiProtocol.REST, sessionRequest, config, hostedSession.getId());
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
+            sessionRequest.setSessionId(hostedSession.getId());
 
             mav.setViewName("3dSecure2");
             mav.addObject("config", config)
                     .addObject("hostedSession", hostedSession)
-                    .addObject("request", req);
+                    .addObject("request", sessionRequest);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {

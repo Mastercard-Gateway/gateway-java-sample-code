@@ -206,19 +206,19 @@
     }
 
     function displayReceipt(apiResponse) {
-        var j = {
+        var responseBody  = {
             "apiResponse": apiResponse
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', '3diasreceipt', true);
+        xhr.open('PUT', '3dsreceipt', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 document.documentElement.innerHTML = this.response;
             }
         }
-        xhr.send(JSON.stringify(j));
+        xhr.send(JSON.stringify(responseBody));
     }
 
     function authenticatePayer() {
@@ -253,13 +253,14 @@
         var cardNumber = document.getElementById("card-number").value;
         var orderAmount = document.getElementById("order-amount").value;
 
-        THREEDS.initiate3DS(cardNumber, orderId, transactionId, function (data) {
-                if (data && data.response && data.response.error) {
-                    var error = data.response.error;
+        THREEDS.initiate3DS(cardNumber, orderId, transactionId, function (data) {//TODO before click PAY()
+                if (data && data.error) {
+                    var error = data.error;
                     //Something bad happened, the error value will match what is returned by the REST API
-                    console.error("error.cause : ", error.cause);
-                    console.error("error.explanation : ", error.explanation);
-                    console.error("error.field : ", error.field);
+                    console.error("error.code : ", error.code);
+                    console.error("error.msg : ", error.msg);
+                    console.error("error.result : ", error.result);
+                    console.error("error.status : ", error.status);
                 }
                 else {
                     console.log("After Initiate 3DS ", data);
