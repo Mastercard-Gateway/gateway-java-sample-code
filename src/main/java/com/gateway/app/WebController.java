@@ -140,6 +140,53 @@ public class WebController {
     }
     /* essentials_exclude_end */
 
+    /**
+     * Display page for alternate payments methods using apm.js
+     *
+     * @return ModelAndView for apm.html
+     */
+    @GetMapping("/apm")
+    public ModelAndView showAPMs(HttpServletRequest httpServletRequest) {
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("CREATE_SESSION");
+        req.setOrderId(Utils.createUniqueId("order-"));
+        req.setTransactionId(Utils.createUniqueId("trans-"));
+
+        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            String resp = connection.postTransaction(requestUrl, config);
+
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+
+            String correlationId = Utils.createUniqueId("APM_");
+            req.setApiOperation("UPDATE_SESSION");
+            req.setOrderAmount("50.00");
+            req.setOrderCurrency("EUR");
+            req.setBrowserPaymentOperation("PAY");
+            // NOTE: Uncomment the below for local testing
+            //req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
+            // NOTE: Comment out the below for local testing
+            req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
+            ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
+
+            mav.setViewName("apm");
+            mav.addObject("config", config);
+            mav.addObject("apmApiVersion", "1.0.0");
+            mav.addObject("hostedSession", hostedSession);
+            mav.addObject("request", req);
+            mav.addObject("correlationId", correlationId);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
     /* essentials_exclude_start */
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
@@ -245,9 +292,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_CHECKOUT_SESSION");
-        req.setOrderId(Utils.createUniqueId("order-"));
-        req.setOrderCurrency(config.getCurrency());
+        req.setApiOperation("CREATE_SESSION");
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -259,9 +304,8 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            mav.setViewName("hostedCheckout");
+            mav.setViewName("apmHostedCheckout");
             mav.addObject("config", config);
-            mav.addObject("orderId", req.getOrderId());
             mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);

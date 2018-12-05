@@ -5,8 +5,8 @@
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
-                <h3>Hosted Checkout</h3>
-                <p>The Hosted Checkout model allows you to collect payment details from your payer through an interaction hosted and displayed by the Payment Gateway. This means you aren't responsible for handling sensitive PCI data.</p>
+                <h3>APM.js integration with Hosted Checkout</h3>
+                <p>The following </p>
                 <p>Hosted Checkout can be implemented as:</p>
                 <div class="container mt-5">
                     <div class="row">
@@ -32,49 +32,38 @@
         </div>
     </div> <!-- row -->
 </div>
+<!--NOTE: Comment out the below for local testing-->
 <script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
         data-error="errorCallback"
         data-cancel="cancelCallback"
-        data-beforeRedirect="beforeRedirect"
-        data-afterRedirect="afterRedirect"
-        data-complete="completeCallback">
+        data-beforeRedirect="Checkout.saveFormFields"
+        data-afterRedirect="Checkout.restoreFormFields">
 </script>
+<!--NOTE: Uncomment out the below for local testing-->
+<!--<script src="https://localhost/checkout/version/50/checkout.js"-->
+<!--data-error="errorCallback"-->
+<!--data-cancel="cancelCallback"-->
+<!--data-beforeRedirect="Checkout.saveFormFields"-->
+<!--data-afterRedirect="Checkout.restoreFormFields">-->
+<!--</script>-->
 <script th:inline="javascript">
-
     /*<![CDATA[*/
-        var merchantId = /*[[${config.merchantId}]]*/ null;
-        var sessionId = /*[[${hostedSession.id}]]*/ null;
-        var sessionVersion = /*[[${hostedSession.version}]]*/ null;
-        var successIndicator = /*[[${hostedSession.successIndicator}]]*/ null;
-        var orderId = /*[[${orderId}]]*/ null;
+    var merchantId = /*[[${config.merchantId}]]*/ null;
+    var sessionId = /*[[${hostedSession.id}]]*/ null;
     /*]]>*/
-        var resultIndicator = null;
 
     // This method preserves the current state of successIndicator and orderId, so they're not overwritten when we return to this page after redirect
-    function beforeRedirect() {
+    function getPageState() {
         return {
-            successIndicator: successIndicator,
-            orderId: orderId
+            sessionId: sessionId
         };
     }
 
     // This method is specifically for the full payment page option. Because we leave this page and return to it, we need to preserve the
     // state of successIndicator and orderId using the beforeRedirect/afterRedirect option
-    function afterRedirect(data) {
-        // Compare with the resultIndicator saved in the completeCallback() method
-        if (resultIndicator) {
-            var result = (resultIndicator === data.successIndicator) ? "SUCCESS" : "ERROR";
-            window.location.href = "/hostedCheckout/" + data.orderId + "/" + result;
-        }
-        else {
-            successIndicator = data.successIndicator;
-            orderId = data.orderId;
-            sessionId = data.sessionId;
-            sessionVersion = data.sessionVersion;
-            merchantId = data.merchantId;
-
-            window.location.href = "/hostedCheckout/" + data.orderId + "/" + data.successIndicator + "/" + data.sessionId;
-        }
+    function restorePageState(data) {
+        console.log("afterRedirect: ", data);
+        Checkout.showLightbox();
     }
 
     function errorCallback(error) {
@@ -85,6 +74,7 @@
         $errorAlert.append("<p>" + message + "</p>");
         $errorAlert.show();
     }
+
     function cancelCallback() {
         console.log('Payment cancelled');
         // Reload the page to generate a new session ID - the old one is out of date as soon as the lightbox is invoked
@@ -93,21 +83,15 @@
 
     // This handles the response from Hosted Checkout and redirects to the appropriate endpoint
     function completeCallback(response) {
-        // Save the resultIndicator
-        resultIndicator = response;
-        var result = (resultIndicator === successIndicator) ? "SUCCESS" : "ERROR";
-        window.location.href = "/hostedCheckout/" + orderId + "/" + result;
+        console.log("COMPLETE: ", response);
     }
 
     Checkout.configure({
         merchant: merchantId,
         order: {
-            amount: function() {
-                //Dynamic calculation of amount
-                return 80 + 20;
-            },
-            currency: 'USD',
-            description: 'Ordered goods'
+            currency: 'EUR',
+            description: 'Ordered goods',
+            amount: '50.00'
         },
         session: {
             id: sessionId

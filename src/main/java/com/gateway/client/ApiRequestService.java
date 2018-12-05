@@ -2,6 +2,7 @@
  * Copyright (c) 2018 MasterCard. All rights reserved.
  */
 
+
 package com.gateway.client;
 
 import com.gateway.app.Config;
@@ -44,7 +45,7 @@ public class ApiRequestService {
             req.setOrderId(null);
             req.setTransactionId(null);
         }
-        if (apiOperation.equals("CREATE_CHECKOUT_SESSION")) {
+        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals("CREATE_SESSION")) {
             req.setApiMethod("POST");
         }
         return req;
@@ -151,7 +152,7 @@ public class ApiRequestService {
 
         // Used for hosted checkout - CREATE_CHECKOUT_SESSION operation
         JsonObject order = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) && request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
+        if (Utils.notNullOrEmpty(request.getApiOperation()) && (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION") || request.getApiOperation().equals("UPDATE_SESSION"))) {
             // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
         }
@@ -217,7 +218,7 @@ public class ApiRequestService {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
             if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
                 interaction.addProperty("returnUrl", request.getReturnUrl());
-            } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT") || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")) {
+            } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT") || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT") || request.getApiOperation().equals("UPDATE_SESSION")) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
             }
         }
@@ -227,7 +228,7 @@ public class ApiRequestService {
 
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation())) data.addProperty("apiOperation", request.getApiOperation());
+        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals("UPDATE_SESSION") && !request.getApiOperation().equals("CREATE_SESSION")) data.addProperty("apiOperation", request.getApiOperation());
         if (Utils.notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
         if (!wallet.entrySet().isEmpty()) data.add("wallet", wallet);
@@ -295,6 +296,36 @@ public class ApiRequestService {
     /* essentials_exclude_end */
 
     /**
+     * This method updates the Hosted Session
+     *
+     * @param protocol  REST or NVP
+     * @param request   contains info on what data the payload should include
+     * @param config    contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId used to target a specific session
+     * @throws Exception
+     */
+    public static void updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+        RESTApiClient connection = new RESTApiClient();
+
+        try {
+            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
+            ApiRequest updateSessionRequest = new ApiRequest();
+            updateSessionRequest.setApiOperation(request.getApiOperation());
+            updateSessionRequest.setOrderAmount(request.getOrderAmount());
+            updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
+            updateSessionRequest.setOrderId(request.getOrderId());
+            updateSessionRequest.setReturnUrl(request.getReturnUrl());
+            updateSessionRequest.setBrowserPaymentOperation(request.getBrowserPaymentOperation());
+            String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
+            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+        }
+        catch (Exception e) {
+            logger.error("Unable to update session", e);
+            throw e;
+        }
+    }
+
+    /**
      * This method updates the Hosted Session with order info (description, amount, currency, ID)
      *
      * @param protocol  REST or NVP
@@ -319,7 +350,6 @@ public class ApiRequestService {
             logger.error("Unable to update session", e);
             throw e;
         }
-
     }
 
     /**
