@@ -282,9 +282,10 @@ public class WebController {
     }
 
     /**
-     * Display 3DSecure operation page
+     * Display 3DSecure-2.0 operation page
      *
-     * @return ModelAndView for 3dSecure.html
+     * @param httpServletRequest
+     * @return ModelAndView for 3dSecure2.html
      */
     @GetMapping("/3dSecure2")
     public ModelAndView showSecure2Id(HttpServletRequest httpServletRequest) {
@@ -315,21 +316,6 @@ public class WebController {
         }
         return mav;
     }
-
-
-    @GetMapping(value = "/process3dsRedirect")
-    public ModelAndView process3dsRedirect(@RequestParam String simple) {
-        ModelAndView mav = new ModelAndView();
-
-        try {
-            mav.setViewName("process3dsRedirect");
-            mav.addObject("simple", simple);
-        }  catch (Exception e) {
-            ExceptionService.constructGeneralErrorResponse(mav, e);
-        }
-        return mav;
-    }
-
 
     /**
      * Display page for Hosted Checkout operation

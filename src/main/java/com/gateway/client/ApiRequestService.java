@@ -26,7 +26,8 @@ public class ApiRequestService {
      */
     public enum ApiOperation {
         CREATE_SESSION,
-        UPDATE_SESSION;
+        UPDATE_SESSION,
+        PAY;
     }
 
     /**

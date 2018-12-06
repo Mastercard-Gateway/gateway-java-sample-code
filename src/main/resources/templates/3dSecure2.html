@@ -1,25 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
 <body>
-<!-- <script src="/scripts/hostedSession.js"></script> -->
+<!--<script src="/scripts/hostedSession.js"></script>-->
 <script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"></script>
-
 <script th:inline="javascript">
     var JavaSample = {
         operation: function() {
-            return "CHECK_3DS_ENROLLMENT";
-        },
-        endpoint: function() {
-            return "check3dsEnrollment";
+            return "PAY";
         },
         secureIdResponseUrl: function() {
-            return encodeURI(window.location.protocol + "//" + window.location.host + "/process3ds");
+            return encodeURI(window.location.protocol + "//" + window.location.host + "/process3ds2Redirect");
         }
     };
 </script>
 <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-<!--<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>-->
+<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
@@ -29,7 +25,8 @@
                     <p><strong>NOTE:</strong> You can also do an authorization using 3D Secure 2.0, depending on your merchant settings.</p>
                     <p>Here are the processes that occur for this transaction:</p>
                     <ol>
-                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Checkout%20Session.html'}" target="_blank">CREATE_CHECKOUT_SESSION</a> operation to collect sensitive card data.</li>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}" target="_blank">CREATE_SESSION</a> operation to collect sensitive card data.</li>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}" target="_blank">UPDATE_SESSION</a> operation to update the session details such as <code>authentication.channel = MERCHANT_REQUESTED</code>.</li>
                         <li>Initiate Authentication
                         <li>Authenticate Payer</li>
                         <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}" target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.</li>
@@ -119,14 +116,13 @@
     /*]]>*/
     var resultIndicator = null;
 
-    THREEDS.configure({
+    ThreeDS.configure({
         merchantId: merchantId,
         hostedSessionId: sessionId,
         containerId: '3DSUI',
         configuration: {userLanguage: "en-AU", wsVersion: 50},
-        sessionId: sessionId,
         callback: function (data) {
-            if (THREEDS.isConfigured())
+            if (ThreeDS.isConfigured())
                 console.log("Done with configure");
         }
     });
@@ -164,6 +160,11 @@
         }
     }
 
+    /**
+     *
+     * @param params data.htmlRedirectCode
+     * @param callback auth()
+     */
     function submitAuthenticatePayer(params, callback) {
         var e = document.createElement('div');
         e.style.display = "none";
@@ -182,9 +183,9 @@
     }
 
     function auth() {
-        var j = {
+        var requestBody = {
             "sessionId": sessionId,
-            "apiOperation": 'PAY',
+            "apiOperation": JavaSample.operation(),
             "cardNumber": document.getElementById("card-number").value,
             "expiryMonth": document.getElementById("expiry-month").value,
             "expiryYear": document.getElementById("expiry-year").value,
@@ -195,14 +196,14 @@
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', '3dsreceipt', true);
+            xhr.open('PUT', '3dsreceipt', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 document.documentElement.innerHTML = this.response;
             }
         }
-        xhr.send(JSON.stringify(j));
+        xhr.send(JSON.stringify(requestBody));
     }
 
     function displayReceipt(apiResponse) {
@@ -224,11 +225,20 @@
     function authenticatePayer() {
         var cardNumber = document.getElementById("card-number").value;
         var orderAmount = document.getElementById("order-amount").value;
-        THREEDS.authenticatePayer(orderAmount, cardNumber, '05', '2021', 'AUD', orderId, transactionId, "http://localhost/sample/process3dsRedirect",{}, function (data) {
+        var orderCurrency = document.getElementById("order-currency").value;
+        var expiryYear = document.getElementById("expiry-year").value;
+        var expiryMonth = document.getElementById("expiry-month").value;
+
+        ThreeDS.authenticatePayer(orderAmount, cardNumber, expiryMonth, expiryYear, orderCurrency, orderId, transactionId,
+           JavaSample.secureIdResponseUrl(),{}, function (data) {
             processAuthenticatePayerResponse(data);
         });
     }
 
+    /**
+     *
+     * @param data authenticatePayer response
+     */
     function processAuthenticatePayerResponse(data) {
         if (data.error) {
             if (data.error.code === 429) {
@@ -241,9 +251,9 @@
         else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
 //            auth();
-//            submitAuthenticatePayer(data.htmlRedirectCode, function () {
-//                auth();
-//            });
+           submitAuthenticatePayer(data.htmlRedirectCode, function () {
+               auth();
+           });
         }
     }
 
@@ -253,7 +263,7 @@
         var cardNumber = document.getElementById("card-number").value;
         var orderAmount = document.getElementById("order-amount").value;
 
-        THREEDS.initiate3DS(cardNumber, orderId, transactionId, function (data) {//TODO before click PAY()
+        ThreeDS.initiateAuthentication(cardNumber, orderId, transactionId, function (data) {//TODO before click PAY()
                 if (data && data.error) {
                     var error = data.error;
                     //Something bad happened, the error value will match what is returned by the REST API
@@ -277,6 +287,6 @@
         );
     }
 </script>
-<script src="/scripts/threeDS.js"></script>
+<!--<script src="/scripts/threeDS.js"></script>-->
 </body>
 </html>

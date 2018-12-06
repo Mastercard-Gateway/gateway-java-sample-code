@@ -531,4 +531,64 @@ public class ApiController {
         }
         return mav;
     }
+
+    /**
+     * Renders the issuer's challenge UI
+     *
+     * @param simple The gateway always returns *simple* field in the response for insertion into the page. With the
+     * challenge flow, this will redirect the payer’s browser to the ACS where the issuer’s challenge UI will be
+     * presented, after which the payer will be redirected back to your web site. In other cases, where no ACS challenge
+     * UI is present, the contents of *simple* field will direct the payer’s browser straight back to your website.
+     * @return the ACS challenge view
+     */
+    @GetMapping(value = "/process3ds2Redirect")
+    public ModelAndView process3ds2Redirect(@RequestParam String simple) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            mav.setViewName("acsChallenge");
+            mav.addObject("simple", simple);
+        }  catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @PutMapping(value = "/3ds2receipt")
+    public ModelAndView render3DS2Receipt(@RequestBody String apiResponse)
+    {
+//        $apiResponse = json_encode($request->getParsedBody()['apiResponse']);
+//        $response = $this->view->render($response, "receipt.phtml", ["responseData" => $apiResponse, "requestData" => "", "requestUrl" => "", "apiOperation" => "INITIATE AUTHENTICATION"]);
+//
+//        return $response->withStatus(200);
+        ModelAndView mav = new ModelAndView();
+//
+        try {
+//            // Make a payment using the session
+//            // Construct API request
+//            ApiRequest apiReq = ApiRequestService.createApiRequest("PAY", config);
+//            apiReq.setSessionId(sessionId);
+//            String payload = ApiRequestService.buildJSONPayload(apiReq);
+//            String reqUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiReq);
+//
+//            // Perform API operation
+//            RESTApiClient apiConnection = new RESTApiClient();
+//            String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+//
+//            TransactionResponse masterpassResponse = ApiResponseService.parseMasterpassResponse(apiResponse);
+//            mav.setViewName("receipt");
+//            mav.addObject("response", masterpassResponse);
+//            mav.setViewName("acsChallenge");
+//            mav.addObject("response", apiResponse);
+        }  catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+
 }
