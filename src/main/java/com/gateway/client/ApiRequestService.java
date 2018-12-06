@@ -323,18 +323,20 @@ public class ApiRequestService {
      * @param sessionId used to target a specific session
      * @throws Exception
      */
-    public static String updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+    public static void updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
         RESTApiClient connection = new RESTApiClient();
 
         try {
             String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
             ApiRequest updateSessionRequest = new ApiRequest();
-//            updateSessionRequest.setApiOperation(request.getApiOperation());
-            updateSessionRequest.setOrderAmount("100");
-            updateSessionRequest.setOrderCurrency("AUD");
+            updateSessionRequest.setApiOperation(request.getApiOperation());
+            updateSessionRequest.setOrderAmount(request.getOrderAmount());
+            updateSessionRequest.setOrderCurrency(request.getOrderCurrency());
             updateSessionRequest.setOrderId(request.getOrderId());
+            updateSessionRequest.setReturnUrl(request.getReturnUrl());
+            updateSessionRequest.setBrowserPaymentOperation(request.getBrowserPaymentOperation());
             String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
-            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
         }
         catch (Exception e) {
             logger.error("Unable to update session", e);
