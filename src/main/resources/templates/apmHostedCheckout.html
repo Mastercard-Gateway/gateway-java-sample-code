@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'hostedCheckout')}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apmHostedCheckout')}">
 <body>
 <div class="col-9">
     <div class="row">
@@ -34,17 +34,17 @@
 </div>
 <!--NOTE: Comment out the below for local testing-->
 <script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
-        data-error="errorCallback"
-        data-cancel="cancelCallback"
-        data-beforeRedirect="Checkout.saveFormFields"
-        data-afterRedirect="Checkout.restoreFormFields">
+    data-error="errorCallback"
+    data-cancel="cancelCallback"
+    data-beforeRedirect="Checkout.saveFormFields"
+    data-afterRedirect="Checkout.restoreFormFields">
 </script>
 <!--NOTE: Uncomment out the below for local testing-->
 <!--<script src="https://localhost/checkout/version/50/checkout.js"-->
-<!--data-error="errorCallback"-->
-<!--data-cancel="cancelCallback"-->
-<!--data-beforeRedirect="Checkout.saveFormFields"-->
-<!--data-afterRedirect="Checkout.restoreFormFields">-->
+        <!--data-error="errorCallback"-->
+        <!--data-cancel="cancelCallback"-->
+        <!--data-beforeRedirect="Checkout.saveFormFields"-->
+        <!--data-afterRedirect="Checkout.restoreFormFields">-->
 <!--</script>-->
 <script th:inline="javascript">
     /*<![CDATA[*/
