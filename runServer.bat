@@ -1,4 +1,3 @@
-
 # Update this file for setting up Merchant Id and other environmental configurations for the test server
 
 set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
