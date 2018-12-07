@@ -355,7 +355,7 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            mav.setViewName("apmHostedCheckout");
+            mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
