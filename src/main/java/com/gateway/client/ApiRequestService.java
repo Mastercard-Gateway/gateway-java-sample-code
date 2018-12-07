@@ -4,6 +4,12 @@
 
 package com.gateway.client;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
 import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,11 +17,8 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import static com.gateway.client.ApiRequestService.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
 
 public class ApiRequestService {
 
@@ -24,10 +27,10 @@ public class ApiRequestService {
     /**
      * The available operations from the API
      */
-    public enum ApiOperation {
-        CREATE_SESSION,
-        UPDATE_SESSION,
-        PAY;
+    public interface ApiOperation {
+        String CREATE_SESSION = "CREATE_SESSION";
+        String UPDATE_SESSION = "UPDATE_SESSION";
+        String PAY = "PAY";
     }
 
     /**
@@ -55,10 +58,10 @@ public class ApiRequestService {
             req.setOrderId(null);
             req.setTransactionId(null);
         }
-        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals(ApiOperation.CREATE_SESSION.name())) {
+        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals(CREATE_SESSION)) {
             req.setApiMethod("POST");
         }
-        if (apiOperation.equals(ApiOperation.UPDATE_SESSION.name())) {
+        if (apiOperation.equals(UPDATE_SESSION)) {
             req.setApiMethod("PUT");
         }
         return req;
@@ -165,7 +168,9 @@ public class ApiRequestService {
 
         // Used for hosted checkout - CREATE_CHECKOUT_SESSION operation
         JsonObject order = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) && (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION") || request.getApiOperation().equals("UPDATE_SESSION"))) {
+        if (Utils.notNullOrEmpty(request.getApiOperation()) &&
+                (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")
+                        || request.getApiOperation().equals(UPDATE_SESSION))) {
             // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
         }
@@ -237,7 +242,9 @@ public class ApiRequestService {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
             if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
                 interaction.addProperty("returnUrl", request.getReturnUrl());
-            } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT") || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT") || request.getApiOperation().equals("UPDATE_SESSION")) {
+            } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT")
+                    || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")
+                    || request.getApiOperation().equals(UPDATE_SESSION)) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
             }
         }
@@ -247,7 +254,9 @@ public class ApiRequestService {
 
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals("UPDATE_SESSION") && !request.getApiOperation().equals("CREATE_SESSION")) data.addProperty("apiOperation", request.getApiOperation());
+        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals(UPDATE_SESSION)
+                && !request.getApiOperation().equals(CREATE_SESSION))
+            data.addProperty("apiOperation", request.getApiOperation());
         if (Utils.notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
         if (!authentication.entrySet().isEmpty()) data.add("authentication", authentication);
@@ -354,7 +363,7 @@ public class ApiRequestService {
      * @throws Exception
      */
     public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
-        request.setApiOperation(ApiOperation.UPDATE_SESSION.name());
+        request.setApiOperation(UPDATE_SESSION);
         request.setApiMethod("PUT");
 
         request.setAuthenticationChannel("MERCHANT_REQUESTED");

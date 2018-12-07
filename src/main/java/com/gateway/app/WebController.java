@@ -4,15 +4,26 @@
 
 package com.gateway.app;
 
-import com.gateway.client.*;
+import javax.servlet.http.HttpServletRequest;
+
+import com.gateway.client.ApiException;
+import com.gateway.client.ApiProtocol;
+import com.gateway.client.ApiRequest;
+import com.gateway.client.ApiRequestService;
+import com.gateway.client.ApiResponseService;
+import com.gateway.client.ExceptionService;
+import com.gateway.client.HostedSession;
+import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import static com.gateway.client.ApiRequestService.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
 
 @Controller
 public class WebController {
@@ -295,12 +306,16 @@ public class WebController {
             RESTApiClient connection = new RESTApiClient();
 
             //CREATE_SESSION
+//            ApiRequest createSessionRequest = ApiRequestService.createApiRequest(CREATE_SESSION, config);
+            ApiRequest createSessionRequest = new ApiRequest();
+            createSessionRequest.setApiOperation("CREATE_SESSION");
             String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-            String resp = connection.postTransaction(requestUrl, config);
+            String createSessionRequestPayload = ApiRequestService.buildJSONPayload(createSessionRequest);
+            String resp = connection.postTransaction(createSessionRequestPayload, requestUrl, config);
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
             //UPDATE_SESSION
-            ApiRequest sessionRequest = ApiRequestService.createApiRequest(ApiRequestService.ApiOperation.UPDATE_SESSION.name(),config);
+            ApiRequest sessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
             String updateResp = ApiRequestService.update3DSSession(ApiProtocol.REST, sessionRequest, config, hostedSession.getId());
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
             sessionRequest.setSessionId(hostedSession.getId());
