@@ -252,10 +252,39 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+    @Test
+    public void parseUpdate3DS2Session() throws Exception {
+        String ApiOperation = "UPDATE_SESSION";
+        String orderAmount = "10.00";
+        String orderCurrency = "USD";
+        String orderId = "order-194";
+        String authenticationChannel = "MERCHANT_REQUESTED";
+
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation(ApiOperation);
+        request.setOrderAmount(orderAmount);
+        request.setAuthenticationChannel(authenticationChannel);
+        request.setOrderId(orderId);
+        request.setOrderCurrency(orderCurrency);
+
+        String result = ApiRequestService.buildJSONPayload(request);
+
+        String data = "{\n" +
+                "  \"order\": {\n" +
+                "    \"id\": "+orderId+",\n" +
+                "    \"amount\": \""+orderAmount+"\",\n" +
+                "    \"currency\": "+orderCurrency+"\n" +
+                "  },\n" +
+                "  \"authentication\": {\n" +
+                "    \"channel\": "+authenticationChannel+"\n" +
+                "  }\n" +
+                "}";
+
+        assertEquals(prettifyJson(data), result);
+    }
 
     @Test
     public void parse3ds2Request() throws Exception {
-        //TODO
         String ApiOperation = "PAY";
         String orderAmount = "10.00";
         String orderCurrency = "USD";
@@ -280,8 +309,8 @@ public class ApiRequestServiceTest {
                 "\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
 
         assertEquals(prettifyJson(data), result);
-        //TODO
     }
+
     @Test
     public void parseACSRequest() throws Exception {
         ApiRequest request = new ApiRequest();
