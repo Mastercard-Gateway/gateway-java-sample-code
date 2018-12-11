@@ -6,6 +6,45 @@
         <div class="contents col-12">
             <div class="col-md-12">
                 <h3>APM.js integration with Hosted Checkout</h3>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Order Details</h6>
+                    </div>
+                    <div class="panel-body">
+                        <form id="order-form" onSubmit="orderFormSubmitHandler()">
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label class="control-label" for="order-amount">Amount</label>
+                                    <input id="order-amount" type="number" min="1" max="999999999" maxlength="10" class="form-control input-md" required placeholder="e.g. 50.00"/>
+
+                                    <label class="control-label" for="order-currency">Currency</label>
+                                    <select id="order-currency" class="form-control input-md" required>
+                                        <option hidden>Select a currency</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="SGD">SGD</option>
+                                        <option value="MXN">MXN</option>
+                                        <option value="AUD">AUD</option>
+                                        <option value="BRL">BRL</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-9">
+                                    <label class="col-md-4 control-label" for="order-description">Description</label>
+                                    <div class="col-md-12">
+                                        <textarea id="order-description"  class="form-control" rows="4" required placeholder="e.g. Ordered goods"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button id="order-submit" type="submit" class="btn btn-primary pull-right" disabled>Update configuration</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <hr>
                 <p>The following </p>
                 <p>Hosted Checkout can be implemented as:</p>
                 <div class="container mt-5">
@@ -42,6 +81,7 @@
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
     var sessionId = /*[[${hostedSession.id}]]*/ null;
+    var currency = /*[[${config.currency}]]*/ null;
     /*]]>*/
 
     // This method preserves the current state of successIndicator and orderId, so they're not overwritten when we return to this page after redirect
@@ -78,23 +118,103 @@
         console.log("COMPLETE: ", response);
     }
 
-    Checkout.configure({
-        merchant: merchantId,
-        order: {
-            currency: 'EUR',
-            description: 'Ordered goods',
-            amount: '50.00'
+    /** Initializing Order Details Form **/
+    var orderform = $('#order-form');
+    var currencyInput = $('#order-currency');
+    var amountInput = $('#order-amount');
+    var descriptionInput = $('#order-description');
+    var orderSubmit = $('#order-submit');
+    var lightboxButton = $('#lightbox-with-session');
+    var fullpageButton = $('#page-with-session');
+
+    orderform
+      .change(function() {
+        if (orderSubmit.prop('disabled')) {
+          orderSubmit.prop('disabled', false);
+          lightboxButton.prop('disabled', true);
+          fullpageButton.prop('disabled', true);
+        }
+      })
+      .submit(function() {
+        orderSubmit.prop('disabled', true);
+        lightboxButton.prop('disabled', false);
+        fullpageButton.prop('disabled', false);
+      });
+
+    var order = initOrderValues();
+    setOrderFormValues(order);
+
+    var configObject = {
+      merchant: merchantId,
+      order: {
+        currency: order.currency,
+        description: order.description,
+        amount: order.amount,
+      },
+      session: {
+        id: sessionId,
+      },
+      interaction: {
+        merchant: {
+          name: 'Merchant Name',
         },
-        session: {
-            id: sessionId
-        },
-        interaction: {
-            merchant: {
-                name: 'Merchant Name'
-            }
-        },
-        hppdebug: true
-    });
+      },
+      hppdebug: true,
+    };
+
+    function orderFormSubmitHandler() {
+      order = getOrderFormValues();
+      storeOrderValues(order);
+    }
+
+    function getOrderFormValues() {
+      // Getting the input values
+      var currency = currencyInput.val();
+      var amount = amountInput.val();
+      var description = descriptionInput.val();
+
+      return {
+        currency: currency,
+        amount: amount,
+        description: description,
+      };
+    }
+
+    function setOrderFormValues(order) {
+      currencyInput.val(order.currency);
+      amountInput.val(order.amount);
+      descriptionInput.val(order.description);
+    }
+
+    function storeOrderValues(order) {
+      if (window.sessionStorage) {
+        sessionStorage.setItem('amount', order.amount);
+        sessionStorage.setItem('currency', order.currency);
+        sessionStorage.setItem('description', order.description);
+      }
+    }
+
+    function pullStoredOrderValues() {
+      var stored = {};
+      if (window.sessionStorage) {
+        stored.amount = sessionStorage.getItem('amount');
+        stored.currency = sessionStorage.getItem('currency');
+        stored.description = sessionStorage.getItem('description');
+      }
+      return stored;
+    }
+
+    function initOrderValues() {
+      var order = pullStoredOrderValues();
+
+      return {
+        amount: order.amount || '0.99',
+        currency: order.currency || currency,
+        description: order.description || 'Ordered goods',
+      };
+    }
+
+    Checkout.configure(configObject);
 </script>
 
 </body>

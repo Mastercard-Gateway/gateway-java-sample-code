@@ -102,6 +102,16 @@ input {
     border-color: #E55C00;
     cursor: pointer;
 }
+
+.btn.btn-primary:disabled{
+    background-color: #818182;
+    border-color: #464a4e;
+}
+.btn.btn-primary:disabled:hover {
+    background-color: #818182;
+    border-color: #464a4e;
+    cursor: no-drop;
+}
 .endpoint {
     word-wrap: break-word;
 }
@@ -147,4 +157,9 @@ input {
 @keyframes loading-bar-spinner {
     0%   { transform: rotate(0deg);   transform: rotate(0deg); }
     100% { transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+/* Helper Classes */
+.pull-right {
+    float: right !important;
 }
