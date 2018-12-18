@@ -104,16 +104,30 @@ input {
 }
 
 .btn.btn-primary:disabled{
-    background-color: #818182;
-    border-color: #464a4e;
+    background-color: #D8D8D8;
 }
 .btn.btn-primary:disabled:hover {
-    background-color: #818182;
-    border-color: #464a4e;
     cursor: no-drop;
 }
 .endpoint {
     word-wrap: break-word;
+}
+
+.custom-order {
+    border-radius: 4px;
+    background-color: #F7F7F7;
+    margin-top: 3rem;
+}
+.custom-order input {
+    font-size: .9rem;
+}
+.custom-order label {
+    color: #212528;
+    font-size: .9rem;
+    font-weight: bold;
+}
+#order-submit {
+    border: none;
 }
 /* essentials_exclude_start */
 #masterpass-button {

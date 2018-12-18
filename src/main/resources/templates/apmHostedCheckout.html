@@ -5,47 +5,8 @@
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
-                <h3>APM.js integration with Hosted Checkout</h3>
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h6 class="panel-title">Order Details</h6>
-                    </div>
-                    <div class="panel-body">
-                        <form id="order-form" onSubmit="orderFormSubmitHandler()">
-                            <div class="row">
-                                <div class="form-group col-md-3">
-                                    <label class="control-label" for="order-amount">Amount</label>
-                                    <input id="order-amount" type="number" min="1" max="999999999" maxlength="10" class="form-control input-md" required placeholder="e.g. 50.00"/>
-
-                                    <label class="control-label" for="order-currency">Currency</label>
-                                    <select id="order-currency" class="form-control input-md" required>
-                                        <option hidden>Select a currency</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="SGD">SGD</option>
-                                        <option value="MXN">MXN</option>
-                                        <option value="AUD">AUD</option>
-                                        <option value="BRL">BRL</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group col-md-9">
-                                    <label class="col-md-4 control-label" for="order-description">Description</label>
-                                    <div class="col-md-12">
-                                        <textarea id="order-description"  class="form-control" rows="4" required placeholder="e.g. Ordered goods"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <button id="order-submit" type="submit" class="btn btn-primary pull-right" disabled>Update configuration</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <hr>
-                <p>The following </p>
+                <h3>Hosted Checkout</h3>
+                <p>The Hosted Checkout model allows you to collect payment details from your payer through an interaction hosted and displayed by the Payment Gateway. This means you aren't responsible for handling sensitive PCI data.</p>
                 <p>Hosted Checkout can be implemented as:</p>
                 <div class="container mt-5">
                     <div class="row">
@@ -67,13 +28,80 @@
                         </div>
                     </div>
                 </div>
+                <div class="panel panel-default custom-order">
+                    <div class="panel-body">
+                        <form id="order-form" onSubmit="orderFormSubmitHandler()">
+                            <h6 class="panel-title">Customize Checkout Configurations</h6>
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label class="control-label" for="order-amount">Amount</label>
+                                    <input id="order-amount" type="number" min="1" max="999999999" maxlength="10" class="form-control input-md" required placeholder="e.g. 50.00"/>
+                                </div>
+
+                                <div class="form-group col-md-9">
+                                    <label class="control-label" for="order-currency">Currency</label>
+                                    <select id="order-currency" class="form-control input-md" required>
+                                        <option hidden>Select a currency</option>
+                                        <option value="AUD" title="Australian Dollar">AUD - Australian Dollar</option>
+                                        <option value="BRL" title="Brazilian Real">BRL - Brazilian Real</option>
+                                        <option value="CAD" title="Canadian Dollar">CAD - Canadian Dollar</option>
+                                        <option value="CHF" title="Swiss Franc">CHF - Swiss Franc</option>
+                                        <option value="CZK" title="Czech Rep. Koruna">CZK - Czech Rep. Koruna</option>
+                                        <option value="DKK" title="Danish Krone">DKK - Danish Krone</option>
+                                        <option value="EUR" title="Euro">EUR - Euro</option>
+                                        <option value="GBP" title="UK Pound Sterling">GBP - UK Pound Sterling</option>
+                                        <option value="HKD" title="Hong Kong Dollar">HKD - Hong Kong Dollar</option>
+                                        <option value="HUF" title="Hungarian Forint">HUF - Hungarian Forint</option>
+                                        <option value="ILS" title="Israeli Sheqel">ILS - Israeli Sheqel</option>
+                                        <option value="JPY" title="Japanese Yen">JPY - Japanese Yen</option>
+                                        <option value="MXN" title="Mexican Peso">MXN - Mexican Peso</option>
+                                        <option value="MYR" title="Malaysian Ringgit">MYR - Malaysian Ringgit</option>
+                                        <option value="NOK" title="Norwegian Krone">NOK - Norwegian Krone</option>
+                                        <option value="NZD" title="New Zealand Dollar">NZD - New Zealand Dollar</option>
+                                        <option value="PHP" title="Philippine Peso">PHP - Philippine Peso</option>
+                                        <option value="PLN" title="Polish Zloty">PLN - Polish Zloty</option>
+                                        <option value="SEK" title="Swedish Krona">SEK - Swedish Krona</option>
+                                        <option value="SGD" title="Singapore Dollar">SGD - Singapore Dollar</option>
+                                        <option value="THB" title="Thai Baht">THB - Thai Baht</option>
+                                        <option value="TWD" title="New Taiwan Dollar">TWD - New Taiwan Dollar</option>
+                                        <option value="USD" title="US Dollar">USD - US Dollar</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <label class="control-label" for="order-description">Description</label>
+                                    <textarea id="order-description"  class="form-control" rows="4" required placeholder="e.g. Ordered goods"></textarea>
+                                </div>
+                            </div>
+                            <h6 class="panel-title">Advanced Settings</h6>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label class="control-label" for="order-session-id">Custom Session ID</label>
+                                    <input id="order-session-id" type="text" minlength="31" maxlength="50" class="form-control input-md" placeholder="SESSION12345ABC" autocomplete="off"/>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label class="control-label" for="order-return-url">Return URL</label>
+                                    <input id="order-return-url" type="text" class="form-control input-md" placeholder="http://www.mystore.com/returnurl"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <button id="order-submit" type="submit" class="btn btn-primary pull-right" disabled>Update configuration</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div> <!-- row -->
 </div>
-<script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
+<script id="checkout-script" th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
     data-error="errorCallback"
     data-cancel="cancelCallback"
+    data-complete="completeCallback"
     data-beforeRedirect="Checkout.saveFormFields"
     data-afterRedirect="Checkout.restoreFormFields">
 </script>
@@ -116,13 +144,18 @@
     // This handles the response from Hosted Checkout and redirects to the appropriate endpoint
     function completeCallback(response) {
         console.log("COMPLETE: ", response);
+        console.log('ReturnUrl: ', order.returnUrl);
+        window.location.replace( order.returnUrl );
     }
 
     /** Initializing Order Details Form **/
     var orderform = $('#order-form');
+    var checkoutScript = $('#checkout-script');
     var currencyInput = $('#order-currency');
     var amountInput = $('#order-amount');
     var descriptionInput = $('#order-description');
+    var sessionIdInput = $('#order-session-id');
+    var returnUrlInput = $('#order-return-url');
     var orderSubmit = $('#order-submit');
     var lightboxButton = $('#lightbox-with-session');
     var fullpageButton = $('#page-with-session');
@@ -143,23 +176,24 @@
 
     var order = initOrderValues();
     setOrderFormValues(order);
+    setReturnUrl( order.returnUrl );
 
     var configObject = {
       merchant: merchantId,
       order: {
         currency: order.currency,
         description: order.description,
-        amount: order.amount,
+        amount: order.amount
       },
       session: {
-        id: sessionId,
+        id: order.sessionId || sessionId
       },
       interaction: {
         merchant: {
-          name: 'Merchant Name',
-        },
+          name: 'Merchant Name'
+        }
       },
-      hppdebug: true,
+      hppdebug: true
     };
 
     function orderFormSubmitHandler() {
@@ -168,15 +202,12 @@
     }
 
     function getOrderFormValues() {
-      // Getting the input values
-      var currency = currencyInput.val();
-      var amount = amountInput.val();
-      var description = descriptionInput.val();
-
       return {
-        currency: currency,
-        amount: amount,
-        description: description,
+        currency: currencyInput.val(),
+        amount: amountInput.val(),
+        description: descriptionInput.val(),
+        sessionId: sessionIdInput.val(),
+        returnUrl: returnUrlInput.val()
       };
     }
 
@@ -184,6 +215,8 @@
       currencyInput.val(order.currency);
       amountInput.val(order.amount);
       descriptionInput.val(order.description);
+      sessionIdInput.val(order.sessionId);
+      returnUrlInput.val(order.returnUrl);
     }
 
     function storeOrderValues(order) {
@@ -191,7 +224,23 @@
         sessionStorage.setItem('amount', order.amount);
         sessionStorage.setItem('currency', order.currency);
         sessionStorage.setItem('description', order.description);
+        sessionStorage.setItem('sessionId', order.sessionId);
+        sessionStorage.setItem('returnUrl', order.returnUrl);
       }
+    }
+
+    function setReturnUrl( url ) {
+      console.log('url', url);
+
+      if(url){
+        console.log('setting url to ', order.returnUrl);
+        checkoutScript.data('complete', order.returnUrl);
+      } else {
+        console.log('removing url');
+        checkoutScript.data('complete', '');
+      }
+
+      // checkoutScript.data( 'complete', 'https://www.example.com' );
     }
 
     function pullStoredOrderValues() {
@@ -200,6 +249,8 @@
         stored.amount = sessionStorage.getItem('amount');
         stored.currency = sessionStorage.getItem('currency');
         stored.description = sessionStorage.getItem('description');
+        stored.sessionId = sessionStorage.getItem('sessionId');
+        stored.returnUrl = sessionStorage.getItem('returnUrl');
       }
       return stored;
     }
@@ -208,9 +259,11 @@
       var order = pullStoredOrderValues();
 
       return {
-        amount: order.amount || '0.99',
+        amount: order.amount || '50',
         currency: order.currency || currency,
         description: order.description || 'Ordered goods',
+        sessionId: order.sessionId || '',
+        returnUrl: order.returnUrl || ''
       };
     }
 
