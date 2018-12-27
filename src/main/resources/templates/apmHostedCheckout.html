@@ -28,16 +28,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel panel-default custom-order">
-                    <div class="panel-body">
+                <div class="tab">
+                    <input id="tab-one" type="checkbox" name="tabs">
+                    <label class="tab-title" for="tab-one">Customize Checkout Configurations</label>
+                    <div class="tab-content">
                         <form id="order-form" onSubmit="orderFormSubmitHandler()">
-                            <h6 class="panel-title">Customize Checkout Configurations</h6>
                             <div class="row">
                                 <div class="form-group col-md-3">
                                     <label class="control-label" for="order-amount">Amount</label>
                                     <input id="order-amount" type="number" min="1" max="999999999" maxlength="10" class="form-control input-md" required placeholder="e.g. 50.00"/>
                                 </div>
-
                                 <div class="form-group col-md-9">
                                     <label class="control-label" for="order-currency">Currency</label>
                                     <select id="order-currency" class="form-control input-md" required>
@@ -80,7 +80,6 @@
                                     <label class="control-label" for="order-session-id">Custom Session ID</label>
                                     <input id="order-session-id" type="text" minlength="31" maxlength="50" class="form-control input-md" placeholder="SESSION12345ABC" autocomplete="off"/>
                                 </div>
-
                                 <div class="form-group col-md-6">
                                     <label class="control-label" for="order-return-url">Return URL</label>
                                     <input id="order-return-url" type="text" class="form-control input-md" placeholder="http://www.mystore.com/returnurl"/>
@@ -101,7 +100,6 @@
 <script id="checkout-script" th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
     data-error="errorCallback"
     data-cancel="cancelCallback"
-    data-complete="completeCallback"
     data-beforeRedirect="Checkout.saveFormFields"
     data-afterRedirect="Checkout.restoreFormFields">
 </script>
@@ -141,14 +139,17 @@
         window.location.reload(true);
     }
 
-    // This handles the response from Hosted Checkout and redirects to the appropriate endpoint
-    function completeCallback(response) {
-        console.log("COMPLETE: ", response);
-        console.log('ReturnUrl: ', order.returnUrl);
-        window.location.replace( order.returnUrl );
+    /** This handles the response from Hosted Checkout and redirects to the appropriate endpoint
+     * @param {string} resultIndicator - The result indicator can be used to securely determine if the payment succeeded in a Return To Merchant integration.
+     * @param {string} sessionVersion - Version of the Payment Session after payment completed.
+     */
+    function completeCallback(resultIndicator, sessionVersion) {
+      console.info('Complete: ', resultIndicator, sessionVersion);
+
+      window.location.replace( order.returnUrl );
     }
 
-    /** Initializing Order Details Form **/
+    /** Getting values from Order form **/
     var orderform = $('#order-form');
     var checkoutScript = $('#checkout-script');
     var currencyInput = $('#order-currency');
@@ -160,6 +161,7 @@
     var lightboxButton = $('#lightbox-with-session');
     var fullpageButton = $('#page-with-session');
 
+    // Toggling buttons
     orderform
       .change(function() {
         if (orderSubmit.prop('disabled')) {
@@ -174,7 +176,8 @@
         fullpageButton.prop('disabled', false);
       });
 
-    var order = initOrderValues();
+    // Initializing form
+    var order = initOrderFormValues();
     setOrderFormValues(order);
     setReturnUrl( order.returnUrl );
 
@@ -198,7 +201,19 @@
 
     function orderFormSubmitHandler() {
       order = getOrderFormValues();
-      storeOrderValues(order);
+      storeOrderFormValues(order);
+    }
+
+    function initOrderFormValues() {
+      var order = pullOrderFormValues();
+
+      return {
+        amount: order.amount || '50',
+        currency: order.currency || currency,
+        description: order.description || 'Ordered goods',
+        sessionId: order.sessionId || '',
+        returnUrl: order.returnUrl || ''
+      };
     }
 
     function getOrderFormValues() {
@@ -219,7 +234,7 @@
       returnUrlInput.val(order.returnUrl);
     }
 
-    function storeOrderValues(order) {
+    function storeOrderFormValues(order) {
       if (window.sessionStorage) {
         sessionStorage.setItem('amount', order.amount);
         sessionStorage.setItem('currency', order.currency);
@@ -229,21 +244,7 @@
       }
     }
 
-    function setReturnUrl( url ) {
-      console.log('url', url);
-
-      if(url){
-        console.log('setting url to ', order.returnUrl);
-        checkoutScript.data('complete', order.returnUrl);
-      } else {
-        console.log('removing url');
-        checkoutScript.data('complete', '');
-      }
-
-      // checkoutScript.data( 'complete', 'https://www.example.com' );
-    }
-
-    function pullStoredOrderValues() {
+    function pullOrderFormValues() {
       var stored = {};
       if (window.sessionStorage) {
         stored.amount = sessionStorage.getItem('amount');
@@ -255,16 +256,10 @@
       return stored;
     }
 
-    function initOrderValues() {
-      var order = pullStoredOrderValues();
-
-      return {
-        amount: order.amount || '50',
-        currency: order.currency || currency,
-        description: order.description || 'Ordered goods',
-        sessionId: order.sessionId || '',
-        returnUrl: order.returnUrl || ''
-      };
+    function setReturnUrl( url ) {
+      if(url){
+        checkoutScript.attr( "data-complete", order.returnUrl );
+      }
     }
 
     Checkout.configure(configObject);
