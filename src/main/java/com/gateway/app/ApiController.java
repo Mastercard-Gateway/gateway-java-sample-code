@@ -548,6 +548,7 @@ public class ApiController {
         try {
             mav.setViewName("acsChallenge");
             mav.addObject("simple", simple);
+            mav.addObject("config", config);
         }  catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
