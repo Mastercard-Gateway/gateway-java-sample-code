@@ -120,7 +120,7 @@
         merchantId: merchantId,
         hostedSessionId: sessionId,
         containerId: '3DSUI',
-        configuration: {userLanguage: "en-AU", wsVersion: 50},
+        configuration: {userLanguage: "en-AU", wsVersion: /*[[${config.apiVersion}]]*/ null},
         callback: function (data) {
             if (ThreeDS.isConfigured())
                 console.log("Done with configure");
@@ -212,7 +212,7 @@
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', '3dsreceipt', true);
+        xhr.open('PUT', '3ds2receipt', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
