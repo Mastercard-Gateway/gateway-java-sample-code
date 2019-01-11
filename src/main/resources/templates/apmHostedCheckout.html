@@ -160,6 +160,37 @@
     var orderSubmit = $('#order-submit');
     var lightboxButton = $('#lightbox-with-session');
     var fullpageButton = $('#page-with-session');
+    var tabCheckout = $('#tab-one');
+    var isSessionStorageSupported = storageAvailable('sessionStorage');
+
+    // Toggling accordion
+    tabCheckout.change(function() {
+      if(this.checked && isSessionStorageSupported) {
+          console.log('checked and storage supported');
+          sessionStorage.setItem('tabChecked', 'checked');
+
+      } else if (!this.checked && isSessionStorageSupported) {
+          console.log('unchecked and storage supported');
+          sessionStorage.setItem('tabChecked', 'unchecked');
+      } else {
+        console.info('Session Storage is not supported')
+      }
+    });
+
+    function toggleTab() {
+      if(isSessionStorageSupported){
+        var isChecked = sessionStorage.getItem('tabChecked') || 'unchecked';
+        console.log('isChecked: ', isChecked, typeof isChecked);
+
+        if(isChecked === 'checked') {
+          console.log('this is true', isChecked);
+          tabCheckout.prop('checked', true);
+        } else {
+          console.log('this is false', isChecked);
+          tabCheckout.prop('checked', false);
+        }
+      }
+    }
 
     // Toggling buttons
     orderform
@@ -177,7 +208,8 @@
       });
 
     // Initializing form
-    var order = initOrderFormValues();
+    toggleTab();
+    var order = getOrderValues();
     setOrderFormValues(order);
     setReturnUrl( order.returnUrl );
 
@@ -204,14 +236,14 @@
       storeOrderFormValues(order);
     }
 
-    function initOrderFormValues() {
-      var order = pullOrderFormValues();
+    function getOrderValues() {
+      var order = pullStoredValues();
 
       return {
         amount: order.amount || '50',
         currency: order.currency || currency,
         description: order.description || 'Ordered goods',
-        sessionId: order.sessionId || '',
+        sessionId: order.sessionId || sessionId,
         returnUrl: order.returnUrl || ''
       };
     }
@@ -235,7 +267,7 @@
     }
 
     function storeOrderFormValues(order) {
-      if (window.sessionStorage) {
+      if (isSessionStorageSupported) {
         sessionStorage.setItem('amount', order.amount);
         sessionStorage.setItem('currency', order.currency);
         sessionStorage.setItem('description', order.description);
@@ -244,9 +276,9 @@
       }
     }
 
-    function pullOrderFormValues() {
+    function pullStoredValues() {
       var stored = {};
-      if (window.sessionStorage) {
+      if (isSessionStorageSupported) {
         stored.amount = sessionStorage.getItem('amount');
         stored.currency = sessionStorage.getItem('currency');
         stored.description = sessionStorage.getItem('description');
@@ -258,7 +290,32 @@
 
     function setReturnUrl( url ) {
       if(url){
-        checkoutScript.attr( "data-complete", order.returnUrl );
+        checkoutScript.attr( 'data-complete', order.returnUrl );
+      }
+    }
+
+    // Feature-detecting localStorage
+    function storageAvailable(type) {
+      try {
+        var storage = window[type],
+          x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+      }
+      catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+          e.code === 22 ||
+          // Firefox
+          e.code === 1014 ||
+          // test name field too, because code might not be present
+          // everything except Firefox
+          e.name === 'QuotaExceededError' ||
+          // Firefox
+          e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+          // acknowledge QuotaExceededError only if there's something already stored
+          storage.length !== 0;
       }
     }
 
