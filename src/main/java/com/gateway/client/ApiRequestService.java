@@ -182,6 +182,8 @@ public class ApiRequestService {
         //3DS2
         JsonObject authentication = new JsonObject();
         if (Utils.notNullOrEmpty(request.getAuthenticationChannel())) authentication.addProperty("channel", request.getAuthenticationChannel());
+        if (Utils.notNullOrEmpty(request.getAcceptVersions()))
+            authentication.addProperty("acceptVersions", request.getAcceptVersions());
 
         JsonObject wallet = new JsonObject();
         /* essentials_exclude_start */
@@ -366,7 +368,8 @@ public class ApiRequestService {
         request.setApiOperation(UPDATE_SESSION);
         request.setApiMethod("PUT");
 
-        request.setAuthenticationChannel("MERCHANT_REQUESTED");
+        request.setAcceptVersions("3DS2,3DS1").
+                setAuthenticationChannel("PAYER_BROWSER");
 
         String updateSessionPayload = ApiRequestService.buildJSONPayload(request);
         try {

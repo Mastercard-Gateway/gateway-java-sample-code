@@ -26,7 +26,7 @@
                     <p>Here are the processes that occur for this transaction:</p>
                     <ol>
                         <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}" target="_blank">CREATE_SESSION</a> operation to collect sensitive card data.</li>
-                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}" target="_blank">UPDATE_SESSION</a> operation to update the session details such as <code>authentication.channel = MERCHANT_REQUESTED</code>.</li>
+                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}" target="_blank">UPDATE_SESSION</a> operation to update the session details such as <code>authentication.channel = PAYER_BROWSER</code>.</li>
                         <li>Initiate Authentication
                         <li>Authenticate Payer</li>
                         <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}" target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.</li>
