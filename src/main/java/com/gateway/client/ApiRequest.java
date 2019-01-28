@@ -40,6 +40,7 @@ public class ApiRequest {
 
     //3DS2 properties
     private String authenticationChannel;
+    private String acceptVersions;
 
     // Wallet properties
     /* essentials_exclude_start */
@@ -283,6 +284,14 @@ public class ApiRequest {
 
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
+    }
+
+    public String getAcceptVersions() {
+        return acceptVersions;
+    }
+
+    public ApiRequest setAcceptVersions(String acceptVersions) {
+        this.acceptVersions = acceptVersions; return this;
     }
 
     /* essentials_exclude_end */
