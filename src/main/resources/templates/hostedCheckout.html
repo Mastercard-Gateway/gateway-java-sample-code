@@ -40,7 +40,7 @@
         data-afterRedirect="Checkout.restoreFormFields">
 </script>
 <!--NOTE: Uncomment out the below for local testing-->
-<!--<script src="https://localhost/checkout/version/50/checkout.js"-->
+<!--<script th:src="@{'https://localhost/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"-->
     <!--data-error="errorCallback"-->
     <!--data-cancel="cancelCallback"-->
     <!--data-beforeRedirect="Checkout.saveFormFields"-->
