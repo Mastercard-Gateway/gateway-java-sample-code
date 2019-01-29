@@ -308,7 +308,7 @@ public class WebController {
             //CREATE_SESSION
 //            ApiRequest createSessionRequest = ApiRequestService.createApiRequest(CREATE_SESSION, config);
             ApiRequest createSessionRequest = new ApiRequest();
-            createSessionRequest.setApiOperation("CREATE_SESSION");
+            createSessionRequest.setApiOperation(CREATE_SESSION);
             String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
             String createSessionRequestPayload = ApiRequestService.buildJSONPayload(createSessionRequest);
             String resp = connection.postTransaction(createSessionRequestPayload, requestUrl, config);

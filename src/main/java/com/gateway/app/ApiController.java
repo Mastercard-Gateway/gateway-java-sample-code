@@ -4,8 +4,20 @@
 
 package com.gateway.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gateway.client.*;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.gateway.client.ApiException;
+import com.gateway.client.ApiProtocol;
+import com.gateway.client.ApiRequest;
+import com.gateway.client.ApiRequestService;
+import com.gateway.client.ApiResponseService;
+import com.gateway.client.ExceptionService;
+import com.gateway.client.HostedSession;
+import com.gateway.client.NVPApiClient;
+import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
@@ -14,12 +26,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.Map;
+import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
 
 @Controller
 public class ApiController {
@@ -553,6 +569,25 @@ public class ApiController {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
+    }
+
+    @PutMapping(value = "/updateSessionWithCard/{sessionId}")
+    @ResponseBody
+    public boolean updateSessionWithCard(HttpServletRequest request, @PathVariable String sessionId, @RequestBody ApiRequest apiRequest) {
+//        ApiRequest sessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
+        apiRequest.setApiOperation(UPDATE_SESSION);
+        apiRequest.setApiMethod("PUT");
+        apiRequest.setSourceType("CARD");
+        String updateSessionPayload = ApiRequestService.buildJSONPayload(apiRequest);
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            String updateSessionRequestUrl =
+                    ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+        } catch (Exception e) {
+            logger.error("Unable to update session", e);
+        }
+        return true;
     }
 
     /**
