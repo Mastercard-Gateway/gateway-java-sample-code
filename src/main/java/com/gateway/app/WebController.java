@@ -187,6 +187,66 @@ public class WebController {
         return mav;
     }
 
+    /**
+     * APM receipt page
+     *
+     * @return ModelAndView for apmReceipt.html
+     */
+    @GetMapping("/apmReceipt")
+    public ModelAndView showAPMReceipt() {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("config", config);
+        mav.addObject("apmApiVersion", "1.0.0");
+        mav.setViewName("apmReceipt");
+        return mav;
+    }
+
+    /**
+     * Display page for APM with Hosted Checkout
+     *
+     * @return ModelAndView for apmHostedCheckout.html
+     */
+    @GetMapping("/apmHostedCheckout")
+    public ModelAndView showApmHostedCheckout() {
+
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("CREATE_SESSION");
+
+        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+
+        String data = ApiRequestService.buildJSONPayload(req);
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            String resp = connection.postTransaction(data, requestUrl, config);
+
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+
+            mav.setViewName("apmHostedCheckout");
+            mav.addObject("config", config);
+            mav.addObject("hostedSession", hostedSession);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+    /**
+     * APM with Hosted Checkout receipt page
+     *
+     * @return ModelAndView for apmHostedCheckoutReceipt.html
+     */
+    @GetMapping("/apmHostedCheckoutReceipt")
+    public ModelAndView showAPMwithHCOReceipt() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("apmHostedCheckoutReceipt");
+        return mav;
+    }
+
     /* essentials_exclude_start */
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details

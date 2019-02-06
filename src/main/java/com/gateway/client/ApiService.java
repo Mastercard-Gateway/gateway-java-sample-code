@@ -1,16 +1,14 @@
-/*
- * Copyright (c) 2018 MasterCard. All rights reserved.
- */
-
 package com.gateway.client;
 
 import com.gateway.app.Config;
 import com.google.gson.*;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -53,6 +51,18 @@ public class ApiService {
                 // Load credentials
                 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
                 httpClientContext.setCredentialsProvider(credentialsProvider);
+
+                if (System.getProperty("http.proxyHost") != null && System.getProperty("http.proxyPort") != null) {
+                    int port = Integer.parseInt(System.getProperty("http.proxyPort"));
+                    logger.info("Using proxy settings - Host = " + System.getProperty("http.proxyHost") + "Port = " + port);
+                    HttpHost proxy = new HttpHost(System.getProperty("http.proxyHost"), port, (port == 8443 ? "https" : "http"));
+
+                    RequestConfig requestConfig= RequestConfig.custom()
+                            .setProxy(proxy)
+                            .build();
+
+                    httpMethod.setConfig(requestConfig);
+                }
 
                 // Execute the request
                 HttpResponse response = httpClient.execute(httpMethod, httpClientContext);

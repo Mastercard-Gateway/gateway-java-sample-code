@@ -1,4 +1,5 @@
-dist
+dist/*
+!dist/gateway-java-sample-code-1.0.jar
 target
 .env
 .idea/
