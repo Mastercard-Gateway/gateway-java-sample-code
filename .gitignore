@@ -9,7 +9,6 @@ mvnw
 mvnw.cmd
 
 # compiled output
-/dist
 /tmp
 /out-tsc
 /target
