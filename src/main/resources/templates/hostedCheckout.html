@@ -59,75 +59,12 @@
                                             id="order-currency"
                                             class="form-control input-md"
                                             required
-                                    >
-                                        <option hidden>Select a currency</option>
-                                        <option value="AUD" title="Australian Dollar"
-                                        >AUD - Australian Dollar</option
-                                        >
-                                        <option value="BRL" title="Brazilian Real"
-                                        >BRL - Brazilian Real</option
-                                        >
-                                        <option value="CAD" title="Canadian Dollar"
-                                        >CAD - Canadian Dollar</option
-                                        >
-                                        <option value="CHF" title="Swiss Franc"
-                                        >CHF - Swiss Franc</option
-                                        >
-                                        <option value="CZK" title="Czech Rep. Koruna"
-                                        >CZK - Czech Rep. Koruna</option
-                                        >
-                                        <option value="DKK" title="Danish Krone"
-                                        >DKK - Danish Krone</option
-                                        >
-                                        <option value="EUR" title="Euro">EUR - Euro</option>
-                                        <option value="GBP" title="UK Pound Sterling"
-                                        >GBP - UK Pound Sterling</option
-                                        >
-                                        <option value="HKD" title="Hong Kong Dollar"
-                                        >HKD - Hong Kong Dollar</option
-                                        >
-                                        <option value="HUF" title="Hungarian Forint"
-                                        >HUF - Hungarian Forint</option
-                                        >
-                                        <option value="ILS" title="Israeli Sheqel"
-                                        >ILS - Israeli Sheqel</option
-                                        >
-                                        <option value="JPY" title="Japanese Yen"
-                                        >JPY - Japanese Yen</option
-                                        >
-                                        <option value="MXN" title="Mexican Peso"
-                                        >MXN - Mexican Peso</option
-                                        >
-                                        <option value="MYR" title="Malaysian Ringgit"
-                                        >MYR - Malaysian Ringgit</option
-                                        >
-                                        <option value="NOK" title="Norwegian Krone"
-                                        >NOK - Norwegian Krone</option
-                                        >
-                                        <option value="NZD" title="New Zealand Dollar"
-                                        >NZD - New Zealand Dollar</option
-                                        >
-                                        <option value="PHP" title="Philippine Peso"
-                                        >PHP - Philippine Peso</option
-                                        >
-                                        <option value="PLN" title="Polish Zloty"
-                                        >PLN - Polish Zloty</option
-                                        >
-                                        <option value="SEK" title="Swedish Krona"
-                                        >SEK - Swedish Krona</option
-                                        >
-                                        <option value="SGD" title="Singapore Dollar"
-                                        >SGD - Singapore Dollar</option
-                                        >
-                                        <option value="THB" title="Thai Baht"
-                                        >THB - Thai Baht</option
-                                        >
-                                        <option value="TWD" title="New Taiwan Dollar"
-                                        >TWD - New Taiwan Dollar</option
-                                        >
-                                        <option value="USD" title="US Dollar"
-                                        >USD - US Dollar</option
-                                        >
+                                            th:field="*{currencies}">
+                                        <option th:each="currency : *{currencies}"
+                                                th:value="${currency.key}"
+                                                th:title="${currency.value}"
+                                                th:text="${currency.key} + ' - ' + ${currency.value}">
+                                        </option>
                                     </select>
                                 </div>
                             </div>
