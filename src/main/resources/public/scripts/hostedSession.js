@@ -9,13 +9,6 @@ if (self === top) {
     top.location = self.location;
 }
 
-PaymentSession.setFocus('card.number');
-
-PaymentSession.setFocusStyle(["card.number","card.securityCode"], {
-    borderColor: 'red',
-    borderWidth: '3px'
-});
-
 PaymentSession.configure({
     fields: {
         // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
@@ -35,7 +28,8 @@ PaymentSession.configure({
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
             if (response.status) {
-                if ("ok" == response.status) {
+                clearErrorMessages();
+                if ("ok" == response.status && finalSubmit == true) {
                     console.log("Session updated with data: " + response.session.id);
 
                     // Submit fields
@@ -81,15 +75,57 @@ PaymentSession.configure({
                 } else if ("system_error" == response.status) {
                     handleError("Session update failed with system error: " + response.errors.message)
                 }
+                finalSubmit = false;
             } else {
                 handleError("Session update failed: " + response);
+                finalSubmit = false;
             }
         }
     }
 });
 
+
+PaymentSession.setFocusStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
+    borderColor: 'red',
+    borderWidth: '3px'
+});
+
+
+var finalSubmit = expiryMonth = expiryYear = cardNumber = securityCode = false;
+
+PaymentSession.onBlur(['card.number'], function(selector)
+{
+    finalSubmit = false;
+    cardNumber = true;
+    PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.expiryMonth'], function(selector)
+{
+	finalSubmit = false;
+	expiryMonth = true;
+	PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.expiryYear'], function(selector)
+{
+	finalSubmit = false;
+	expiryYear = true;
+	PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.securityCode'], function(selector)
+{
+    finalSubmit = false;
+    securityCode = true;
+    PaymentSession.updateSessionFromForm('card');
+});
+
+
 function pay() {
     $("#loading-bar-spinner").show();
+    finalSubmit = true;
+    expiryMonth = expiryYear = cardNumber = securityCode = false;
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
     PaymentSession.updateSessionFromForm('card');
 }
@@ -100,4 +136,10 @@ function handleError(message) {
     console.log(message);
     $errorAlert.append("<p>" + message + "</p>");
     $errorAlert.show();
+}
+
+function clearErrorMessages(){
+    var $errorAlert = $('#error-alert');
+    $errorAlert.html("");
+    $errorAlert.hide();
 }
