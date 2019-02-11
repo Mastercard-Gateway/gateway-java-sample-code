@@ -1,5 +1,3 @@
-dist/*
-!dist/**/*.jar
 target
 .env
 .idea/
