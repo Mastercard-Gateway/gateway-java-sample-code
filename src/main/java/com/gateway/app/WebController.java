@@ -291,6 +291,7 @@ public class WebController {
             put("CHF", "Swiss Franc");
             put("CZK", "Czech Rep. Koruna");
             put("DKK", "Danish Krone");
+            put("EUR", "Euro");
             put("GBP", "UK Pound Sterling");
             put("HKD", "Hong Kong Dollar");
             put("HUF", "Hungarian Forint");
