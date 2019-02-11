@@ -4,6 +4,8 @@
 
 package com.gateway.app;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.gateway.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -281,6 +283,34 @@ public class WebController {
         return createHostedSessionModel("3dSecure");
     }
 
+    private static final Map<String, String> currencies = new HashMap<String, String>(){
+        {
+            put("AUD", "Australian Dollar");
+            put("BRL", "Brazilian Real");
+            put("CAD", "Canadian Dollar");
+            put("CHF", "Swiss Franc");
+            put("CZK", "Czech Rep. Koruna");
+            put("DKK", "Danish Krone");
+            put("EUR", "Euro");
+            put("GBP", "UK Pound Sterling");
+            put("HKD", "Hong Kong Dollar");
+            put("HUF", "Hungarian Forint");
+            put("ILS", "Israeli Sheqel");
+            put("JPY", "Japanese Yen");
+            put("MXN", "Mexican Peso");
+            put("MYR", "Malaysian Ringgit");
+            put("NOK", "Norwegian Krone");
+            put("NZD", "New Zealand Dollar");
+            put("PHP", "Philippine Peso");
+            put("PLN", "Polish Zloty");
+            put("SEK", "Swedish Krona");
+            put("SGD", "Singapore Dollar");
+            put("THB", "Thai Baht");
+            put("TWD", "New Taiwan Dollar");
+            put("USD", "US Dollar");
+        }
+    };
+
     /**
      * Display page for Hosted Checkout operation
      *
@@ -306,6 +336,7 @@ public class WebController {
 
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
+            mav.addObject("currencies", currencies);
             mav.addObject("hostedSession", hostedSession);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
