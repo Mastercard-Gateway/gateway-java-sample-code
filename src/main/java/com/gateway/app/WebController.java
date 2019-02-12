@@ -4,11 +4,19 @@
 
 package com.gateway.app;
 
-import javax.servlet.http.HttpServletRequest;
-
 import java.util.HashMap;
 import java.util.Map;
-import com.gateway.client.*;
+import javax.servlet.http.HttpServletRequest;
+
+import com.gateway.client.ApiException;
+import com.gateway.client.ApiProtocol;
+import com.gateway.client.ApiRequest;
+import com.gateway.client.ApiRequestService;
+import com.gateway.client.ApiResponseService;
+import com.gateway.client.ExceptionService;
+import com.gateway.client.HostedSession;
+import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

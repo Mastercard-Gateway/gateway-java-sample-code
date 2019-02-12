@@ -3,7 +3,7 @@
 <body>
 <!--<script src="/scripts/hostedSession.js"></script>-->
 <script type="text/javascript"
-        src="https://dl01aspall42v.qabri.mastercard.int/static/threeDS/1.1.0/three-ds.min.js"></script>
+        th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"></script>
 <script th:inline="javascript">
     var JavaSample = {
         operation: function () {
@@ -14,9 +14,8 @@
         }
     };
 </script>
-<!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
+<!--<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>-->
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
@@ -27,30 +26,42 @@
                         merchant settings.</p>
                     <p>Here are the processes that occur for this transaction:</p>
                     <ol>
-                        <li>Use the <a
-                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}"
-                                target="_blank">CREATE_SESSION</a> operation to collect sensitive card data.
+                        <li>Use the <a target="_blank"
+                                       th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/'
+                                                                       + ${config.apiVersion}
+                                                                       + '/latest/operation/Session%3a%20Create%20Session.html'}">CREATE_SESSION</a>
+                            operation to collect sensitive card data.
                         </li>
-                        <li>Use the <a
-                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}"
-                                target="_blank">UPDATE_SESSION</a> operation to update the session details such as
+                        <li>Use the <a target="_blank" th:href="@{${config.apiBaseURL}
+                                + '/api/documentation/apiDocumentation/rest-json/version/'
+                                + ${config.apiVersion}
+                                + '/operation/Session%3a%20Update%20Session.html'}">UPDATE_SESSION</a>
+                            operation to update the session details such as
                             <code>authentication.channel = PAYER_BROWSER</code>.
                         </li>
                         <li>Initiate Authentication
                         <li>Authenticate Payer</li>
-                        <li>Use the <a
-                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}"
-                                target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.
+                        <li>Use the <a target="_blank"
+                                       th:href="@{${config.apiBaseURL}
+                                + '/api/documentation/apiDocumentation/rest-json/version/'
+                                + ${config.apiVersion}
+                                + '/operation/3DS%3a%20Process%20ACS%20Result.html'}">PROCESS_ACS_RESULT</a> to check if
+                            the authentication was successful.
                         </li>
                         <li>Use session.id and 3DSecureId to complete the transaction using <a
-                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html'}"
+                                th:href="@{${config.apiBaseURL}
+                            + '/api/documentation/apiDocumentation/rest-json/version/'
+                            + ${config.apiVersion}
+                            + '/operation/Transaction%3a%20%20Pay.html'}"
                                 target="_blank">PAY</a> or <a
-                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html'}"
+                                th:href="@{${config.apiBaseURL}
+                                + '/api/documentation/apiDocumentation/rest-json/version/'
+                                + ${config.apiVersion}+'/operation/Transaction%3a%20%20Authorize.html'}"
                                 target="_blank">AUTHORIZE</a>.
                         </li>
                     </ol>
-                    <p class="mb-0">You can find test cards <a
-                            th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.
+                    <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL}
+                    + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.
                     </p>
                 </div>
                 <div class="mb-4">
@@ -87,6 +98,7 @@
                     </div>
                 </div>
                 <div id="3DSUI" hidden="true"></div>
+                <div hidden="true" id="3DSUIPostData"></div>
                 <div>
                     <h6>Order details</h6>
                     <div class="form-group">
@@ -137,12 +149,9 @@
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
     var sessionId = /*[[${hostedSession.id}]]*/ null;
-    var sessionVersion = /*[[${hostedSession.version}]]*/ null;
-    var successIndicator = /*[[${hostedSession.updateStatus}]]*/ null;
     var orderId = /*[[${request.orderId}]]*/ null;
     var transactionId = /*[[${request.transactionId}]]*/ null;
     /*]]>*/
-    var resultIndicator = null;
 
     ThreeDS.configure({
         merchantId: merchantId,
@@ -155,13 +164,13 @@
         }
     });
 
-
     /**
-     *
+     * Post the htmlRedirectCode received from Authenticate Payer call
      * @param params data.htmlRedirectCode
-     * @param callback auth()
+     * @param callback auth() function
      */
-        function submitAuthenticatePayer(params, callback) {
+    //4
+    function submitAuthenticatePayer(params, callback) {
         var e = document.createElement('div');
         e.style.display = "none";
         e.innerHTML = params;
@@ -172,25 +181,24 @@
         callback();
     }
 
+    //1.1
     function updateSession() {
         var requestBody = {
-            "apiOperation": "UPDATE_SESSION",
             "cardNumber": document.getElementById("card-number").value,
             "expiryMonth": document.getElementById("expiry-month").value,
             "expiryYear": document.getElementById("expiry-year").value,
             "orderId": document.getElementById("order-id").value,
             "orderAmount": document.getElementById("order-amount").value,
-            "orderCurrency": document.getElementById("order-currency").value,
-            "sourceType": "CARD",
-            "protocol": 'REST'
+            "orderCurrency": document.getElementById("order-currency").value
         };
 
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open('PUT', 'updateSessionWithCard/' + sessionId, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify(requestBody));
-    }
+    };
 
+    //5
     function auth() {
         var requestBody = {
             "sessionId": sessionId,
@@ -201,11 +209,13 @@
             "orderId": document.getElementById("order-id").value,
             "transactionId": document.getElementById("transaction-id").value,
             "hostedSession": false,
-            "protocol": 'REST'
+            "protocol": 'REST',
+            "apiMethod": 'PUT',
+            "sourceType": 'CARD'
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', '3dsreceipt', true);
+        xhr.open('PUT', '3ds2receipt', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -231,26 +241,37 @@
         xhr.send(JSON.stringify(responseBody));
     }
 
+    //2
     function authenticatePayer() {
         ThreeDS.authenticatePayer(orderId, transactionId, {}, function (data) {
             processAuthenticatePayerResponse(data);
         });
     }
 
+    /*
+    * Something bad happened, the error value will match what is returned by the REST API
+    */
+    function logError(error) {
+        console.error("error.code : ", error.code);
+        console.error("error.msg : ", error.msg);
+        console.error("error.result : ", error.result);
+        console.error("error.status : ", error.status);
+    }
     /**
      *
      * @param data authenticatePayer response
      */
+    //3
     function processAuthenticatePayerResponse(data) {
         if (data.error) {
+            logError(data.error);
             if (data.error.code === 429) {
+                console.warn("Retrying after 5000");
                 window.setTimeout(authenticatePayer(), 5000);
-            }
-            else {
+            } else {
                 displayReceipt(data);
             }
-        }
-        else {
+        } else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
             submitAuthenticatePayer(data.htmlRedirectCode, function () {
                 auth();
@@ -258,21 +279,21 @@
         }
     }
 
-
+    //1
     function pay() {
+        //TODO updateSession and initiateAuthentication once fields are valid (before click Pay)
         // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
         updateSession();
-        // TODO verify configure with card number, redo update if necessary
-        ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {//TODO before click PAY()
-                    if (data && data.error) {
+        ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {
+                if (data) {
+                    if (data.error) {
                         var error = data.error;
-                        //Something bad happened, the error value will match what is returned by the REST API
-                        console.error("error.code : ", error.code);
-                        console.error("error.msg : ", error.msg);
-                        console.error("error.result : ", error.result);
-                        console.error("error.status : ", error.status);
-                    }
-                    else {
+                        logError(error);
+                        if (error.code === 400) {
+                            console.warn("Retrying after 5000");
+                            window.setTimeout(pay(), 5000);
+                        }
+                    } else {
                         console.log("After Initiate 3DS ", data);
                         switch (data.gatewayRecommendation) {
                             case "PROCEED_WITH_AUTHENTICATION":
@@ -284,6 +305,7 @@
                         }
                     }
                 }
+            }
         );
     }
 </script>

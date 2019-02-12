@@ -176,8 +176,6 @@ public class ApiRequestService {
         }
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
-        if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
-
 
         //3DS2
         JsonObject authentication = new JsonObject();
