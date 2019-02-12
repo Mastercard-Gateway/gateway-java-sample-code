@@ -1,4 +1,3 @@
-dist
 target
 .env
 .idea/
@@ -8,7 +7,6 @@ mvnw
 mvnw.cmd
 
 # compiled output
-/dist
 /tmp
 /out-tsc
 /target

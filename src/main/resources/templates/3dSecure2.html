@@ -2,13 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
 <body>
 <!--<script src="/scripts/hostedSession.js"></script>-->
-<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"></script>
+<script type="text/javascript"
+        src="https://dl01aspall42v.qabri.mastercard.int/static/threeDS/1.1.0/three-ds.min.js"></script>
 <script th:inline="javascript">
     var JavaSample = {
-        operation: function() {
+        operation: function () {
             return "PAY";
         },
-        secureIdResponseUrl: function() {
+        secureIdResponseUrl: function () {
             return encodeURI(window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/process3ds2Redirect");
         }
     };
@@ -22,17 +23,35 @@
             <div class="col-md-12">
                 <h3>Pay with 3DS-2.0</h3>
                 <div class="alert alert-warning" role="alert">
-                    <p><strong>NOTE:</strong> You can also do an authorization using 3D Secure 2.0, depending on your merchant settings.</p>
+                    <p><strong>NOTE:</strong> You can also do an authorization using 3D Secure 2.0, depending on your
+                        merchant settings.</p>
                     <p>Here are the processes that occur for this transaction:</p>
                     <ol>
-                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}" target="_blank">CREATE_SESSION</a> operation to collect sensitive card data.</li>
-                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}" target="_blank">UPDATE_SESSION</a> operation to update the session details such as <code>authentication.channel = PAYER_BROWSER</code>.</li>
+                        <li>Use the <a
+                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Create%20Session.html'}"
+                                target="_blank">CREATE_SESSION</a> operation to collect sensitive card data.
+                        </li>
+                        <li>Use the <a
+                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a%20Update%20Session.html'}"
+                                target="_blank">UPDATE_SESSION</a> operation to update the session details such as
+                            <code>authentication.channel = PAYER_BROWSER</code>.
+                        </li>
                         <li>Initiate Authentication
                         <li>Authenticate Payer</li>
-                        <li>Use the <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}" target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.</li>
-                        <li>Use session.id and 3DSecureId to complete the transaction using <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html'}" target="_blank">PAY</a> or <a th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html'}" target="_blank">AUTHORIZE</a>.</li>
+                        <li>Use the <a
+                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/3DS%3a%20Process%20ACS%20Result.html'}"
+                                target="_blank">PROCESS_ACS_RESULT</a> to check if the authentication was successful.
+                        </li>
+                        <li>Use session.id and 3DSecureId to complete the transaction using <a
+                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Pay.html'}"
+                                target="_blank">PAY</a> or <a
+                                th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a%20%20Authorize.html'}"
+                                target="_blank">AUTHORIZE</a>.
+                        </li>
                     </ol>
-                    <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
+                    <p class="mb-0">You can find test cards <a
+                            th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.
+                    </p>
                 </div>
                 <div class="mb-4">
                     <input type="hidden" readonly="readonly" name="method" value="PUT" size="20" maxlength="80"/>
@@ -48,54 +67,63 @@
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="card-number">Card number</label>
                         <div class="col-md-7">
-                            <input id="card-number" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <input id="card-number" type="text" placeholder="" class="form-control input-md"
+                                   required=""/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
-                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md"
+                                   required=""/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
-                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md"
+                                   required=""/>
                         </div>
                     </div>
                 </div>
                 <div id="3DSUI" hidden="true"></div>
-                <div id="3DSUIPostData" hidden="true"></div>
                 <div>
                     <h6>Order details</h6>
                     <div class="form-group">
-                        <label class="col-md-7 control-label" for="order-id">Order ID (Auto generated unique Order ID)</label>
+                        <label class="col-md-7 control-label" for="order-id">Order ID (Auto generated unique Order
+                            ID)</label>
                         <div class="col-md-7">
-                            <input id="order-id" type="text" th:value="${request.orderId}" class="form-control input-md" required="" readonly/>
+                            <input id="order-id" type="text" th:value="${request.orderId}" class="form-control input-md"
+                                   required="" readonly/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="order-amount">Order amount</label>
                         <div class="col-md-7">
-                            <input id="order-amount" type="text" th:value="${request.orderAmount}" maxlength="14" class="form-control input-md" required=""/>
+                            <input id="order-amount" type="text" th:value="${request.orderAmount}" maxlength="14"
+                                   class="form-control input-md" required=""/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="order-currency">Order currency</label>
                         <div class="col-md-7">
-                            <input id="order-currency" type="text" th:value="${request.orderCurrency}" maxlength="3" class="form-control input-md" required=""/>
+                            <input id="order-currency" type="text" th:value="${request.orderCurrency}" maxlength="3"
+                                   class="form-control input-md" required=""/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="order-description">Order description</label>
                         <div class="col-md-7">
-                            <input id="order-description" type="text" th:value="${request.orderDescription}" maxlength="127" class="form-control input-md" required=""/>
+                            <input id="order-description" type="text" th:value="${request.orderDescription}"
+                                   maxlength="127" class="form-control input-md" required=""/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-7 control-label" for="transaction-id">Transaction ID  (Auto generated unique Transaction ID)</label>
+                        <label class="col-md-7 control-label" for="transaction-id">Transaction ID (Auto generated unique
+                            Transaction ID)</label>
                         <div class="col-md-7">
-                            <input id="transaction-id" type="text" th:value="${request.transactionId}" class="form-control input-md" required="" readonly/>
+                            <input id="transaction-id" type="text" th:value="${request.transactionId}"
+                                   class="form-control input-md" required="" readonly/>
                         </div>
                     </div>
                 </div>
@@ -127,59 +155,40 @@
         }
     });
 
-    function crossDomainPost(url, params, callback) {
-        // Add the iframe with a unique name
-        let iframe = document.createElement("iframe");
-        let uniqueString = "methodIFrame";
-        document.body.appendChild(iframe);
-        iframe.style.display = "none";
-        iframe.contentWindow.name = uniqueString;
-
-        // construct a form with hidden inputs, targeting the iframe
-        let form = document.createElement("form");
-        form.target = uniqueString;
-        form.action = url;
-        form.method = "POST";
-
-        addParams2Form(params, form);
-
-        document.body.appendChild(form);
-        form.submit();
-        callback();
-        function addParams2Form(arr, form) {
-            for (var key in arr) {
-                if (params.hasOwnProperty(key)) {
-                    var hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", key);
-                    hiddenField.setAttribute("value", params[key]);
-
-                    form.appendChild(hiddenField);
-                }
-            }
-        }
-    }
 
     /**
      *
      * @param params data.htmlRedirectCode
      * @param callback auth()
      */
-    function submitAuthenticatePayer(params, callback) {
+        function submitAuthenticatePayer(params, callback) {
         var e = document.createElement('div');
         e.style.display = "none";
         e.innerHTML = params;
-
-//        while(e.firstChild) {
-//            document.body.appendChild(e.firstChild);
-//        }
-
         var divId = document.getElementById("3DSUIPostData");
         divId.innerHTML = params;
         divId.hidden = false;
 
-
         callback();
+    }
+
+    function updateSession() {
+        var requestBody = {
+            "apiOperation": "UPDATE_SESSION",
+            "cardNumber": document.getElementById("card-number").value,
+            "expiryMonth": document.getElementById("expiry-month").value,
+            "expiryYear": document.getElementById("expiry-year").value,
+            "orderId": document.getElementById("order-id").value,
+            "orderAmount": document.getElementById("order-amount").value,
+            "orderCurrency": document.getElementById("order-currency").value,
+            "sourceType": "CARD",
+            "protocol": 'REST'
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', 'updateSessionWithCard/' + sessionId, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(requestBody));
     }
 
     function auth() {
@@ -196,7 +205,7 @@
         };
 
         var xhr = new XMLHttpRequest();
-            xhr.open('PUT', '3dsreceipt', true);
+        xhr.open('PUT', '3dsreceipt', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -207,7 +216,7 @@
     }
 
     function displayReceipt(apiResponse) {
-        var responseBody  = {
+        var responseBody = {
             "apiResponse": apiResponse
         };
 
@@ -223,14 +232,7 @@
     }
 
     function authenticatePayer() {
-        let cardNumber = document.getElementById("card-number").value;
-        let orderAmount = document.getElementById("order-amount").value;
-        let orderCurrency = document.getElementById("order-currency").value;
-        let expiryYear = document.getElementById("expiry-year").value;
-        let expiryMonth = document.getElementById("expiry-month").value;
-
-        ThreeDS.authenticatePayer(orderAmount, cardNumber, expiryMonth, expiryYear, orderCurrency, orderId, transactionId,
-           JavaSample.secureIdResponseUrl(),{}, function (data) {
+        ThreeDS.authenticatePayer(orderId, transactionId, {}, function (data) {
             processAuthenticatePayerResponse(data);
         });
     }
@@ -250,40 +252,38 @@
         }
         else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
-//            auth();
-           submitAuthenticatePayer(data.htmlRedirectCode, function () {
-               auth();
-           });
+            submitAuthenticatePayer(data.htmlRedirectCode, function () {
+                auth();
+            });
         }
     }
 
 
     function pay() {
         // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-        var cardNumber = document.getElementById("card-number").value;
-        var orderAmount = document.getElementById("order-amount").value;
-
-        ThreeDS.initiateAuthentication(cardNumber, orderId, transactionId, function (data) {//TODO before click PAY()
-                if (data && data.error) {
-                    var error = data.error;
-                    //Something bad happened, the error value will match what is returned by the REST API
-                    console.error("error.code : ", error.code);
-                    console.error("error.msg : ", error.msg);
-                    console.error("error.result : ", error.result);
-                    console.error("error.status : ", error.status);
-                }
-                else {
-                    console.log("After Initiate 3DS ", data);
-                    switch (data.gatewayRecommendation) {
-                        case "PROCEED_WITH_AUTHENTICATION":
-                            authenticatePayer();
-                            break;
-                        case "DO_NOT_PROCEED":
-                            displayReceipt(data);
-                            break;
+        updateSession();
+        // TODO verify configure with card number, redo update if necessary
+        ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {//TODO before click PAY()
+                    if (data && data.error) {
+                        var error = data.error;
+                        //Something bad happened, the error value will match what is returned by the REST API
+                        console.error("error.code : ", error.code);
+                        console.error("error.msg : ", error.msg);
+                        console.error("error.result : ", error.result);
+                        console.error("error.status : ", error.status);
+                    }
+                    else {
+                        console.log("After Initiate 3DS ", data);
+                        switch (data.gatewayRecommendation) {
+                            case "PROCEED_WITH_AUTHENTICATION":
+                                authenticatePayer();
+                                break;
+                            case "DO_NOT_PROCEED":
+                                displayReceipt(data);
+                                break;
+                        }
                     }
                 }
-            }
         );
     }
 </script>
