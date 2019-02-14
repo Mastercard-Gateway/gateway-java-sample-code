@@ -14,8 +14,12 @@
         }
     };
 </script>
+<!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
+<style id="antiClickjack">body {
+    display: none !important;
+}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-<!--<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>-->
+<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
 <div class="col-9">
     <div class="row">
         <div class="contents col-12">
@@ -64,9 +68,9 @@
                     + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.
                     </p>
                 </div>
-                <div class="mb-4">
+                <div class="mb-4" id="3dSecure2">
                     <input type="hidden" readonly="readonly" name="method" value="PUT" size="20" maxlength="80"/>
-                    <!--<input name="sessionId" th:value="${hostedSession.id}" size="20" maxlength="80" readonly/>-->
+                    <input name="sessionId" th:value="${hostedSession.id}" size="20" maxlength="80" readonly/>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="session-id">Session Id</label>
                         <div class="col-md-7">
@@ -79,7 +83,7 @@
                         <label class="col-md-7 control-label" for="card-number">Card number</label>
                         <div class="col-md-7">
                             <input id="card-number" type="text" placeholder="" class="form-control input-md"
-                                   required=""/>
+                                   readonly required=""/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -96,9 +100,16 @@
                                    required=""/>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="security-code">Security code</label>
+                        <div class="col-md-7">
+                            <input class="form-control input-md" id="security-code" placeholder="" readonly
+                                   type="text"/>
+                        </div>
+                    </div>
                 </div>
                 <div id="3DSUI" hidden="true"></div>
-                <div hidden="true" id="3DSUIPostData"></div>
+                <div display="none" id="3DSUIPostData"></div>
                 <div>
                     <h6>Order details</h6>
                     <div class="form-group">
@@ -139,7 +150,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="mt-4 btn btn-primary" id="payButton" onclick="pay();">Pay with 3DS-2.0</button>
+                <button class="mt-4 btn btn-primary" id="payButton" onclick="preparePay();">Pay with 3DS-2.0</button>
             </div>
         </div>
     </div> <!-- row -->
@@ -171,58 +182,58 @@
      */
     //4
     function submitAuthenticatePayer(params, callback) {
-        var e = document.createElement('div');
-        e.style.display = "none";
-        e.innerHTML = params;
         var divId = document.getElementById("3DSUIPostData");
         divId.innerHTML = params;
         divId.hidden = false;
-
-        callback();
+        divId.display = "";
+        var acsIframe = document.getElementById('challengeFrame') || document.getElementById('redirectTo3ds1Frame');
+        acsIframe.style.position = 'absolute';
+        // callback();
     }
 
-    //1.1
-    function updateSession() {
-        var requestBody = {
-            "cardNumber": document.getElementById("card-number").value,
-            "expiryMonth": document.getElementById("expiry-month").value,
-            "expiryYear": document.getElementById("expiry-year").value,
-            "orderId": document.getElementById("order-id").value,
-            "orderAmount": document.getElementById("order-amount").value,
-            "orderCurrency": document.getElementById("order-currency").value
-        };
-
-        let xhr = new XMLHttpRequest();
-        xhr.open('PUT', 'updateSessionWithCard/' + sessionId, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(requestBody));
-    };
+    // //1.1
+    // function updateSession() {
+    //     var requestBody = {
+    //         "cardNumber": document.getElementById("card-number").value,
+    //         "expiryMonth": document.getElementById("expiry-month").value,
+    //         "expiryYear": document.getElementById("expiry-year").value,
+    //         "orderId": document.getElementById("order-id").value,
+    //         "orderAmount": document.getElementById("order-amount").value,
+    //         "orderCurrency": document.getElementById("order-currency").value
+    //     };
+    //
+    //     let xhr = new XMLHttpRequest();
+    //     xhr.open('PUT', 'updateSessionWithCard/' + sessionId, true);
+    //     xhr.setRequestHeader('Content-Type', 'application/json');
+    //     xhr.send(JSON.stringify(requestBody));
+    // };
 
     //5
     function auth() {
-        var requestBody = {
-            "sessionId": sessionId,
-            "apiOperation": JavaSample.operation(),
-            "cardNumber": document.getElementById("card-number").value,
-            "expiryMonth": document.getElementById("expiry-month").value,
-            "expiryYear": document.getElementById("expiry-year").value,
-            "orderId": document.getElementById("order-id").value,
-            "transactionId": document.getElementById("transaction-id").value,
-            "hostedSession": false,
-            "protocol": 'REST',
-            "apiMethod": 'PUT',
-            "sourceType": 'CARD'
-        };
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('PUT', '3ds2receipt', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                document.documentElement.innerHTML = this.response;
-            }
-        }
-        xhr.send(JSON.stringify(requestBody));
+        pay();
+        // var requestBody = {
+        //     "sessionId": sessionId,
+        //     "apiOperation": JavaSample.operation(),
+        //     "cardNumber": document.getElementById("card-number").value,
+        //     "expiryMonth": document.getElementById("expiry-month").value,
+        //     "expiryYear": document.getElementById("expiry-year").value,
+        //     "orderId": document.getElementById("order-id").value,
+        //     "transactionId": document.getElementById("transaction-id").value,
+        //     "hostedSession": false,
+        //     "protocol": 'REST',
+        //     "apiMethod": 'PUT',
+        //     "sourceType": 'CARD'
+        // };
+        //
+        // var xhr = new XMLHttpRequest();
+        // xhr.open('PUT', '3ds2receipt', true);
+        // xhr.setRequestHeader('Content-Type', 'application/json');
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState == XMLHttpRequest.DONE) {
+        //         document.documentElement.innerHTML = this.response;
+        //     }
+        // }
+        // xhr.send(JSON.stringify(requestBody));
     }
 
     function displayReceipt(apiResponse) {
@@ -273,42 +284,47 @@
             }
         } else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
-            submitAuthenticatePayer(data.htmlRedirectCode, function () {
-                auth();
-            });
+            if (data.gatewayRecommendation == "PROCEED_WITH_AUTHENTICATION") {
+                //challenge flow
+                submitAuthenticatePayer(data.htmlRedirectCode, function () {
+                    auth();
+                });
+            }
         }
     }
 
-    //1
-    function pay() {
-        //TODO updateSession and initiateAuthentication once fields are valid (before click Pay)
-        // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-        updateSession();
+    function initiateAuthentication() {
         ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {
-                if (data) {
-                    if (data.error) {
-                        var error = data.error;
-                        logError(error);
-                        if (error.code === 400) {
-                            console.warn("Retrying after 5000");
-                            window.setTimeout(pay(), 5000);
-                        }
-                    } else {
-                        console.log("After Initiate 3DS ", data);
-                        switch (data.gatewayRecommendation) {
-                            case "PROCEED_WITH_AUTHENTICATION":
-                                authenticatePayer();
-                                break;
-                            case "DO_NOT_PROCEED":
-                                displayReceipt(data);
-                                break;
-                        }
+            if (data) {
+                if (data.error) {
+                    var error = data.error;
+                    logError(error);
+                    if (error.code === 400) {
+                        console.warn("Retrying after 5000");
+                        window.setTimeout(initiateAuthentication(), 5000);
+                    }
+                } else {
+                    console.log("After Initiate 3DS ", data);
+                    switch (data.gatewayRecommendation) {
+                        case "PROCEED_WITH_AUTHENTICATION":
+                            authenticatePayer();
+                            break;
+                        case "DO_NOT_PROCEED":
+                            displayReceipt(data);
+                            break;
                     }
                 }
             }
-        );
+        });
+    }
+    //1
+    function preparePay() {
+        //TODO updateSession and initiateAuthentication once fields are valid (before click Pay)
+        // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
+        updateSession(initiateAuthentication);//TODO paymentsession.updatesession
     }
 </script>
-<!--<script src="/scripts/threeDS.js"></script>-->
+<script src="/scripts/threeDS.js"></script>
+<!--<script src="scripts/hostedSession.js"></script>-->
 </body>
 </html>
