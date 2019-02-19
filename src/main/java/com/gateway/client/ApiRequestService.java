@@ -49,21 +49,29 @@ public class ApiRequestService {
         req.setOrderCurrency(config.getCurrency());
         req.setOrderId(Utils.createUniqueId("order-"));
         req.setTransactionId(Utils.createUniqueId("trans-"));
-        if (apiOperation.equals("CAPTURE") || apiOperation.equals("REFUND") || apiOperation.equals("VOID")
-                || apiOperation.equals("UPDATE_AUTHORIZATION")) {
+
+        switch (apiOperation) {
+            case "CAPTURE":
+            case "REFUND":
+            case "VOID":
+            case "UPDATE_AUTHORIZATION":
             req.setOrderId(null);
-        }
-        if (apiOperation.equals("RETRIEVE_ORDER") || apiOperation.equals("RETRIEVE_TRANSACTION")) {
+                break;
+            case "RETRIEVE_ORDER":
+            case "RETRIEVE_TRANSACTION": {
             req.setApiMethod("GET");
             req.setOrderId(null);
             req.setTransactionId(null);
         }
-        if (apiOperation.equals("CREATE_CHECKOUT_SESSION") || apiOperation.equals(CREATE_SESSION)) {
+            break;
+            case "CREATE_CHECKOUT_SESSION":
+            case CREATE_SESSION:
             req.setApiMethod("POST");
-        }
-        if (apiOperation.equals(UPDATE_SESSION)) {
+                break;
+            case UPDATE_SESSION:
             req.setApiMethod("PUT");
         }
+
         return req;
     }
 
@@ -182,6 +190,8 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getAuthenticationChannel())) authentication.addProperty("channel", request.getAuthenticationChannel());
         if (Utils.notNullOrEmpty(request.getAcceptVersions()))
             authentication.addProperty("acceptVersions", request.getAcceptVersions());
+        if (Utils.notNullOrEmpty(request.getRedirectResponseUrl()))
+            authentication.addProperty("redirectResponseUrl", request.getRedirectResponseUrl());
 
         JsonObject wallet = new JsonObject();
         /* essentials_exclude_start */
@@ -362,12 +372,14 @@ public class ApiRequestService {
      * @param config contains frequently used information like Merchant ID, API password, etc.
      * @throws Exception
      */
-    public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
+    public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId,
+            String redirectResponseUrl) throws Exception {
         request.setApiOperation(UPDATE_SESSION);
         request.setApiMethod("PUT");
 
         request.setAcceptVersions("3DS2,3DS1").
-                setAuthenticationChannel("PAYER_BROWSER");
+                setAuthenticationChannel("PAYER_BROWSER").
+                setRedirectResponseUrl(redirectResponseUrl);
 
         String updateSessionPayload = ApiRequestService.buildJSONPayload(request);
         try {

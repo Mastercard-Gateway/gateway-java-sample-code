@@ -41,6 +41,7 @@ public class ApiRequest {
     //3DS2 properties
     private String authenticationChannel;
     private String acceptVersions;
+    private String redirectResponseUrl;
 
     // Wallet properties
     /* essentials_exclude_start */
@@ -249,8 +250,9 @@ public class ApiRequest {
         return authenticationChannel;
     }
 
-    public void setAuthenticationChannel(String authenticationChannel) {
+    public ApiRequest setAuthenticationChannel(String authenticationChannel) {
         this.authenticationChannel = authenticationChannel;
+        return this;
     }
 
     /* essentials_exclude_start */
@@ -294,5 +296,13 @@ public class ApiRequest {
         this.acceptVersions = acceptVersions; return this;
     }
 
+    public String getRedirectResponseUrl() {
+        return redirectResponseUrl;
+    }
+
+    public ApiRequest setRedirectResponseUrl(String redirectResponseUrl) {
+        this.redirectResponseUrl = redirectResponseUrl;
+        return this;
+    }
     /* essentials_exclude_end */
 }

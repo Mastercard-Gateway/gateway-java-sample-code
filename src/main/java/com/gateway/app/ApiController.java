@@ -573,28 +573,6 @@ public class ApiController {
         return mav;
     }
 
-    @PutMapping(value = "/updateSessionWithCard/{sessionId}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> updateSessionWithCard(HttpServletRequest request, @PathVariable String sessionId,
-            @RequestBody ApiRequest apiRequest) {
-        ApiRequest sessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
-        apiRequest.setApiOperation(UPDATE_SESSION);
-        apiRequest.setApiMethod("PUT");
-//        apiRequest.setSourceType("CARD");
-        String updateSessionPayload = ApiRequestService.buildJSONPayload(apiRequest);
-        try {
-            RESTApiClient connection = new RESTApiClient();
-            String updateSessionRequestUrl =
-                    ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
-            connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-        } catch (Exception e) {
-            logger.error("Unable to update session", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unable to update session");
-        }
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
     /**
      * Make payment using the session and display receipt
      * @return

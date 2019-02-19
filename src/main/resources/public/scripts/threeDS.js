@@ -29,7 +29,7 @@ PaymentSession.configure({
     initialized: function (response) {
       if (response.status) {
         if ("ok" == response.status) {
-          console.log("Session updated with data: " + response.session.id);
+          console.log("Session initialized for scope: " + response.scopeId);
         }
       }
     },
@@ -79,7 +79,7 @@ function updateSession(callback) {
   $("#loading-bar-spinner").show();
   // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
   afterSessionUpdated = callback;
-  PaymentSession.updateSessionFromForm('card', '', scope);
+  PaymentSession.updateSessionFromForm('card', null, scope);
 }
 
 function handleError(message) {

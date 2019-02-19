@@ -340,20 +340,21 @@ public class WebController {
             ApiRequest createSessionRequest = new ApiRequest();
             createSessionRequest.setApiOperation(CREATE_SESSION);
             String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-            String createSessionRequestPayload = ApiRequestService.buildJSONPayload(createSessionRequest);
-            String resp = connection.postTransaction(createSessionRequestPayload, requestUrl, config);
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+            String createResp = connection.postTransaction(requestUrl, config);
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(createResp);
 
-            //UPDATE_SESSION
-            ApiRequest sessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
-            String updateResp = ApiRequestService.update3DSSession(ApiProtocol.REST, sessionRequest, config, hostedSession.getId());
+            //UPDATE_SESSION FOR 3DS2
+            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
+            String updateResp = ApiRequestService
+                    .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
+                            ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect");//process3ds2Redirect
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
-            sessionRequest.setSessionId(hostedSession.getId());
+            updateSessionRequest.setSessionId(hostedSession.getId());
 
             mav.setViewName("3dSecure2");
             mav.addObject("config", config)
                     .addObject("hostedSession", hostedSession)
-                    .addObject("request", sessionRequest);
+                    .addObject("request", updateSessionRequest);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {

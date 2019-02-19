@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
 <body>
-<!--<script src="/scripts/hostedSession.js"></script>-->
-<script type="text/javascript"
-        th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"></script>
 <script th:inline="javascript">
     var JavaSample = {
         operation: function () {
@@ -14,10 +11,10 @@
         }
     };
 </script>
+<script th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"
+        type="text/javascript"></script>
 <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
-<style id="antiClickjack">body {
-    display: none !important;
-}</style>
+<style id="antiClickjack">body { display: none !important; }</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
 <script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
 <div class="col-9">
@@ -70,7 +67,6 @@
                 </div>
                 <div class="mb-4" id="3dSecure2">
                     <input type="hidden" readonly="readonly" name="method" value="PUT" size="20" maxlength="80"/>
-                    <input name="sessionId" th:value="${hostedSession.id}" size="20" maxlength="80" readonly/>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="session-id">Session Id</label>
                         <div class="col-md-7">
@@ -182,31 +178,18 @@
      */
     //4
     function submitAuthenticatePayer(params, callback) {
-        var divId = document.getElementById("3DSUIPostData");
-        divId.innerHTML = params;
-        divId.hidden = false;
-        divId.display = "";
+        var content = params;
+        document.body.innerHTML = content;
+        var contentScript = $(content).find("script")[0];
+        if (contentScript !== undefined) {
+            var script = document.createElement("script");
+            script.innerText = contentScript.innerText;
+            document.body.appendChild(script);
         var acsIframe = document.getElementById('challengeFrame') || document.getElementById('redirectTo3ds1Frame');
         acsIframe.style.position = 'absolute';
-        // callback();
-    }
+        }
 
-    // //1.1
-    // function updateSession() {
-    //     var requestBody = {
-    //         "cardNumber": document.getElementById("card-number").value,
-    //         "expiryMonth": document.getElementById("expiry-month").value,
-    //         "expiryYear": document.getElementById("expiry-year").value,
-    //         "orderId": document.getElementById("order-id").value,
-    //         "orderAmount": document.getElementById("order-amount").value,
-    //         "orderCurrency": document.getElementById("order-currency").value
-    //     };
-    //
-    //     let xhr = new XMLHttpRequest();
-    //     xhr.open('PUT', 'updateSessionWithCard/' + sessionId, true);
-    //     xhr.setRequestHeader('Content-Type', 'application/json');
-    //     xhr.send(JSON.stringify(requestBody));
-    // };
+    }
 
     //5
     function auth() {
@@ -254,7 +237,7 @@
 
     //2
     function authenticatePayer() {
-        ThreeDS.authenticatePayer(orderId, transactionId, {}, function (data) {
+        ThreeDS.authenticatePayer(orderId, transactionId, {redirectResponseUrl: JavaSample.secureIdResponseUrl()}, function (data) {
             processAuthenticatePayerResponse(data);
         });
     }
@@ -284,15 +267,19 @@
             }
         } else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
-            if (data.gatewayRecommendation == "PROCEED_WITH_AUTHENTICATION") {
+            switch (data.gatewayRecommendation) {
+                case "PROCEED_WITH_AUTHENTICATION":
+                case "PROCEED_WITH_PAYMENT":
                 //challenge flow
                 submitAuthenticatePayer(data.htmlRedirectCode, function () {
                     auth();
                 });
+                    break;
             }
         }
     }
 
+    // 1.2
     function initiateAuthentication() {
         ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {
             if (data) {
