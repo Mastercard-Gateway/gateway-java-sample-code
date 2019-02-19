@@ -25,6 +25,8 @@ import com.gateway.response.WalletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
@@ -572,12 +574,13 @@ public class ApiController {
     }
 
     @PutMapping(value = "/updateSessionWithCard/{sessionId}")
-    @ResponseBody
-    public boolean updateSessionWithCard(HttpServletRequest request, @PathVariable String sessionId, @RequestBody ApiRequest apiRequest) {
-//        ApiRequest sessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> updateSessionWithCard(HttpServletRequest request, @PathVariable String sessionId,
+            @RequestBody ApiRequest apiRequest) {
+        ApiRequest sessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
         apiRequest.setApiOperation(UPDATE_SESSION);
         apiRequest.setApiMethod("PUT");
-        apiRequest.setSourceType("CARD");
+//        apiRequest.setSourceType("CARD");
         String updateSessionPayload = ApiRequestService.buildJSONPayload(apiRequest);
         try {
             RESTApiClient connection = new RESTApiClient();
@@ -586,40 +589,34 @@ public class ApiController {
             connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
         } catch (Exception e) {
             logger.error("Unable to update session", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unable to update session");
         }
-        return true;
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
-     *
+     * Make payment using the session and display receipt
      * @return
      */
     @PutMapping(value = "/3ds2receipt")
-    public ModelAndView render3DS2Receipt(@RequestBody String apiResponse)
+    public ModelAndView post3DS2Receipt(@RequestBody ApiRequest apiReq)
     {
-//        $apiResponse = json_encode($request->getParsedBody()['apiResponse']);
-//        $response = $this->view->render($response, "receipt.phtml", ["responseData" => $apiResponse, "requestData" => "", "requestUrl" => "", "apiOperation" => "INITIATE AUTHENTICATION"]);
-//
-//        return $response->withStatus(200);
         ModelAndView mav = new ModelAndView();
-//
+
         try {
-//            // Make a payment using the session
-//            // Construct API request
-//            ApiRequest apiReq = ApiRequestService.createApiRequest("PAY", config);
-//            apiReq.setSessionId(sessionId);
-//            String payload = ApiRequestService.buildJSONPayload(apiReq);
-//            String reqUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiReq);
-//
-//            // Perform API operation
-//            RESTApiClient apiConnection = new RESTApiClient();
-//            String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
-//
-//            TransactionResponse masterpassResponse = ApiResponseService.parseMasterpassResponse(apiResponse);
-//            mav.setViewName("receipt");
-//            mav.addObject("response", masterpassResponse);
-//            mav.setViewName("acsChallenge");
-//            mav.addObject("response", apiResponse);
+//           Construct API request
+            String payload = ApiRequestService.buildJSONPayload(apiReq);
+            String reqUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiReq);
+
+            // Perform API operation
+            RESTApiClient apiConnection = new RESTApiClient();
+            String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+            //TODO 3DSResponse
+            SecureIdEnrollmentResponse threeDSResponse = ApiResponseService.parse3DSecureResponse(apiResponse);
+
+            mav.setViewName("receipt");
+            mav.addObject("response", threeDSResponse);
         }  catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
