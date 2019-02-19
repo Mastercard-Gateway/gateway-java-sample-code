@@ -45,6 +45,8 @@ public class ApiResponseService {
                 hostedSession.setSuccessIndicator(json.get("successIndicator").getAsString());
             if (jsonSession.get("updateStatus") != null)
                 hostedSession.setUpdateStatus(jsonSession.get("updateStatus").getAsString());
+            if (jsonSession.get("aes256Key") != null)
+                hostedSession.setAes256Key(jsonSession.get("aes256Key").getAsString());
 
             return hostedSession;
         } catch (Exception e) {

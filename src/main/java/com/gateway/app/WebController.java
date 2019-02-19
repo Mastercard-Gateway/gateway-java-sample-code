@@ -347,7 +347,8 @@ public class WebController {
             ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
             String updateResp = ApiRequestService
                     .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
-                            ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect");//process3ds2Redirect
+                            ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect?" +
+                                    "merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId());//process3ds2Redirect
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
             updateSessionRequest.setSessionId(hostedSession.getId());
 

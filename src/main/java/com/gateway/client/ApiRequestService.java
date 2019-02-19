@@ -59,10 +59,10 @@ public class ApiRequestService {
                 break;
             case "RETRIEVE_ORDER":
             case "RETRIEVE_TRANSACTION": {
-            req.setApiMethod("GET");
-            req.setOrderId(null);
-            req.setTransactionId(null);
-        }
+                req.setApiMethod("GET");
+                req.setOrderId(null);
+                req.setTransactionId(null);
+            }
             break;
             case "CREATE_CHECKOUT_SESSION":
             case CREATE_SESSION:

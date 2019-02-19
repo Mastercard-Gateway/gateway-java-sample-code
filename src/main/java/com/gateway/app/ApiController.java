@@ -25,8 +25,6 @@ import com.gateway.response.WalletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,10 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
-
-import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
 
 @Controller
 public class ApiController {
@@ -551,24 +546,39 @@ public class ApiController {
     }
 
     /**
-     * Renders the issuer's challenge UI
      *
-     * @param simple The gateway always returns *simple* field in the response for insertion into the page. With the
-     * challenge flow, this will redirect the payer’s browser to the ACS where the issuer’s challenge UI will be
-     * presented, after which the payer will be redirected back to your web site. In other cases, where no ACS challenge
-     * UI is present, the contents of *simple* field will direct the payer’s browser straight back to your website.
-     * @return the ACS challenge view
      */
-    @GetMapping(value = "/process3ds2Redirect")
-    public ModelAndView process3ds2Redirect(@RequestParam String simple) {
+    @PostMapping(value = "/process3ds2Redirect")
+    public ModelAndView process3ds2Redirect(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView();
 
-        try {
-            mav.setViewName("acsChallenge");
-            mav.addObject("simple", simple);
-            mav.addObject("config", config);
-        }  catch (Exception e) {
-            ExceptionService.constructGeneralErrorResponse(mav, e);
+        //perform PAY if recommended
+        if (request.getParameter("response.gatewayRecommendation")
+                .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+
+            // Construct API request
+            ApiRequest paymentRequest = ApiRequestService.createApiRequest("PAY", config);
+            String sessionId = request.getParameter("sessionId");
+            paymentRequest.setSessionId(sessionId);
+
+            //TODO decrypt encryptedData.ciphertext to obtain sensitive data
+            String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
+            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
+
+            // Perform API operation
+            RESTApiClient paymentConnection = new RESTApiClient();
+            String apiResponse = null;
+            try {
+                apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
+
+                // Format request/response for easy viewing
+                mav = ApiResponseService
+                        .formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
+
+                mav.addObject("config", config);
+            } catch (Exception e) {
+                ExceptionService.constructGeneralErrorResponse(mav, e);
+            }
         }
         return mav;
     }
