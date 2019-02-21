@@ -17,11 +17,15 @@ import com.gateway.client.ExceptionService;
 import com.gateway.client.HostedSession;
 import com.gateway.client.NVPApiClient;
 import com.gateway.client.RESTApiClient;
-import com.gateway.client.Utils;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
+import com.gateway.utils.Crypto;
+import com.gateway.utils.EncryptedData;
+import com.gateway.utils.Utils;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,8 @@ public class ApiController {
 
     @Autowired
     public Config config;
+    @Autowired
+    public SessionStore sessionStore;
 
     /* essentials_exclude_start */
     /**
@@ -560,15 +566,32 @@ public class ApiController {
             ApiRequest paymentRequest = ApiRequestService.createApiRequest("PAY", config);
             String sessionId = request.getParameter("sessionId");
             paymentRequest.setSessionId(sessionId);
+            paymentRequest.setTransactionId(request.getParameter("transaction.id"));
+            paymentRequest.setOrderId("order.id");
+            HostedSession session = sessionStore.getSession(sessionId);
 
-            //TODO decrypt encryptedData.ciphertext to obtain sensitive data
-            String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
-            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
-
-            // Perform API operation
-            RESTApiClient paymentConnection = new RESTApiClient();
-            String apiResponse = null;
             try {
+                //retrieve transaction details to perform api call
+                {
+                    EncryptedData encryptedData = ApiResponseService.parseEncryptedData(request);
+                    String decrypted = Crypto.decrypt(encryptedData, session.getAes256Key());
+
+                    JsonObject encryptedDataJson = new JsonParser().parse(decrypted).getAsJsonObject();
+                    JsonObject card = encryptedDataJson.getAsJsonObject("sourceOfFunds").getAsJsonObject("provided")
+                            .getAsJsonObject("card");
+
+                    paymentRequest.setCardNumber(card.get("number").getAsString());
+                    paymentRequest.setExpiryMonth(card.getAsJsonObject("expiry").get("month").getAsString());
+                    paymentRequest.setExpiryYear(card.getAsJsonObject("expiry").get("year").getAsString());
+                }
+                //TODO decrypt encryptedData.ciphertext to obtain sensitive data
+                //TODO use decrypted data to perform PAY operation
+                String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
+                String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
+
+                // Perform API operation
+                RESTApiClient paymentConnection = new RESTApiClient();
+                String apiResponse = null;
                 apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
 
                 // Format request/response for easy viewing

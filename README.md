@@ -5,6 +5,7 @@ This is a sample application to help developers start building Java applications
 1. Java 8
 1. Maven
 1. Registered account with MPGS Gateway system
+1. Java Cryptography Extension (JCE) with Unlimited Strength Jurisdiction Policy (installed and/or enable)
 
 ## Authentication
 1. You can authenticate in one of two ways:

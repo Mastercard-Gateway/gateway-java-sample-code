@@ -16,7 +16,7 @@ import com.gateway.client.ApiResponseService;
 import com.gateway.client.ExceptionService;
 import com.gateway.client.HostedSession;
 import com.gateway.client.RESTApiClient;
-import com.gateway.client.Utils;
+import com.gateway.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import static com.gateway.client.ApiRequestService.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
 
 @Controller
@@ -34,6 +33,8 @@ public class WebController {
 
     @Autowired
     public Config config;
+    @Autowired
+    public SessionPersistence sessionStore;
 
     /**
      * Display AUTHORIZE operation page
@@ -336,12 +337,10 @@ public class WebController {
             RESTApiClient connection = new RESTApiClient();
 
             //CREATE_SESSION
-//            ApiRequest createSessionRequest = ApiRequestService.createApiRequest(CREATE_SESSION, config);
-            ApiRequest createSessionRequest = new ApiRequest();
-            createSessionRequest.setApiOperation(CREATE_SESSION);
             String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
             String createResp = connection.postTransaction(requestUrl, config);
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(createResp);
+            sessionStore.saveSession(hostedSession);
 
             //UPDATE_SESSION FOR 3DS2
             ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
