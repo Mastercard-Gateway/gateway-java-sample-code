@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 if (self === top) {
     var antiClickjack = document.getElementById("antiClickjack");
     if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
@@ -5,12 +9,7 @@ if (self === top) {
     top.location = self.location;
 }
 
-PaymentSession.setFocus('card.number');
-
-PaymentSession.setFocusStyle(["card.number","card.securityCode"], {
-    borderColor: 'red',
-    borderWidth: '3px'
-});
+const scope = $(".mb-4")[0].id;
 
 PaymentSession.configure({
     fields: {
@@ -26,7 +25,11 @@ PaymentSession.configure({
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
         initialized: function (response) {
-            // HANDLE INITIALIZATION RESPONSE
+            if (response.status) {
+                if ("ok" == response.status) {
+                    console.log("Payment Session initialized");
+                }
+            }
         },
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
@@ -82,7 +85,14 @@ PaymentSession.configure({
             }
         }
     }
-});
+}, scope);
+
+PaymentSession.setFocus('card.number', scope);
+
+PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
+    borderColor: 'red',
+    borderWidth: '3px'
+}, scope);
 
 function pay() {
     $("#loading-bar-spinner").show();

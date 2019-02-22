@@ -1,4 +1,13 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway.client;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.app.Config;
@@ -6,6 +15,8 @@ import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
+import com.gateway.utils.EncryptedData;
+import com.gateway.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,10 +25,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
 
 public class ApiResponseService {
 
@@ -39,6 +46,10 @@ public class ApiResponseService {
             hostedSession.setVersion(jsonSession.get("version").getAsString());
             if (json.get("successIndicator") != null)
                 hostedSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+            if (jsonSession.get("updateStatus") != null)
+                hostedSession.setUpdateStatus(jsonSession.get("updateStatus").getAsString());
+            if (jsonSession.get("aes256Key") != null)
+                hostedSession.setAes256Key(jsonSession.get("aes256Key").getAsString());
 
             return hostedSession;
         } catch (Exception e) {
@@ -311,4 +322,8 @@ public class ApiResponseService {
 
     }
 
+    public static EncryptedData parseEncryptedData(HttpServletRequest request) {
+        return new EncryptedData(request.getParameter("encryptedData.ciphertext"),
+                request.getParameter("encryptedData.nonce"), request.getParameter("encryptedData.tag"));
+    }
 }

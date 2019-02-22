@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway;
 
 import com.gateway.app.Config;
@@ -49,6 +53,32 @@ public class ApiResponseServiceTest {
         assertEquals(secureIdEnrollmentResponse.getAcsUrl(), "https://www.issuer.com/acsUrl");
         assertEquals(secureIdEnrollmentResponse.getStatus(), "CARD_ENROLLED");
         assertEquals(secureIdEnrollmentResponse.getPaReq(), "PAREQ_VALUE");
+    }
+
+    @Test
+    public void parse3DSecure2UpdateSessionResponse() throws Exception {
+        String data = "{\n" +
+                "    \"authentication\": {\n" +
+                "        \"channel\": \"MERCHANT_REQUESTED\"\n" +
+                "    },\n" +
+                "    \"merchant\": \"TESTWTF25446060\",\n" +
+                "    \"order\": {\n" +
+                "        \"amount\": \"5000\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"id\": \"order-693\"\n" +
+                "    },\n" +
+                "    \"session\": {\n" +
+                "        \"id\": \"SESSION0002396845074E89371117N9\",\n" +
+                "        \"updateStatus\": \"SUCCESS\",\n" +
+                "        \"version\": \"fd4b2f7b02\"\n" +
+                "    },\n" +
+                "    \"version\": \"51\"\n" +
+                "}";
+        HostedSession hostedSession = ApiResponseService.parseSessionResponse(data);
+
+        assertEquals(hostedSession.getUpdateStatus(), "SUCCESS");
+        assertEquals(hostedSession.getVersion(), "fd4b2f7b02");
+        assertEquals(hostedSession.getId(), "SESSION0002396845074E89371117N9");
     }
 
     @Test

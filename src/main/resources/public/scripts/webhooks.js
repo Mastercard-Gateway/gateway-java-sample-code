@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 $(function () {
 
     var notificationUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/process-webhook";

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway.client;
 
 public class ApiRequest {
@@ -34,6 +38,11 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
+    //3DS2 properties
+    private String authenticationChannel;
+    private String acceptVersions;
+    private String redirectResponseUrl;
+
     // Wallet properties
     /* essentials_exclude_start */
     private String masterpassOriginUrl;
@@ -42,6 +51,7 @@ public class ApiRequest {
     private String masterpassCheckoutUrl;
     /* essentials_exclude_end */
     private String walletProvider;
+
 
     public String getSourceToken() {
         return sourceToken;
@@ -235,6 +245,16 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
+
+    public String getAuthenticationChannel() {
+        return authenticationChannel;
+    }
+
+    public ApiRequest setAuthenticationChannel(String authenticationChannel) {
+        this.authenticationChannel = authenticationChannel;
+        return this;
+    }
+
     /* essentials_exclude_start */
     public String getMasterpassOriginUrl() {
         return masterpassOriginUrl;
@@ -266,6 +286,23 @@ public class ApiRequest {
 
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
+    }
+
+    public String getAcceptVersions() {
+        return acceptVersions;
+    }
+
+    public ApiRequest setAcceptVersions(String acceptVersions) {
+        this.acceptVersions = acceptVersions; return this;
+    }
+
+    public String getRedirectResponseUrl() {
+        return redirectResponseUrl;
+    }
+
+    public ApiRequest setRedirectResponseUrl(String redirectResponseUrl) {
+        this.redirectResponseUrl = redirectResponseUrl;
+        return this;
     }
     /* essentials_exclude_end */
 }

@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apm')}">
 <body>
+<!--NOTE: Comment out the below for local testing-->
 <script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
+<!--NOTE: Uncomment out the below for local testing-->
+<!--<script type="text/javascript" src="https://localhost/static/apm/1.0.5-SNAPSHOT/apm.min.js"></script>-->
 <style>
     #idealButton, #sofortButton, #giropayButton {
         display: none;

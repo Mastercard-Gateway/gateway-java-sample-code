@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
+
+<body onload="acsChallenge()">
+
+    <div class="col-9">
+        <div class="row">
+            <div id="threedsChallengeRedirect" xmlns="http://www.w3.org/1999/html">
+                <form id="threedsChallengeRedirectForm" method="POST"
+                      th:action="@{${config.apiBaseURL} + '/acs/mastercard/v2/prompt'}" target="challengeFrame">
+                    <input type="hidden" name="creq" th:value="${simple}"/>
+                </form>
+                <iframe id="challengeFrame" name="challengeFrame" width="100%" height="100%"></iframe>
+                <script>document.getElementById("threedsChallengeRedirectForm").submit();</script>
+            </div>
+        </div>
+    </div>
+    <script>
+        function acsChallenge() {
+            let iframe = document.getElementById("threedsChallengeRedirect");
+            iframe.style.width = "800px";
+            iframe.style.height = "500px";
+        }
+
+    </script>
+</body>
+</html>
