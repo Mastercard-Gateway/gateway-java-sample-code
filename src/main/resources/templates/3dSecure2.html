@@ -1,3 +1,7 @@
+<!--
+  ~ Copyright (c) 2019 MasterCard. All rights reserved.
+  -->
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
 <body>
@@ -194,38 +198,15 @@
     //5
     function auth() {
         pay();
-        // var requestBody = {
-        //     "sessionId": sessionId,
-        //     "apiOperation": JavaSample.operation(),
-        //     "cardNumber": document.getElementById("card-number").value,
-        //     "expiryMonth": document.getElementById("expiry-month").value,
-        //     "expiryYear": document.getElementById("expiry-year").value,
-        //     "orderId": document.getElementById("order-id").value,
-        //     "transactionId": document.getElementById("transaction-id").value,
-        //     "hostedSession": false,
-        //     "protocol": 'REST',
-        //     "apiMethod": 'PUT',
-        //     "sourceType": 'CARD'
-        // };
-        //
-        // var xhr = new XMLHttpRequest();
-        // xhr.open('PUT', '3ds2receipt', true);
-        // xhr.setRequestHeader('Content-Type', 'application/json');
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.readyState == XMLHttpRequest.DONE) {
-        //         document.documentElement.innerHTML = this.response;
-        //     }
-        // }
-        // xhr.send(JSON.stringify(requestBody));
     }
 
-    function displayReceipt(apiResponse) {
+    function displayError(apiResponse) {
         var responseBody = {
             "apiResponse": apiResponse
         };
 
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', '3ds2receipt', true);
+        xhr.open('PUT', 'error', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -263,7 +244,7 @@
                 console.warn("Retrying after 5000");
                 window.setTimeout(authenticatePayer(), 5000);
             } else {
-                displayReceipt(data);
+                displayError(data);
             }
         } else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
@@ -297,7 +278,7 @@
                             authenticatePayer();
                             break;
                         case "DO_NOT_PROCEED":
-                            displayReceipt(data);
+                            displayError(data);
                             break;
                     }
                 }

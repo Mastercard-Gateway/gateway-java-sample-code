@@ -52,7 +52,6 @@ public class ApiRequest {
     /* essentials_exclude_end */
     private String walletProvider;
 
-
     public String getSourceToken() {
         return sourceToken;
     }

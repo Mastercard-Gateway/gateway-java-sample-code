@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
@@ -11,27 +11,21 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.gateway.app.Config;
-import com.gateway.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.gateway.client.ApiRequestService.ApiOperation.CREATE_SESSION;
-import static com.gateway.client.ApiRequestService.ApiOperation.UPDATE_SESSION;
+import static com.gateway.client.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 
 public class ApiRequestService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiRequestService.class);
 
-    /**
-     * The available operations from the API
-     */
-    public interface ApiOperation {
-        String CREATE_SESSION = "CREATE_SESSION";
-        String UPDATE_SESSION = "UPDATE_SESSION";
-        String PAY = "PAY";
+
+    private ApiRequestService() {
     }
 
     /**
@@ -71,6 +65,7 @@ public class ApiRequestService {
                 break;
             case UPDATE_SESSION:
             req.setApiMethod("PUT");
+                break;
         }
 
         return req;

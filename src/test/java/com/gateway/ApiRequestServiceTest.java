@@ -4,6 +4,9 @@
 
 package com.gateway;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.gateway.app.Config;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
@@ -14,9 +17,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -252,6 +252,7 @@ public class ApiRequestServiceTest {
 
         assertEquals(prettifyJson(data), result);
     }
+
     @Test
     public void parseUpdate3DS2Session() throws Exception {
         String ApiOperation = "UPDATE_SESSION";
