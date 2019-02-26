@@ -26,6 +26,9 @@
                 <div class="alert alert-warning" role="alert">
                     <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
+                <div id="error-alert" class="alert alert-danger" role="alert">
+                    <p>The following error(s) occurred:</p>
+                </div>
                 <div class="mb-4">
                     <h6>Payment details</h6>
                     <div class="form-group">
@@ -37,13 +40,28 @@
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
-                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <!--<input id="expiry-month" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
+                            <select id="expiry-month" class="form-control input-md" required="" readonly>
+                                <option value="">Select Month</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>>
+                                <option value="04">April</option>>
+                                <option value="05">May</option>>
+                                <option value="06">June</option>>
+                                <option value="07">July</option>>
+                                <option value="08">August</option>>
+                                <option value="09">September</option>>
+                                <option value="10">October</option>>
+                                <option value="11">November</option>>
+                                <option value="12">December</option>>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
-                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md" required="" readonly/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -91,6 +109,6 @@
         </div>
     </div> <!-- row -->
 </div>
-<script src="scripts/hostedSession.js"></script>
+<script src="scripts/hostedSession2.js"></script>
 </body>
 </html>

@@ -58,16 +58,16 @@ PaymentSession.configure({
 
                     console.log("Session update failed with field errors.");
 
-                    if (response.errors.cardNumber) {
+                    if (response.errors.cardNumber && focusFields.cardNumber.focus && currentFocusField !== 'cardNumber' ) {
                         handleError("Card number missing or invalid.");
                     }
-                    if (response.errors.expiryYear) {
+                    if (response.errors.expiryYear && focusFields.expiryYear.focus && currentFocusField !== 'expiryYear' ) {
                         handleError("Expiry year missing or invalid.");
                     }
-                    if (response.errors.expiryMonth) {
+                    if (response.errors.expiryMonth && focusFields.expiryMonth.focus && currentFocusField !== 'expiryMonth' ) {
                         handleError("Expiry month missing or invalid.");
                     }
-                    if (response.errors.securityCode) {
+                    if (response.errors.securityCode && focusFields.securityCode.focus && currentFocusField !== 'securityCode' ) {
                         handleError("Security code invalid.");
                     }
                 } else if ("request_timeout" == response.status) {
@@ -85,9 +85,99 @@ PaymentSession.configure({
 });
 
 
+var finalSubmit = expiryMonth = expiryYear = cardNumber = securityCode = false;
+
+var focusFields={
+    expiryMonth:{},
+    expiryYear:{},
+    cardNumber:{},
+    securityCode:{}
+};
+
+var selectors =  {
+        cardNumber: "#card-number",
+        securityCode: "#security-code",
+        expiryMonth: "#expiry-month",
+        expiryYear: "#expiry-year"
+};
+
+var currentFocusField = null;
+
+setOnFocusField = function(fieldname){
+    focusFields[fieldname].focus = true;
+};
+
+PaymentSession.onBlur(['card.number'], function(selector)
+{
+    finalSubmit = false;
+    cardNumber = true;
+    PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.expiryMonth'], function(selector)
+{
+	finalSubmit = false;
+	expiryMonth = true;
+    $("label[for='expiry-month']").css({fontWeight:"normal"});
+	PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.expiryYear'], function(selector)
+{
+	finalSubmit = false;
+	expiryYear = true;
+	PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.securityCode'], function(selector)
+{
+    finalSubmit = false;
+    securityCode = true;
+    PaymentSession.updateSessionFromForm('card');
+});
+
+
+PaymentSession.onFocus(['card.number','card.expiryMonth','card.expiryYear' ,'card.securityCode'], function(selector) {
+    //handle focus event
+    console.log(selector);
+
+    for(sel in selectors){
+        if(selectors[sel] === selector){
+            setOnFocusField(sel);
+            currentFocusField = sel;
+        }
+    };
+
+});
+
+PaymentSession.onChange(['card.expiryMonth'], function(selector) {
+    //handle change event
+    $("label[for='expiry-month']").css({fontWeight:"bold"});
+});
+
+PaymentSession.onMouseOver(['card.number'], function(selector) {
+    //handle mouse over event
+    $("label[for='card-number']").css({fontWeight:"bold"});
+});
+
+PaymentSession.onMouseOut(['card.number'], function(selector) {
+    //handle mouse out event
+    $("label[for='card-number']").css({fontWeight:"normal"})
+});
+
+
+PaymentSession.setFocus('card.number');
+
 PaymentSession.setFocusStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
     borderColor: 'red',
-    borderWidth: '3px'
+    borderWidth: '3px',
+    borderStyle:'solid',
+});
+
+PaymentSession.setHoverStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
+    borderColor: 'blue',
+    borderWidth: '3px',
+    borderStyle:'solid'
 });
 
 
