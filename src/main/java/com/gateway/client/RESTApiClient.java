@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 /**
  * Service client class for making API requests using REST protocol using JSON
  */
-@Component
 public final class RESTApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(RESTApiClient.class);

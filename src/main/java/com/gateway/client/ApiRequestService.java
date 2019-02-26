@@ -17,7 +17,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
@@ -25,8 +24,7 @@ import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 public class ApiRequestService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiRequestService.class);
-    @Autowired
-    private static RESTApiClient connection;
+    private static RESTApiClient connection = new RESTApiClient();
 
 
     private ApiRequestService() {
