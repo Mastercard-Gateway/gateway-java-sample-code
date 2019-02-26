@@ -34,8 +34,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import static com.gateway.client.ApiOperation.AUTHORIZE;
-
 
 @Controller
 public class ApiController {
@@ -554,35 +552,24 @@ public class ApiController {
     @PostMapping(value = "/process3ds2Redirect")
     public ModelAndView process3ds2Redirect(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("receipt");
+        try {
 
-        //perform PAY if recommended
-        if (request.getParameter("response.gatewayRecommendation")
-                .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+            //perform PAY if recommended
+            if (request.getParameter("response.gatewayRecommendation")
+                    .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
 
-            // Construct API request
-            ApiRequest paymentRequest = ApiRequestService.createApiRequest(AUTHORIZE, config);
-            String sessionId = request.getParameter("sessionId");
-            paymentRequest.setSessionId(sessionId);
-            paymentRequest.setTransactionId(request.getParameter("transaction.id"));
-            paymentRequest.setOrderId(request.getParameter("order.id"));
-            paymentRequest.setSourceType("CARD");
 
-            try {
-
-                String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
-                String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
-
-                // Perform API operation
-                RESTApiClient paymentConnection = new RESTApiClient();
-                String apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
-
-                TransactionResponse paymentResponse = ApiResponseService.parseAuthorizeResponse(apiResponse);
+                TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
                 mav.setViewName("receipt");
                 mav.addObject("response", paymentResponse);
                 mav.addObject("config", config);
-            } catch (Exception e) {
-                ExceptionService.constructGeneralErrorResponse(mav, e);
+
+            } else {
+                throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED_WITH_PAYMENT.toString());
+
             }
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }

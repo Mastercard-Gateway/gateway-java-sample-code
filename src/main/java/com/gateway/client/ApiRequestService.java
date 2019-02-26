@@ -11,11 +11,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.gateway.app.Config;
+import com.gateway.response.TransactionResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
@@ -23,6 +25,8 @@ import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 public class ApiRequestService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiRequestService.class);
+    @Autowired
+    private static RESTApiClient connection;
 
 
     private ApiRequestService() {
@@ -50,7 +54,7 @@ public class ApiRequestService {
             case "REFUND":
             case "VOID":
             case "UPDATE_AUTHORIZATION":
-            req.setOrderId(null);
+                req.setOrderId(null);
                 break;
             case "RETRIEVE_ORDER":
             case "RETRIEVE_TRANSACTION": {
@@ -61,10 +65,10 @@ public class ApiRequestService {
             break;
             case "CREATE_CHECKOUT_SESSION":
             case CREATE_SESSION:
-            req.setApiMethod("POST");
+                req.setApiMethod("POST");
                 break;
             case UPDATE_SESSION:
-            req.setApiMethod("PUT");
+                req.setApiMethod("PUT");
                 break;
         }
 
@@ -81,7 +85,7 @@ public class ApiRequestService {
     public static String getRequestUrl(ApiProtocol apiProtocol, Config config, ApiRequest request) {
         switch (apiProtocol) {
             case REST:
-                String url = getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/order/" + request.getOrderId();
+                String url = getMerchantRequestUrl(apiProtocol, config) + "/order/" + request.getOrderId();
                 if (Utils.notNullOrEmpty(request.getTransactionId())) {
                     url += "/transaction/" + request.getTransactionId();
                 }
@@ -102,7 +106,7 @@ public class ApiRequestService {
      * @return url
      */
     public static String getSessionRequestUrl(ApiProtocol apiProtocol, Config config) {
-        return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session";
+        return getMerchantRequestUrl(apiProtocol, config) + "/session";
     }
 
     /**
@@ -113,7 +117,20 @@ public class ApiRequestService {
      * @return url
      */
     public static String getTokenRequestUrl(ApiProtocol apiProtocol, Config config) {
-        return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/token";
+        return getMerchantRequestUrl(apiProtocol, config) + "/token";
+    }
+
+    /**
+     * Constructs API endpoint for session-based requests with an existing session ID
+     *
+     * @param apiProtocol REST or NVP
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @return url
+     */
+    private static String getMerchantRequestUrl(ApiProtocol apiProtocol, Config config) {
+        return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() +
+                "/merchant/" + config.getMerchantId();
+
     }
 
     /**
@@ -127,7 +144,7 @@ public class ApiRequestService {
     public static String getSessionRequestUrl(ApiProtocol apiProtocol, Config config, String sessionId) {
         switch (apiProtocol) {
             case REST:
-                return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/session/" + sessionId;
+                return getMerchantRequestUrl(apiProtocol, config) + "/session/" + sessionId;
             case NVP:
                 return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion();
             default:
@@ -145,7 +162,7 @@ public class ApiRequestService {
      * @return url
      */
     public static String getSecureIdRequest(ApiProtocol apiProtocol, Config config, String secureId) {
-        return getApiBaseURL(config.getGatewayHost(), apiProtocol) + "/version/" + config.getApiVersion() + "/merchant/" + config.getMerchantId() + "/3DSecureId/" + secureId;
+        return getMerchantRequestUrl(apiProtocol, config) + "/3DSecureId/" + secureId;
     }
 
     /**
@@ -300,6 +317,7 @@ public class ApiRequestService {
     }
 
     /* essentials_exclude_start */
+
     /**
      * Constructs API request to initiate browser payment
      *
@@ -322,8 +340,7 @@ public class ApiRequestService {
             req.setSourceType(source);
             req.setReturnUrl(getCurrentContext(request) + "/browserPaymentReceipt?transactionId=" + req.getTransactionId() + "&orderId=" + req.getOrderId());
             return req;
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Unable to create browser payment request", e);
             throw e;
         }
@@ -340,7 +357,6 @@ public class ApiRequestService {
      * @throws Exception
      */
     public static void updateSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
-        RESTApiClient connection = new RESTApiClient();
 
         try {
             String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
@@ -353,8 +369,7 @@ public class ApiRequestService {
             updateSessionRequest.setBrowserPaymentOperation(request.getBrowserPaymentOperation());
             String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
             connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Unable to update session", e);
             throw e;
         }
@@ -379,7 +394,6 @@ public class ApiRequestService {
 
         String updateSessionPayload = ApiRequestService.buildJSONPayload(request);
         try {
-            RESTApiClient connection = new RESTApiClient();
             String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
             return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
         } catch (Exception e) {
@@ -398,8 +412,6 @@ public class ApiRequestService {
      * @throws Exception
      */
     public static void updateSessionWithOrderInfo(ApiProtocol protocol, ApiRequest request, Config config, String sessionId) throws Exception {
-        RESTApiClient connection = new RESTApiClient();
-
         try {
             String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
             ApiRequest updateSessionRequest = new ApiRequest();
@@ -408,8 +420,7 @@ public class ApiRequestService {
             updateSessionRequest.setOrderId(request.getOrderId());
             String updateSessionPayload = ApiRequestService.buildJSONPayload(updateSessionRequest);
             connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Unable to update session", e);
             throw e;
         }
@@ -424,8 +435,7 @@ public class ApiRequestService {
         try {
             URL url = new URL(request.getRequestURL().toString());
             return url.getProtocol() + "://" + url.getAuthority();
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             logger.error("Unable to parse return URL", e);
             throw e;
         }
@@ -452,5 +462,60 @@ public class ApiRequestService {
 
     private static void throwUnsupportedProtocolException() {
         throw new IllegalArgumentException("Unsupported API protocol!");
+    }
+
+
+    public static TransactionResponse performTransaction(HttpServletRequest request,
+            Config config) throws Exception {
+        try {
+            // Construct API request
+            String apiOperation = ApiRequestService.retrievePaymentOptionsInquiry(config);
+
+            ApiRequest paymentRequest = ApiRequestService.createApiRequest(apiOperation, config);
+            paymentRequest.setSessionId(request.getParameter("sessionId"));
+            paymentRequest.setTransactionId(request.getParameter("transaction.id"));
+            paymentRequest.setOrderId(request.getParameter("order.id"));
+            paymentRequest.setSourceType("CARD");
+
+
+            String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
+            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
+
+            // Perform API operation
+            String apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
+
+            return ApiResponseService.parseAuthorizeResponse(apiResponse);
+        } catch (Exception e) {
+            logger.debug("Unhandled exception caught", e);
+            throw e;
+        }
+    }
+
+    /**
+     * @param config
+     * @return the API Operation corresponding to the available options for processing a payment
+     * @throws Exception
+     * @see /api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html
+     */
+    public static String retrievePaymentOptionsInquiry(Config config) throws Exception {
+        String paymentOptionsInquiryUrl =
+                ApiRequestService.getMerchantRequestUrl(ApiProtocol.REST, config) + "/paymentOptionsInquiry";
+
+        try {
+            String paymentOptionsInquiryResponse = connection.getTransaction(paymentOptionsInquiryUrl, config);
+            PaymentOptions paymentOptions = new Gson().fromJson(paymentOptionsInquiryResponse, PaymentOptions.class);
+            switch (paymentOptions.getTransactionMode()) {
+                case AUTHORIZE_CAPTURE:
+                    return ApiOperation.AUTHORIZE;
+                case PURCHASE:
+                    return ApiOperation.PAY;
+                default:
+                    throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+            }
+        } catch (Exception e) {
+            logger.debug("Unable to retrieve Payment Options", e);
+            throw e;
+        }
+
     }
 }
