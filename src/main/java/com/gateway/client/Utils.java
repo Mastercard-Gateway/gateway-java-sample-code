@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2019 MasterCard. All rights reserved.
+ * Copyright (c) 2018 MasterCard. All rights reserved.
  */
 
-package com.gateway.utils;
+package com.gateway.client;
 
 import org.apache.commons.lang.RandomStringUtils;
 
 public class Utils {
 
     /**
-     * Generates a random 10-digit alphanumeric number to use as a unique identifier (order ID and transaction ID, for
-     * instance) The unique ID need not have a prefix - it's being added here simply for debugging purposes
+     * Generates a random 10-digit alphanumeric number to use as a unique identifier (order ID and transaction ID, for instance)
+     * The unique ID need not have a prefix - it's being added here simply for debugging purposes
      *
      * @return random identifier
      */
@@ -27,5 +27,4 @@ public class Utils {
     public static boolean notNullOrEmpty(String value) {
         return (value != null && !value.equals(""));
     }
-
 }

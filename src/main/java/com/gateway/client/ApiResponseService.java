@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
@@ -7,7 +7,6 @@ package com.gateway.client;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.app.Config;
@@ -15,8 +14,6 @@ import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
-import com.gateway.utils.EncryptedData;
-import com.gateway.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -118,6 +115,19 @@ public class ApiResponseService {
     }
 
     /* essentials_exclude_start */
+
+    /**
+     * Parses JSON response from AUTHORIZE transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    public static TransactionResponse parseAuthorizeResponse(String response) {
+
+        return parseMasterpassResponse(response);
+
+    }
+
     /**
      * Parses JSON response from Masterpass transaction into TransactionResponse object
      *
@@ -322,8 +332,4 @@ public class ApiResponseService {
 
     }
 
-    public static EncryptedData parseEncryptedData(HttpServletRequest request) {
-        return new EncryptedData(request.getParameter("encryptedData.ciphertext"),
-                request.getParameter("encryptedData.nonce"), request.getParameter("encryptedData.tag"));
-    }
 }

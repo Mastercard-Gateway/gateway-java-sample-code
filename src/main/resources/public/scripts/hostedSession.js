@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 if (self === top) {
@@ -27,7 +27,7 @@ PaymentSession.configure({
         initialized: function (response) {
             if (response.status) {
                 if ("ok" == response.status) {
-                    console.log("Payment Session initialized");
+                    console.log("Payment Session initialized for scope: " + response.scopeId);
                 }
             }
         },
@@ -97,7 +97,7 @@ PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
 function pay() {
     $("#loading-bar-spinner").show();
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-    PaymentSession.updateSessionFromForm('card');
+    PaymentSession.updateSessionFromForm('card', null, scope);
 }
 
 function handleError(message) {

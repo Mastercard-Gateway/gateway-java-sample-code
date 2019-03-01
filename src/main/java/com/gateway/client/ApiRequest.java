@@ -52,7 +52,6 @@ public class ApiRequest {
     /* essentials_exclude_end */
     private String walletProvider;
 
-
     public String getSourceToken() {
         return sourceToken;
     }
@@ -81,8 +80,9 @@ public class ApiRequest {
         return apiOperation;
     }
 
-    public void setApiOperation(String apiOperation) {
+    public ApiRequest setApiOperation(String apiOperation) {
         this.apiOperation = apiOperation;
+        return this;
     }
 
     public String getSourceType() {
@@ -201,8 +201,9 @@ public class ApiRequest {
         return apiMethod;
     }
 
-    public void setApiMethod(String apiMethod) {
+    public ApiRequest setApiMethod(String apiMethod) {
          this.apiMethod = apiMethod;
+         return this;
     }
 
     public String getSessionId() {

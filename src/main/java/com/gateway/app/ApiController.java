@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
@@ -17,15 +17,11 @@ import com.gateway.client.ExceptionService;
 import com.gateway.client.HostedSession;
 import com.gateway.client.NVPApiClient;
 import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
 import com.gateway.response.WalletResponse;
-import com.gateway.utils.Crypto;
-import com.gateway.utils.EncryptedData;
-import com.gateway.utils.Utils;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+
 @Controller
 public class ApiController {
 
@@ -45,8 +42,6 @@ public class ApiController {
 
     @Autowired
     public Config config;
-    @Autowired
-    public SessionStore sessionStore;
 
     /* essentials_exclude_start */
     /**
@@ -556,52 +551,25 @@ public class ApiController {
      */
     @PostMapping(value = "/process3ds2Redirect")
     public ModelAndView process3ds2Redirect(HttpServletRequest request) {
-        ModelAndView mav = new ModelAndView();
+        ModelAndView mav = new ModelAndView("receipt");
+        try {
 
-        //perform PAY if recommended
-        if (request.getParameter("response.gatewayRecommendation")
-                .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+            //perform PAY if recommended
+            if (request.getParameter("response.gatewayRecommendation")
+                    .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
 
-            // Construct API request
-            ApiRequest paymentRequest = ApiRequestService.createApiRequest("PAY", config);
-            String sessionId = request.getParameter("sessionId");
-            paymentRequest.setSessionId(sessionId);
-            paymentRequest.setTransactionId(request.getParameter("transaction.id"));
-            paymentRequest.setOrderId("order.id");
-            HostedSession session = sessionStore.getSession(sessionId);
 
-            try {
-                //retrieve transaction details to perform api call
-                {
-                    EncryptedData encryptedData = ApiResponseService.parseEncryptedData(request);
-                    String decrypted = Crypto.decrypt(encryptedData, session.getAes256Key());
-
-                    JsonObject encryptedDataJson = new JsonParser().parse(decrypted).getAsJsonObject();
-                    JsonObject card = encryptedDataJson.getAsJsonObject("sourceOfFunds").getAsJsonObject("provided")
-                            .getAsJsonObject("card");
-
-                    paymentRequest.setCardNumber(card.get("number").getAsString());
-                    paymentRequest.setExpiryMonth(card.getAsJsonObject("expiry").get("month").getAsString());
-                    paymentRequest.setExpiryYear(card.getAsJsonObject("expiry").get("year").getAsString());
-                }
-                //TODO decrypt encryptedData.ciphertext to obtain sensitive data
-                //TODO use decrypted data to perform PAY operation
-                String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
-                String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
-
-                // Perform API operation
-                RESTApiClient paymentConnection = new RESTApiClient();
-                String apiResponse = null;
-                apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
-
-                // Format request/response for easy viewing
-                mav = ApiResponseService
-                        .formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
-
+                TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
+                mav.setViewName("receipt");
+                mav.addObject("response", paymentResponse);
                 mav.addObject("config", config);
-            } catch (Exception e) {
-                ExceptionService.constructGeneralErrorResponse(mav, e);
+
+            } else {
+                throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED_WITH_PAYMENT.toString());
+
             }
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
@@ -610,28 +578,13 @@ public class ApiController {
      * Make payment using the session and display receipt
      * @return
      */
-    @PutMapping(value = "/3ds2receipt")
-    public ModelAndView post3DS2Receipt(@RequestBody ApiRequest apiReq)
+    @PutMapping(value = "/error")
+    public ModelAndView displayError(@RequestBody HttpServletRequest request)
     {
         ModelAndView mav = new ModelAndView();
 
-        try {
-//           Construct API request
-            String payload = ApiRequestService.buildJSONPayload(apiReq);
-            String reqUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiReq);
 
-            // Perform API operation
-            RESTApiClient apiConnection = new RESTApiClient();
-            String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
-            //TODO 3DSResponse
-            SecureIdEnrollmentResponse threeDSResponse = ApiResponseService.parse3DSecureResponse(apiResponse);
-
-            mav.setViewName("receipt");
-            mav.addObject("response", threeDSResponse);
-        }  catch (Exception e) {
-            ExceptionService.constructGeneralErrorResponse(mav, e);
-        }
-        return mav;
+        return ExceptionService.constructGeneralErrorResponse(mav, new Exception(request.getParameter("apiResponse")));
     }
 
 
