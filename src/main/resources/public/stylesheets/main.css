@@ -48,6 +48,9 @@ h6 {
 form, .contents {
     padding: 15px;
 }
+form#threedsChallengeRedirectForm {
+    padding: 0px;
+}
 .form-control[readonly] {
     background-color: #ffffff;
 }
@@ -85,7 +88,7 @@ input {
     margin-bottom: 50px;
 }
 .row .sidebar {
-    padding: 30px;    
+    padding: 30px;
 }
 .sidebar {
     border-right: 1px solid #CCC;

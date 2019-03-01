@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway.app;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +38,9 @@ public class AppConfiguration {
     @Value("${webhooks.notification.secret}")
     private String webhooksNotificationSecret;
 
+    @Value("${gateway.threeds.api.version}")
+    private String threeDSApiVersion;
+
     @Bean
     public Config buildConfig() {
 
@@ -69,6 +76,9 @@ public class AppConfiguration {
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
 
+        if (threeDSApiVersion != null) {
+            config.setApiThreeDsVersion(threeDSApiVersion);
+        }
         return config;
     }
 }

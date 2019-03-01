@@ -1,4 +1,11 @@
+/*
+ * Copyright (c) 2018 MasterCard. All rights reserved.
+ */
+
 package com.gateway;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import com.gateway.app.Config;
 import com.gateway.client.ApiProtocol;
@@ -10,9 +17,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -245,6 +249,65 @@ public class ApiRequestServiceTest {
         String result = ApiRequestService.buildJSONPayload(request);
 
         String data = "{\"apiOperation\":\"CHECK_3DS_ENROLLMENT\",\"order\":{\"amount\":\"10.00\",\"currency\":\"USD\"},\"session\":{\"id\":\"SESSION0002647025380I5651515F86\"},\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\"http://www.mysite.com/receipt\",\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parseUpdate3DS2Session() throws Exception {
+        String ApiOperation = "UPDATE_SESSION";
+        String orderAmount = "10.00";
+        String orderCurrency = "USD";
+        String orderId = "order-194";
+        String authenticationChannel = "MERCHANT_REQUESTED";
+
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation(ApiOperation);
+        request.setOrderAmount(orderAmount);
+        request.setAuthenticationChannel(authenticationChannel);
+        request.setOrderId(orderId);
+        request.setOrderCurrency(orderCurrency);
+
+        String result = ApiRequestService.buildJSONPayload(request);
+
+        String data = "{\n" +
+                "  \"order\": {\n" +
+                "    \"id\": "+orderId+",\n" +
+                "    \"amount\": \""+orderAmount+"\",\n" +
+                "    \"currency\": "+orderCurrency+"\n" +
+                "  },\n" +
+                "  \"authentication\": {\n" +
+                "    \"channel\": "+authenticationChannel+"\n" +
+                "  }\n" +
+                "}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
+    public void parse3ds2Request() throws Exception {
+        String ApiOperation = "PAY";
+        String orderAmount = "10.00";
+        String orderCurrency = "USD";
+        String sessionId = "SESSION0002647025380I5651515F86";
+        String transactionId = "H9JK29SM0J";
+        String secureIdResponseUrl = "http://www.mybank.com/receipt";
+
+        ApiRequest request = new ApiRequest();
+        request.setApiOperation(ApiOperation);
+        request.setOrderAmount(orderAmount);
+        request.setOrderCurrency(orderCurrency);
+        request.setSessionId(sessionId);
+        request.setTransactionId(transactionId);
+        request.setSecureIdResponseUrl(secureIdResponseUrl);
+        String result = ApiRequestService.buildJSONPayload(request);
+
+        String data = "{\"apiOperation\":\""+ApiOperation+"\"," +
+                "\"order\":{\"amount\":\""+orderAmount+"\"," +
+                "\"currency\":\""+orderCurrency+"\"}," +
+                "\"session\":{\"id\":\""+sessionId+"\"}," +
+                "\"3DSecure\":{\"authenticationRedirect\":{\"responseUrl\":\""+secureIdResponseUrl+"\"," +
+                "\"pageGenerationMode\": \"CUSTOMIZED\"}}}";
 
         assertEquals(prettifyJson(data), result);
     }
