@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
 
 import com.gateway.app.Config;
@@ -28,7 +27,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
-import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,18 +50,7 @@ public class ApiService {
             // Set the proper authentication type - username/password or certificate authentication
             if(config.getAuthenticationType().equals(Config.AuthenticationType.PASSWORD)) {
 
-                CloseableHttpClient httpClient =  HttpClients.custom()
-                    .setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
-                            .loadTrustMaterial(null, new TrustStrategy() {
-                                @Override
-                                public boolean isTrusted(X509Certificate[] chain, String authType)
-                                    throws java.security.cert.CertificateException {
-                                    return true;
-                                }
-                            })
-                            .build()
-                        )
-                    ).build();
+                CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpClientContext httpClientContext = HttpClientContext.create();
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
