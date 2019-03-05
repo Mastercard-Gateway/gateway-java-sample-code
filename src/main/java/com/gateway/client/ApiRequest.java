@@ -38,6 +38,11 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
+    //3DS2 properties
+    private String authenticationChannel;
+    private String acceptVersions;
+    private String redirectResponseUrl;
+
     // Wallet properties
     /* essentials_exclude_start */
     private String masterpassOriginUrl;
@@ -75,8 +80,9 @@ public class ApiRequest {
         return apiOperation;
     }
 
-    public void setApiOperation(String apiOperation) {
+    public ApiRequest setApiOperation(String apiOperation) {
         this.apiOperation = apiOperation;
+        return this;
     }
 
     public String getSourceType() {
@@ -195,8 +201,9 @@ public class ApiRequest {
         return apiMethod;
     }
 
-    public void setApiMethod(String apiMethod) {
+    public ApiRequest setApiMethod(String apiMethod) {
          this.apiMethod = apiMethod;
+         return this;
     }
 
     public String getSessionId() {
@@ -239,6 +246,16 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
+
+    public String getAuthenticationChannel() {
+        return authenticationChannel;
+    }
+
+    public ApiRequest setAuthenticationChannel(String authenticationChannel) {
+        this.authenticationChannel = authenticationChannel;
+        return this;
+    }
+
     /* essentials_exclude_start */
     public String getMasterpassOriginUrl() {
         return masterpassOriginUrl;
@@ -270,6 +287,23 @@ public class ApiRequest {
 
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
+    }
+
+    public String getAcceptVersions() {
+        return acceptVersions;
+    }
+
+    public ApiRequest setAcceptVersions(String acceptVersions) {
+        this.acceptVersions = acceptVersions; return this;
+    }
+
+    public String getRedirectResponseUrl() {
+        return redirectResponseUrl;
+    }
+
+    public ApiRequest setRedirectResponseUrl(String redirectResponseUrl) {
+        this.redirectResponseUrl = redirectResponseUrl;
+        return this;
     }
     /* essentials_exclude_end */
 }

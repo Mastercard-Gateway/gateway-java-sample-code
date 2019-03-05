@@ -6,15 +6,26 @@ package com.gateway.app;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.gateway.client.*;
+import javax.servlet.http.HttpServletRequest;
+
+import com.gateway.client.ApiException;
+import com.gateway.client.ApiProtocol;
+import com.gateway.client.ApiRequest;
+import com.gateway.client.ApiRequestService;
+import com.gateway.client.ApiResponseService;
+import com.gateway.client.ExceptionService;
+import com.gateway.client.HostedSession;
+import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import static com.gateway.client.ApiOperation.UPDATE_SESSION;
+
 
 @Controller
 public class WebController {
@@ -310,6 +321,45 @@ public class WebController {
             put("USD", "US Dollar");
         }
     };
+
+    /**
+     * Display 3DSecure-2.0 operation page
+     *
+     * @param httpServletRequest
+     * @return ModelAndView for 3dSecure2.html
+     */
+    @GetMapping("/3dSecure2")
+    public ModelAndView showSecure2Id(HttpServletRequest httpServletRequest) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+
+            //CREATE_SESSION
+            String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+            String createResp = connection.postTransaction(requestUrl, config);
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(createResp);
+
+            //UPDATE_SESSION FOR 3DS2
+            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
+            String updateResp = ApiRequestService
+                    .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
+                            ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect?" +
+                                    "merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId());//process3ds2Redirect
+            hostedSession = ApiResponseService.parseSessionResponse(updateResp);
+            updateSessionRequest.setSessionId(hostedSession.getId());
+
+            mav.setViewName("3dSecure2");
+            mav.addObject("config", config)
+                    .addObject("hostedSession", hostedSession)
+                    .addObject("request", updateSessionRequest);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
 
     /**
      * Display page for Hosted Checkout operation

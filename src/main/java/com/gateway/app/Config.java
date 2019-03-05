@@ -12,6 +12,7 @@ public class Config {
     private int apiVersion;
     private String gatewayHost;
     private String apiUsername;
+    private String apiThreeDsVersion;
     private String keyStore;
     private String keyStorePassword;
     private String currency;
@@ -107,5 +108,13 @@ public class Config {
 
     public void setAuthenticationType(AuthenticationType authenticationType) {
         this.authenticationType = authenticationType;
+    }
+
+    public void setApiThreeDsVersion(String apiThreeDsVersion) {
+        this.apiThreeDsVersion = apiThreeDsVersion;
+    }
+
+    public String getApiThreeDsVersion() {
+        return apiThreeDsVersion;
     }
 }

@@ -56,6 +56,32 @@ public class ApiResponseServiceTest {
     }
 
     @Test
+    public void parse3DSecure2UpdateSessionResponse() throws Exception {
+        String data = "{\n" +
+                "    \"authentication\": {\n" +
+                "        \"channel\": \"MERCHANT_REQUESTED\"\n" +
+                "    },\n" +
+                "    \"merchant\": \"TESTWTF25446060\",\n" +
+                "    \"order\": {\n" +
+                "        \"amount\": \"5000\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"id\": \"order-693\"\n" +
+                "    },\n" +
+                "    \"session\": {\n" +
+                "        \"id\": \"SESSION0002396845074E89371117N9\",\n" +
+                "        \"updateStatus\": \"SUCCESS\",\n" +
+                "        \"version\": \"fd4b2f7b02\"\n" +
+                "    },\n" +
+                "    \"version\": \"51\"\n" +
+                "}";
+        HostedSession hostedSession = ApiResponseService.parseSessionResponse(data);
+
+        assertEquals(hostedSession.getUpdateStatus(), "SUCCESS");
+        assertEquals(hostedSession.getVersion(), "fd4b2f7b02");
+        assertEquals(hostedSession.getId(), "SESSION0002396845074E89371117N9");
+    }
+
+    @Test
     public void parseHostedCheckoutResponse() throws Exception {
         String data = "{\"amount\":\"100.00\",\"currency\":\"USD\",\"description\":\"Ordered goods\",\"id\":\"order-W9JzSaC1Ky\",\"merchant\":\"TESTSIMPLIFYDEV1\",\"result\":\"SUCCESS\",\"status\":\"CAPTURED\",\"transaction\":[{\"order\":{\"amount\":\"100.00\",\"currency\":\"USD\",\"description\":\"Ordered goods\",\"id\":\"order-W9JzSaC1Ky\"},\"response\":{\"acquirerCode\":\"00\",\"cardSecurityCode\":{\"acquirerCode\":\"M\",\"gatewayCode\":\"MATCH\"},\"gatewayCode\":\"APPROVED\"},\"result\":\"SUCCESS\",\"transaction\":{\"acquirer\":{\"batch\":1,\"id\":\"SYSTEST_ACQ1\",\"merchantId\":\"646515314\"},\"amount\":100,\"authorizationCode\":\"027465\",\"currency\":\"USD\",\"frequency\":\"SINGLE\",\"id\":\"1\",\"receipt\":\"180131305\",\"source\":\"INTERNET\",\"terminal\":\"9358\",\"type\":\"PAYMENT\"},\"version\":\"45\"}]}";
         TransactionResponse response = ApiResponseService.parseHostedCheckoutResponse(data);
