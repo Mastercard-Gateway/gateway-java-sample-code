@@ -401,7 +401,7 @@ public class WebController {
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(createResp);
 
             //UPDATE_SESSION FOR 3DS2
-            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
+            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
             String updateResp = ApiRequestService
                     .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
                             ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect?" +
