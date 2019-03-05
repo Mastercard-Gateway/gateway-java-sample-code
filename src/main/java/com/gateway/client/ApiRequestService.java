@@ -47,21 +47,21 @@ public class ApiRequestService {
         req.setOrderId(Utils.createUniqueId("order-"));
         req.setTransactionId(Utils.createUniqueId("trans-"));
 
-        switch (apiOperation) {
-            case "CAPTURE":
-            case "REFUND":
-            case "VOID":
-            case "UPDATE_AUTHORIZATION":
+        switch (ApiOperation.valueOf(apiOperation)) {
+            case CAPTURE:
+            case REFUND:
+            case VOID:
+            case UPDATE_AUTHORIZATION:
                 req.setOrderId(null);
                 break;
-            case "RETRIEVE_ORDER":
-            case "RETRIEVE_TRANSACTION": {
+            case RETRIEVE_ORDER:
+            case RETRIEVE_TRANSACTION: {
                 req.setApiMethod("GET");
                 req.setOrderId(null);
                 req.setTransactionId(null);
             }
             break;
-            case "CREATE_CHECKOUT_SESSION":
+            case CREATE_CHECKOUT_SESSION:
             case CREATE_SESSION:
                 req.setApiMethod("POST");
                 break;
@@ -189,7 +189,7 @@ public class ApiRequestService {
         JsonObject order = new JsonObject();
         if (Utils.notNullOrEmpty(request.getApiOperation()) &&
                 (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")
-                        || request.getApiOperation().equals(UPDATE_SESSION))) {
+                        || request.getApiOperation().equals(UPDATE_SESSION.toString()))) {
             // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
             if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
         }
@@ -265,7 +265,7 @@ public class ApiRequestService {
                 interaction.addProperty("returnUrl", request.getReturnUrl());
             } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT")
                     || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")
-                    || request.getApiOperation().equals(UPDATE_SESSION)) {
+                    || request.getApiOperation().equals(UPDATE_SESSION.toString())) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
             }
         }
@@ -275,8 +275,8 @@ public class ApiRequestService {
 
         // Add all the elements to the main JSON object we'll return from this method
         JsonObject data = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals(UPDATE_SESSION)
-                && !request.getApiOperation().equals(CREATE_SESSION))
+        if (Utils.notNullOrEmpty(request.getApiOperation()) && !request.getApiOperation().equals(UPDATE_SESSION.toString())
+                && !request.getApiOperation().equals(CREATE_SESSION.toString()))
             data.addProperty("apiOperation", request.getApiOperation());
         if (Utils.notNullOrEmpty(request.getSecureId())) data.addProperty("3DSecureId", request.getSecureId());
         if (!order.entrySet().isEmpty()) data.add("order", order);
@@ -383,7 +383,7 @@ public class ApiRequestService {
      */
     public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId,
             String redirectResponseUrl) throws Exception {
-        request.setApiOperation(UPDATE_SESSION);
+        request.setApiOperation(UPDATE_SESSION.toString());
         request.setApiMethod("PUT");
 
         request.setAcceptVersions("3DS2,3DS1").
@@ -467,7 +467,7 @@ public class ApiRequestService {
             Config config) throws Exception {
         try {
             // Construct API request
-            String apiOperation = ApiRequestService.retrievePaymentOptionsInquiry(config);
+            String apiOperation = ApiRequestService.retrievePaymentOptionsInquiry(config).toString();
 
             ApiRequest paymentRequest = ApiRequestService.createApiRequest(apiOperation, config);
             paymentRequest.setSessionId(request.getParameter("sessionId"));
@@ -495,7 +495,7 @@ public class ApiRequestService {
      * @throws Exception
      * @see /api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html
      */
-    public static String retrievePaymentOptionsInquiry(Config config) throws Exception {
+    public static ApiOperation retrievePaymentOptionsInquiry(Config config) throws Exception {
         String paymentOptionsInquiryUrl =
                 ApiRequestService.getMerchantRequestUrl(ApiProtocol.REST, config) + "/paymentOptionsInquiry";
 

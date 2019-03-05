@@ -7,12 +7,16 @@ package com.gateway.client;
 /**
  * The available operations from the API
  */
-public final class ApiOperation {
-    private ApiOperation() {
-    }
-
-    public static final String CREATE_SESSION = "CREATE_SESSION";
-    public static final String PAY = "PAY";
-    public static final String UPDATE_SESSION = "UPDATE_SESSION";
-    public static final String AUTHORIZE = "AUTHORIZE";
+public enum ApiOperation {
+    CREATE_SESSION,
+    PAY,
+    UPDATE_SESSION,
+    AUTHORIZE,
+    CREATE_CHECKOUT_SESSION,
+    RETRIEVE_TRANSACTION,
+    RETRIEVE_ORDER,
+    UPDATE_AUTHORIZATION,
+    VOID,
+    REFUND,
+    CAPTURE
 }
