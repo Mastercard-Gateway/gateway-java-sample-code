@@ -32,7 +32,7 @@ This is a sample application to help developers start building Java applications
 
 1. Run the following:
 
-        java -jar dist/gateway-java-sample-code-1.1.jar
+        java -jar dist/gateway-java-sample-code-1.1.0.jar
 
 1. Navigate to *http://localhost:5000* to test locally
 
