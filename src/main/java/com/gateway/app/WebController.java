@@ -178,7 +178,7 @@ public class WebController {
             String correlationId = Utils.createUniqueId("APM_");
             req.setApiOperation("UPDATE_SESSION");
             req.setOrderAmount("50.00");
-            req.setOrderCurrency("EUR");
+            req.setOrderCurrency(config.getCurrency());
             req.setBrowserPaymentOperation("PAY");
             // NOTE: Uncomment the below for local testing
             //req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
@@ -188,7 +188,7 @@ public class WebController {
 
             mav.setViewName("apm");
             mav.addObject("config", config);
-            mav.addObject("apmApiVersion", "1.0.0");
+            mav.addObject("apmApiVersion", "1.1.0");
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
             mav.addObject("correlationId", correlationId);
@@ -197,6 +197,20 @@ public class WebController {
         } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
+        return mav;
+    }
+
+    /**
+     * APM receipt page
+     *
+     * @return ModelAndView for apmReceipt.html
+     */
+    @GetMapping("/apmReceipt")
+    public ModelAndView showAPMReceipt() {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("config", config);
+        mav.addObject("apmApiVersion", "1.1.0");
+        mav.setViewName("apmReceipt");
         return mav;
     }
 
