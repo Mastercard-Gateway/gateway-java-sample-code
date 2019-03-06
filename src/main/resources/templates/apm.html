@@ -4,9 +4,9 @@
 <!--NOTE: Comment out the below for local testing-->
 <script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
 <!--NOTE: Uncomment out the below for local testing-->
-<!--<script type="text/javascript" src="https://localhost/static/apm/1.0.5-SNAPSHOT/apm.min.js"></script>-->
+<!--<script type="text/javascript" src="http://localhost:81/static/apm/1.1.0/apm.min.js"></script>-->
 <style>
-    #idealButton, #sofortButton, #giropayButton {
+    #idealButton, #sofortButton, #giropayButton, #alipayButton, #enetsButton, #poliButton {
         display: none;
     }
 </style>
@@ -18,9 +18,24 @@
                 <!--<h4>Hosted Checkout integration</h4>-->
                 <!--<h4>Other integration</h4>-->
                 <div id="mc-apm-container" style="width:0px;height:0px;"></div>
-                <button type="submit" class="mt-4 btn btn-primary" id="idealButton" onclick="payWithIdeal();">Pay with iDEAL</button>
-                <button type="submit" class="mt-4 btn btn-primary" id="sofortButton" onclick="payWithSofort();">Pay with Sofort</button>
-                <button type="submit" class="mt-4 btn btn-primary" id="giropayButton" onclick="payWithGiropay();">Pay with Giropay</button>
+                <button type="submit" class="mt-4 btn btn-primary" id="idealButton" onclick="payWithIdeal();">
+                    Pay with iDEAL
+                </button>
+                <button type="submit" class="mt-4 btn btn-primary" id="sofortButton" onclick="payWithSofort();">
+                    Pay with Sofort
+                </button>
+                <button type="submit" class="mt-4 btn btn-primary" id="giropayButton" onclick="payWithGiropay();">
+                    Pay with Giropay
+                </button>
+                <button type="submit" class="mt-4 btn btn-primary" id="alipayButton" onclick="payWithAlipay();">
+                    Pay with Alipay
+                </button>
+                <button type="submit" class="mt-4 btn btn-primary" id="enetsButton" onclick="payWithEnets();">
+                    Pay with eNETS
+                </button>
+                <button type="submit" class="mt-4 btn btn-primary" id="poliButton" onclick="payWithPoli();">
+                    Pay with POLi
+                </button>
             </div>
         </div>
     </div> <!-- row -->
@@ -33,51 +48,111 @@
     var orderId = /*[[${request.orderId}]]*/ null;
     var transactionId = /*[[${request.transactionId}]]*/ null;
     var correlationId = /*[[${correlationId}]]*/ null;
+    var currency = /*[[${config.currency}]]*/ null;
+    var apiVersion = /*[[${config.apiVersion}]]*/ null;
     /*]]>*/
 
-    APM.configure(merchantId, sessionId, {configuration: {wsVersion: '50', userLanguage: 'en-US'}}, function (data) {
+    APM.configure(merchantId, sessionId, {
+            configuration: {
+                wsVersion: apiVersion,
+                userLanguage: 'en-US'
+            }
+        }, function (data) {
             if (data && data.result === "ERROR") {
                 var error = data;
                 //Something bad happened, the error value will match what is returned by the REST API
                 console.error("error.cause : ", error.cause);
                 console.error("error.explanation : ", error.explanation);
                 console.error("error.field : ", error.field);
-            }
-            else {
-                if(APM.isSupported(APM.METHOD_IDEAL)) {
+            } else {
+                if (APM.isSupported(APM.METHOD_IDEAL) && isActiveCurrencyByMethod(data, APM.METHOD_IDEAL)) {
                     $("#idealButton").show();
                 }
-                if(APM.isSupported(APM.METHOD_SOFORT)) {
+                if (APM.isSupported(APM.METHOD_SOFORT) && isActiveCurrencyByMethod(data, APM.METHOD_SOFORT)) {
                     $("#sofortButton").show();
                 }
-                if(APM.isSupported(APM.METHOD_GIROPAY)) {
+                if (APM.isSupported(APM.METHOD_GIROPAY) && isActiveCurrencyByMethod(data, APM.METHOD_GIROPAY)) {
                     $("#giropayButton").show();
+                }
+                if (APM.isSupported(APM.METHOD_ALIPAY) && isActiveCurrencyByMethod(data, APM.METHOD_ALIPAY)) {
+                    $("#alipayButton").show();
+                }
+                if (APM.isSupported(APM.METHOD_ENETS) && isActiveCurrencyByMethod(data, APM.METHOD_ENETS)) {
+                    $("#enetsButton").show();
+                }
+                if (APM.isSupported(APM.METHOD_POLI) && isActiveCurrencyByMethod(data, APM.METHOD_POLI)) {
+                    $("#poliButton").show();
                 }
             }
         }
     );
+
     function payWithIdeal() {
         APM.initiatePayment(APM.METHOD_IDEAL, orderId, transactionId, null, function (data) {
-            handleResponse(data, APM.METHOD_IDEAL);
+            handleResponse(data);
         });
     }
+
     function payWithSofort() {
         APM.initiatePayment(APM.METHOD_SOFORT, orderId, transactionId, null, function (data) {
-            handleResponse(data, APM.METHOD_SOFORT);
+            handleResponse(data);
         });
     }
+
     function payWithGiropay() {
-        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, {giropay: {bankIdentifier: "12345679"}}, function (data) {
-            handleResponse(data, APM.METHOD_GIROPAY);
+        APM.initiatePayment(APM.METHOD_GIROPAY, orderId, transactionId, {
+            giropay: {
+                bankIdentifier: "12345679"
+            }
+        }, function (data) {
+            handleResponse(data);
         });
     }
-    function handleResponse(data, method) {
-        if(data && data.result === "SUCCESS") {
-            sessionStorage.setItem('paymentMethod', method);
+
+    function payWithAlipay() {
+        APM.initiatePayment(APM.METHOD_ALIPAY, orderId, transactionId, null, function (data) {
+            handleResponse(data);
+        });
+    }
+
+    function payWithEnets() {
+        APM.initiatePayment(APM.METHOD_ENETS, orderId, transactionId, {
+            sourceOfFunds: {
+                type: "ENETS",
+                provided: {enets: {bankAccountHolder: "6513615351"}}
+            }, customer: {email: "test@mastercard.com", phone: "12121212"}
+        }, function (data) {
+            handleResponse(data);
+        });
+    }
+
+    function payWithPoli() {
+        APM.initiatePayment(APM.METHOD_POLI, orderId, transactionId, {
+            sourceOfFunds: {
+                type: "POLI",
+                provided: {poli: {bankAccountHolder: "John Muller"}}
+            }
+        }, function (data) {
+            handleResponse(data);
+        });
+    }
+
+    function handleResponse(data) {
+        if (data && data.result === "SUCCESS") {
             window.location.href = data.restApiResponse.browserPayment.redirectUrl;
+        } else {
+            console.error("There was an error initiating browser payment.")
         }
-        else {
-            console.log("There was an error initiating browser payment.")
+    }
+
+    function isActiveCurrencyByMethod(data, method) {
+        if (data && data.result === "SUCCESS") {
+            var activeCurrencies = data.restApiResponse.paymentTypes[method].currencies;
+            return activeCurrencies.some(function (item) {
+                if (item.currency === currency) {
+                    return true;
+                }
+            });
         }
     }
 </script>
