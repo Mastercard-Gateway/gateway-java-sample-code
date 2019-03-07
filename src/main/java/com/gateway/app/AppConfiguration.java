@@ -29,6 +29,9 @@ public class AppConfiguration {
     @Value("${gateway.api.version}")
     private String apiVersion;
 
+    @Value("${GATEWAY_APM_VERSION:1.1.0}")
+    private String apmVersion;
+
     @Value("${gateway.keystore.path}")
     private String keystore;
 
@@ -75,6 +78,7 @@ public class AppConfiguration {
         config.setApiUsername("merchant." + merchantId);
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
+        config.setApmVersion(apmVersion);
 
         if (threeDSApiVersion != null) {
             config.setApiThreeDsVersion(threeDSApiVersion);

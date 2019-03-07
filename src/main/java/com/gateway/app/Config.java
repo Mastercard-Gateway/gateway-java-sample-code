@@ -10,6 +10,7 @@ public class Config {
     private String apiPassword;
     private String apiBaseURL;
     private int apiVersion;
+    private String apmVersion;
     private String gatewayHost;
     private String apiUsername;
     private String apiThreeDsVersion;
@@ -52,6 +53,12 @@ public class Config {
 
     public void setApiVersion(int apiVersion) {
         this.apiVersion = apiVersion;
+    }
+
+    public String getApmVersion() { return apmVersion; }
+
+    public void setApmVersion(String apmVersion) {
+        this.apmVersion = apmVersion;
     }
 
     public String getGatewayHost() {
