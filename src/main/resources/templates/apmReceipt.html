@@ -52,7 +52,6 @@
     /*]]>*/
 
     var paymentInfo = null;
-    var correlationId = getParameterByName('correlationId');
     var orderId = getParameterByName('orderId');
     var transactionId = getParameterByName('transactionId');
     var merchantId = getParameterByName('merchantId');
@@ -60,23 +59,25 @@
     var options = {configuration: {wsVersion: apiVersion, userLanguage: 'en-US'}};
 
     APM.configure(merchantId, sessionId, options, function () {
+        $("#loading-bar-spinner").show();
         if (APM.isConfigured()) {
             APM.retrievePayment(orderId, transactionId, null, function (data) {
                 //raw response for the payment
                 paymentInfo = data;
-                var method = sessionStorage.getItem("paymentMethod");
+                var method = data.restApiResponse.sourceOfFunds.type.toLowerCase();
                 APM.isSuccessfulPayment(method, paymentInfo, function (data) {
                     if (data) {
                         $("#orderStatus").text(data.restApiResponse.response.gatewayCode);
                         $("#orderId").text(orderId);
                         $("#currency").text(data.restApiResponse.order.currency);
                         $("#amount").text(data.restApiResponse.order.amount);
-                        $("#paymentMethod").text(data.restApiResponse.sourceOfFunds.type);
+                        $("#paymentMethod").text(method.toUpperCase());
                         if (data.restApiResponse.result === "SUCCESS") {
                             $("#orderStatus").css('color', 'green')
                         } else {
                             $("#orderStatus").css('color', 'red')
                         }
+                        $("#loading-bar-spinner").hide();
                     } else {
                         console.error("Payment was not successful");
                     }
