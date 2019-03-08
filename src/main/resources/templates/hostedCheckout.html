@@ -129,20 +129,14 @@
         </div>
     </div> <!-- row -->
 </div>
-<!--NOTE: Comment out the below for local testing-->
-<script th:src="@{${config.apiBaseURL} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
+
+<script th:src="@{${baseUrl} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
         data-error="errorCallback"
         data-cancel="cancelCallback"
         data-beforeRedirect="Checkout.saveFormFields"
         data-afterRedirect="Checkout.restoreFormFields">
 </script>
-<!--NOTE: Uncomment out the below for local testing-->
-<!--<script th:src="@{'https://localhost/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"-->
-    <!--data-error="errorCallback"-->
-    <!--data-cancel="cancelCallback"-->
-    <!--data-beforeRedirect="Checkout.saveFormFields"-->
-    <!--data-afterRedirect="Checkout.restoreFormFields">-->
-<!--</script>-->
+
 <script th:inline="javascript">
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;

@@ -36,6 +36,15 @@ public class WebController {
     public Config config;
 
     /**
+     * If -Dlocal=https (or http) argument is passed, then the base url will be pointing to http(s)://localhost,
+     * otherwise base url will point to the GATEWAY_BASE_URL passed in the env variables.
+     * @return  String base url
+     */
+    private String getBaseUrl() {
+        return System.getProperty("local") != null ? System.getProperty("local") + "://localhost" : config.getApiBaseURL();
+    }
+
+    /**
      * Display AUTHORIZE operation page
      *
      * @return ModelAndView for authorize.html
@@ -191,6 +200,7 @@ public class WebController {
             mav.addObject("apmApiVersion", config.getApmVersion());
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
+            mav.addObject("baseUrl", getBaseUrl());
             mav.addObject("correlationId", correlationId);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
@@ -462,6 +472,7 @@ public class WebController {
             mav.addObject("config", config);
             mav.addObject("currencies", currencies);
             mav.addObject("hostedSession", hostedSession);
+            mav.addObject("baseUrl", getBaseUrl());
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
