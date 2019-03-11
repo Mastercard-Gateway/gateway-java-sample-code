@@ -6,6 +6,8 @@ package com.gateway.app;
 
 public class Config {
 
+    private final String httpProxyHost;
+    private final Integer httpProxyPort;
     private String merchantId;
     private String apiPassword;
     private String apiBaseURL;
@@ -20,6 +22,21 @@ public class Config {
     private AuthenticationType authenticationType;
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
+
+    public Config() {
+        httpProxyHost = System.getProperty("http.proxyHost") != null ? System.getProperty("http.proxyHost") : null;
+        httpProxyPort = System.getProperty("http.proxyPort") != null ?
+                Integer.valueOf(System.getProperty("http.proxyPort")) : null;
+    }
+
+    public String getHttpProxyHost() {
+        return httpProxyHost;
+    }
+
+    public Integer getHttpProxyPort() {
+        return httpProxyPort;
+    }
+
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
     public String getMerchantId() {

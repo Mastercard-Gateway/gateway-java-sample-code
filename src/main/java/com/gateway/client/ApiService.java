@@ -71,10 +71,11 @@ public class ApiService {
                 credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(config.getApiUsername(), config.getApiPassword()));
                 httpClientContext.setCredentialsProvider(credentialsProvider);
 
-                if (System.getProperty("http.proxyHost") != null && System.getProperty("http.proxyPort") != null) {
-                    int port = Integer.parseInt(System.getProperty("http.proxyPort"));
-                    logger.info("Using proxy settings - Host = " + System.getProperty("http.proxyHost") + "Port = " + port);
-                    HttpHost proxy = new HttpHost(System.getProperty("http.proxyHost"), port, (port == 8443 ? "https" : "http"));
+                if (config.getHttpProxyHost() != null && config.getHttpProxyPort() != null) {
+                    logger.info("Using proxy settings - Host = {0} Port = {1}", config.getHttpProxyHost(),
+                            config.getHttpProxyPort());
+                    HttpHost proxy = new HttpHost(config.getHttpProxyHost(), config.getHttpProxyPort(),
+                            config.getHttpProxyHost().contains("https") ? "https" : "http");
 
                     RequestConfig requestConfig= RequestConfig.custom()
                             .setProxy(proxy)
