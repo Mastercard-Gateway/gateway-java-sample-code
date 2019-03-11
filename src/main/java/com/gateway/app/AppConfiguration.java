@@ -29,7 +29,7 @@ public class AppConfiguration {
     @Value("${gateway.api.version}")
     private String apiVersion;
 
-    @Value("${GATEWAY_APM_VERSION:1.1.0}")
+    @Value("${gateway.apm.api.version}")
     private String apmVersion;
 
     @Value("${gateway.keystore.path}")
