@@ -2,6 +2,15 @@
  * Copyright (c) 2018 MasterCard. All rights reserved.
  */
 
+
+/**
+ *    The Hosted Session JavaScript client library enables you to collect sensitive payment details from the payer in
+ *    payment form fields, hosted by the Mastercard Payment Gateway. For more information, see {@link https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentSession.html payment session}
+ *    {@link https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html Implementing a Hosted Session Integration}
+ */
+
+
+// APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE
 if (self === top) {
   var antiClickjack = document.getElementById("antiClickjack");
   if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
@@ -12,6 +21,8 @@ if (self === top) {
 const scope = $(".mb-4")[0].id;
 
 var afterSessionUpdated;
+
+// CONFIGURES A HOSTED SESSION INTERACTION
 PaymentSession.configure({
   session: $("#session-id")[0].value,
   fields: {
@@ -67,8 +78,10 @@ PaymentSession.configure({
   }
 }, scope);
 
+// SETS FOCUS ON THE SPECIFIED HOSTED FIELD
 PaymentSession.setFocus('card.number', scope);
 
+// SETS THE STYLING ATTRIBUTES FOR THE SPECIFIED HOSTED FIELDS WHEN THE FOCUS IS GAINED
 PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
   borderColor: 'red',
   borderWidth: '3px'
@@ -77,8 +90,11 @@ PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
 // 1.1
 function updateSession(callback) {
   $("#loading-bar-spinner").show();
-  // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
+  // UPDATE CALLBACK FUNCTION THAT WILL BE CALLED ONCE THE SESSION HAS BEEN UPDATED
   afterSessionUpdated = callback;
+
+  // STORES THE INPUT FROM THE HOSTED FIELD INTO THE SESSION
+  // USAGE PaymentSession.updateSessionFromForm(paymentType, [localBrand, [scope]])
   PaymentSession.updateSessionFromForm('card', null, scope);
 }
 
