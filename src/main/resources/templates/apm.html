@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apm')}">
 <body>
-<!--NOTE: Comment out the below for local testing-->
-<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
-<!--NOTE: Uncomment out the below for local testing-->
-<!--<script type="text/javascript" src="http://localhost:81/static/apm/1.1.0/apm.min.js"></script>-->
+<script type="text/javascript" th:src="@{${baseUrl} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
 <style>
     #idealButton, #sofortButton, #giropayButton, #alipayButton, #enetsButton, #poliButton {
         display: none;
