@@ -89,10 +89,7 @@ PaymentSession.configure({
 
 PaymentSession.setFocus('card.number', scope);
 
-PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
-    borderColor: 'red',
-    borderWidth: '3px'
-}, scope);
+
 
 function pay() {
     $("#loading-bar-spinner").show();
