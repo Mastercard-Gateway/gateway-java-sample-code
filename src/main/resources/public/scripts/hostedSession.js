@@ -85,10 +85,6 @@ PaymentSession.configure({
 });
 
 
-PaymentSession.setFocusStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
-    borderColor: 'red',
-    borderWidth: '3px'
-});
 
 
 function pay() {
