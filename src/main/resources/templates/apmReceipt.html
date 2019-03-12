@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apmReceipt')}">
+<body>
+<script type="text/javascript" th:src="@{${baseUrl} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div id="receipt" class="col-md-12">
+                <h3>Transaction Receipt</h3>
+                <div class="row">
+                    <div class="col">
+                        Order status
+                    </div>
+                    <div class="col">
+                        <p><strong id="orderStatus"></strong></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Order ID
+                    </div>
+                    <div class="col">
+                        <p id="orderId"></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Amount
+                    </div>
+                    <div class="col">
+                        <p><span id="amount"></span>&nbsp;<span id="currency"></span></p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        Payment method
+                    </div>
+                    <div class="col">
+                        <p id="paymentMethod"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var apiVersion = /*[[${config.apiVersion}]]*/ null;
+    /*]]>*/
+
+    var paymentInfo = null;
+    var orderId = getParameterByName('orderId');
+    var transactionId = getParameterByName('transactionId');
+    var merchantId = getParameterByName('merchantId');
+    var sessionId = getParameterByName('sessionId');
+    var options = {configuration: {wsVersion: apiVersion, userLanguage: 'en-US'}};
+
+    APM.configure(merchantId, sessionId, options, function () {
+        $("#loading-bar-spinner").show();
+        if (APM.isConfigured()) {
+            APM.retrievePayment(orderId, transactionId, null, function (data) {
+                //raw response for the payment
+                paymentInfo = data;
+                var method = data.restApiResponse.sourceOfFunds.type.toLowerCase();
+                APM.isSuccessfulPayment(method, paymentInfo, function (data) {
+                    if (data) {
+                        $("#orderStatus").text(data.restApiResponse.response.gatewayCode);
+                        $("#orderId").text(orderId);
+                        $("#currency").text(data.restApiResponse.order.currency);
+                        $("#amount").text(data.restApiResponse.order.amount);
+                        $("#paymentMethod").text(method.toUpperCase());
+                        if (data.restApiResponse.result === "SUCCESS") {
+                            $("#orderStatus").css('color', 'green')
+                        } else {
+                            $("#orderStatus").css('color', 'red')
+                        }
+                        $("#loading-bar-spinner").hide();
+                    } else {
+                        console.error("Payment was not successful");
+                    }
+                });
+            });
+        } else {
+            console.error("Error configuring APM");
+        }
+    });
+
+    // Pure Javascript query parameters parser
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+</script>
+</body>
+</html>
