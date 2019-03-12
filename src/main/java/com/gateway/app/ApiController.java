@@ -547,18 +547,21 @@ public class ApiController {
     }
 
     /**
-     *
+     * Provided in the UpdateSession operation call as <pre>authentication.redirectResponseUrl</pre>, the payer will be
+     * redirected to this URL will be after completing the payer authentication process.
      */
     @PostMapping(value = "/process3ds2Redirect")
     public ModelAndView process3ds2Redirect(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("receipt");
         try {
 
-            //perform PAY if recommended
+            // When the result of the Authenticate Payer operation indicates that you can proceed with the payment, you
+            // may initiate an Authorize or Pay operation.
             if (request.getParameter("response.gatewayRecommendation")
                     .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
-
-
+                // The gateway will use the authentication.transactionId (provided in the request) to lookup the
+                // authentication results that is stored when you asked to perform authentication. The gateway will
+                // pass the required information to the acquirer.
                 TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
                 mav.setViewName("receipt");
                 mav.addObject("response", paymentResponse);
