@@ -418,8 +418,6 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            RESTApiClient connection = new RESTApiClient();
-
             //CREATE_SESSION
             HostedSession hostedSession = ApiRequestService.createHostedSession(config);
 
