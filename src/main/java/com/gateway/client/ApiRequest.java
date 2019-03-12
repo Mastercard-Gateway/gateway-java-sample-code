@@ -246,11 +246,21 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
-
+    /**
+     * Indicates the channel in which the authentication request is being initiated.
+     *
+     * @return
+     * @see ApiAuthenticationChannel
+     */
     public String getAuthenticationChannel() {
         return authenticationChannel;
     }
 
+    /**
+     * @param authenticationChannel
+     * @return
+     * @see ApiAuthenticationChannel
+     */
     public ApiRequest setAuthenticationChannel(String authenticationChannel) {
         this.authenticationChannel = authenticationChannel;
         return this;

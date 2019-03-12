@@ -150,7 +150,8 @@
                         </div>
                     </div>
                 </div>
-                <button class="mt-4 btn btn-primary" id="payButton" onclick="preparePay();">Pay with EMV 3DS</button>
+                <button class="mt-4 btn btn-primary" id="payButton" onclick="payWithThreeDS();">Pay with EMV 3DS
+                </button>
             </div>
         </div>
     </div> <!-- row -->
@@ -177,11 +178,12 @@
 
     /**
      * Post the htmlRedirectCode received from Authenticate Payer call
+     * Redirect the payer’s browser to the ACS where the issuer’s challenge UI will be presented, after which the payer
+     * will be redirected back to your web site. In other cases, where no ACS challenge UI is present, the contents of
+     * will direct the authentication.redirect.simple field payer’s browser straight back to your website.
      * @param params data.htmlRedirectCode
-     * @param callback auth() function
      */
-    //4
-    function submitAuthenticatePayer(params, callback) {
+    function redirectToACS(params) {
         var content = params;
         document.body.innerHTML = content;
         var contentScript = $(content).find("script")[0];
@@ -192,14 +194,12 @@
         var acsIframe = document.getElementById('challengeFrame') || document.getElementById('redirectTo3ds1Frame');
         acsIframe.style.position = 'absolute';
         }
-
     }
 
-    //5
-    function auth() {
-        pay();
-    }
-
+    /**
+     * Displays the error page with the response from the api
+     * @param apiResponse the response from the api that contains the error
+     */
     function displayError(apiResponse) {
         var responseBody = {
             "apiResponse": apiResponse
@@ -216,9 +216,17 @@
         xhr.send(JSON.stringify(responseBody));
     }
 
-    //2
+    /**
+     * Calls the ThreeDS.js library to Authenticate the payer
+     */
     function authenticatePayer() {
-        ThreeDS.authenticatePayer(orderId, transactionId, {redirectResponseUrl: JavaSample.secureIdResponseUrl()}, function (data) {
+        // Authentication method for authenticating payer using 3DS that was initiated using `initiate3DS` call.
+        // This method will call AUTHENTICATE_PAYER REST API and returns the raw response in `data.response` field.
+        // @param orderId    (required) - Order Id of the transaction
+        // @param transactionId (required) - Transaction Id of the transaction
+        // @param optionalParams (optional) - Any additional REST API `request` params such as billing and shipping details
+        // @param callback function (required)
+        ThreeDS.authenticatePayer(orderId, transactionId, null, function (data) {
             processAuthenticatePayerResponse(data);
         });
     }
@@ -249,19 +257,26 @@
         } else {
             console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
             switch (data.gatewayRecommendation) {
+                //PROCEED_WITH_PAYMENT (currently returning PROCEED_WITH_AUTHENTICATION - known issue to be fixed in 19.1)
+                // You can proceed with the payment as authentication is granted.
                 case "PROCEED_WITH_AUTHENTICATION":
                 case "PROCEED_WITH_PAYMENT":
                 //challenge flow
-                submitAuthenticatePayer(data.htmlRedirectCode, function () {
-                    auth();
-                });
+                    redirectToACS(data.htmlRedirectCode);
                     break;
             }
         }
     }
 
-    // 1.2
+    /**
+     * Use the ThreeDS Library to Initiate 3DS Authentication for the arguments passed.
+     */
     function initiateAuthentication() {
+        // This method will call INITIATE_AUTHENTICATION REST API and returns the raw response in `data.response` field.
+        // It uses the same `orderId` and `transactionId` used in Update Session which was made prior to this call.
+        // @param orderId    (required) - Order Id of the transaction
+        // @param transactionId (required) - Transaction Id of the transaction
+        // @param callback function (required)
         ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {
             if (data) {
                 if (data.error) {
@@ -285,9 +300,12 @@
             }
         });
     }
-    //1
-    function preparePay() {
-        //TODO updateSession and initiateAuthentication once fields are valid (before click Pay)
+
+    /**
+     * Use the ThreeDS Library to process the payment, from Initiate Payment, to Authenticate Payer.
+     */
+    function payWithThreeDS() {
+        // TODO updateSession and initiateAuthentication once fields are valid (before click Pay)
         // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
         pay(initiateAuthentication);
     }
