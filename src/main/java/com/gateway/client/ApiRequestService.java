@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.gateway.app.Config;
+import com.gateway.response.PaymentOptionsResponse;
 import com.gateway.response.TransactionResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -480,12 +481,20 @@ public class ApiRequestService {
         throw new IllegalArgumentException("Unsupported API protocol!");
     }
 
-
+    /**
+     * Performs the transaction based on the Payment Options retrieved for the customer (PAY or AUTHORIZE)
+     *
+     * @param request
+     * @param config
+     * @return
+     * @throws Exception
+     */
     public static TransactionResponse performTransaction(HttpServletRequest request,
             Config config) throws Exception {
         try {
             // Construct API request
-            String apiOperation = ApiRequestService.retrievePaymentOptionsInquiry(config).toString();
+            // Make a  Payment Options Inquiry first to determine for which is operation the Merchant is enabled (PAY/AUTHORIZE)
+            String apiOperation = ApiRequestService.getApiOperationFromPaymentOptionsInquiry(config).toString();
 
             ApiRequest paymentRequest = ApiRequestService.createApiRequest(apiOperation, config);
             paymentRequest.setSessionId(request.getParameter("sessionId"));
@@ -508,30 +517,45 @@ public class ApiRequestService {
     }
 
     /**
+     * Request to retrieve the options available for processing a payment, for example, the credit cards and currencies.
      * @param config
      * @return the API Operation corresponding to the available options for processing a payment
      * @throws Exception
-     * @see /api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html
+     * @see https://secure.uat.tnspayments.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
      */
-    public static ApiOperation retrievePaymentOptionsInquiry(Config config) throws Exception {
+    public static PaymentOptionsResponse retrievePaymentOptionsInquiry(Config config) throws Exception {
         String paymentOptionsInquiryUrl =
                 ApiRequestService.getMerchantRequestUrl(ApiProtocol.REST, config) + "/paymentOptionsInquiry";
 
         try {
             String paymentOptionsInquiryResponse = connection.getTransaction(paymentOptionsInquiryUrl, config);
-            PaymentOptions paymentOptions = new Gson().fromJson(paymentOptionsInquiryResponse, PaymentOptions.class);
-            switch (paymentOptions.getTransactionMode()) {
-                case AUTHORIZE_CAPTURE:
-                    return ApiOperation.AUTHORIZE;
-                case PURCHASE:
-                    return ApiOperation.PAY;
-                default:
-                    throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
-            }
+            return new Gson().fromJson(paymentOptionsInquiryResponse, PaymentOptionsResponse.class);
         } catch (Exception e) {
             logger.debug("Unable to retrieve Payment Options", e);
             throw e;
         }
 
+    }
+
+    /**
+     * Defines the merchants transaction mode, i.e. if the funds are immediately requested to be moved from the payer's
+     * account or the payment is authorized only and the funds will be moved/captured later.
+     *
+     * @param config
+     * @return the API Operation corresponding to the available options for processing a payment
+     * @throws Exception
+     * @see https://secure.uat.tnspayments.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
+     */
+    public static ApiOperation getApiOperationFromPaymentOptionsInquiry(Config config) throws Exception {
+
+        PaymentOptionsResponse paymentOptions = retrievePaymentOptionsInquiry(config);
+        switch (paymentOptions.getTransactionMode()) {
+            case AUTHORIZE_CAPTURE:
+                return ApiOperation.AUTHORIZE;
+            case PURCHASE:
+                return ApiOperation.PAY;
+            default:
+                throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+        }
     }
 }
