@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.gateway.app.Config;
+import com.gateway.client.ApiAuthenticationChannel;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
 import com.gateway.client.ApiRequestService;
@@ -259,7 +260,7 @@ public class ApiRequestServiceTest {
         String orderAmount = "10.00";
         String orderCurrency = "USD";
         String orderId = "order-194";
-        String authenticationChannel = "MERCHANT_REQUESTED";
+        String authenticationChannel = ApiAuthenticationChannel.MERCHANT_REQUESTED.toString();
 
         ApiRequest request = new ApiRequest();
         request.setApiOperation(ApiOperation);

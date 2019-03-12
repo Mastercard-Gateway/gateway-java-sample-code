@@ -7,3 +7,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2019-01-11
 ### Added
 - *Customize Checkout Configurations* form in **APMs - Hosted Checkout** section.
+- Added support for ThreeDS.js 1.1.0 library

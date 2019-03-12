@@ -124,7 +124,7 @@ public class ApiResponseService {
      */
     public static TransactionResponse parseAuthorizeResponse(String response) {
 
-        return parseMasterpassResponse(response);
+        return parseTransactionResponse(response);
 
     }
 
@@ -136,6 +136,17 @@ public class ApiResponseService {
      */
     public static TransactionResponse parseMasterpassResponse(String response) {
 
+        return parseTransactionResponse(response);
+
+    }
+
+    /**
+     * Parses JSON response from a transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    private static TransactionResponse parseTransactionResponse(String response) {
         try {
 
             TransactionResponse resp = new TransactionResponse();
@@ -155,7 +166,6 @@ public class ApiResponseService {
             logger.error("Unable to parse wallet response", e);
             throw e;
         }
-
     }
     /* essentials_exclude_end */
 

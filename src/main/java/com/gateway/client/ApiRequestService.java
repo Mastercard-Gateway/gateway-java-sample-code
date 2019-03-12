@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.gateway.client.ApiAuthenticationChannel.PAYER_BROWSER;
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 
@@ -30,6 +31,37 @@ public class ApiRequestService {
     private ApiRequestService() {
     }
 
+    /**
+     * This method updates the Hosted Session for 3DS-2.0
+     *
+     * @param protocol REST or NVP
+     * @param request contains info on what data the payload should not include. Should include sessionID
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId The id of the session to be updated
+     * @param redirectResponseUrl The URL to which you want to redirect the payer after completing the payer
+     * authentication process. You must provide this URL, unless you are certain that there will be no interaction with
+     * the payer.
+     * @throws Exception
+     * @see https://test-gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Session%3a
+     * Update Session.html
+     */
+    public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId,
+            String redirectResponseUrl) throws Exception {
+        request.setApiOperation(UPDATE_SESSION.toString())
+                .setApiMethod("PUT")
+                .setAcceptVersions("3DS2,3DS1")
+                .setAuthenticationChannel(PAYER_BROWSER.toString())
+                .setRedirectResponseUrl(redirectResponseUrl);
+
+        String updateSessionPayload = ApiRequestService.buildJSONPayload(request);
+        try {
+            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
+            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
+        } catch (Exception e) {
+            logger.error("Unable to update session", e);
+            throw e;
+        }
+    }
     /**
      * Constructs an object used to complete the API.
      * Contains information about which operation to target and what info is needed in the request body.
@@ -373,31 +405,17 @@ public class ApiRequestService {
         }
     }
 
+
     /**
-     * This method updates the Hosted Session for 3DS-2.0
-     *
-     * @param protocol REST or NVP
-     * @param request contains info on what data the payload should not include. Should include sessionID
-     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * Creates an empty Session
+     * @param config
+     * @return A HostedSession object
      * @throws Exception
      */
-    public static String update3DSSession(ApiProtocol protocol, ApiRequest request, Config config, String sessionId,
-            String redirectResponseUrl) throws Exception {
-        request.setApiOperation(UPDATE_SESSION.toString());
-        request.setApiMethod("PUT");
-
-        request.setAcceptVersions("3DS2,3DS1").
-                setAuthenticationChannel("PAYER_BROWSER").
-                setRedirectResponseUrl(redirectResponseUrl);
-
-        String updateSessionPayload = ApiRequestService.buildJSONPayload(request);
-        try {
-            String updateSessionRequestUrl = ApiRequestService.getSessionRequestUrl(protocol, config, sessionId);
-            return connection.sendTransaction(updateSessionPayload, updateSessionRequestUrl, config);
-        } catch (Exception e) {
-            logger.error("Unable to update session", e);
-            throw e;
-        }
+    public static HostedSession createHostedSession(Config config) throws Exception {
+        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+        String createResp = connection.postTransaction(requestUrl, config);
+        return ApiResponseService.parseSessionResponse(createResp);
     }
 
     /**

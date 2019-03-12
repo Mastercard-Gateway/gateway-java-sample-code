@@ -421,16 +421,18 @@ public class WebController {
             RESTApiClient connection = new RESTApiClient();
 
             //CREATE_SESSION
-            String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-            String createResp = connection.postTransaction(requestUrl, config);
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(createResp);
+            HostedSession hostedSession = ApiRequestService.createHostedSession(config);
 
             //UPDATE_SESSION FOR 3DS2
             ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
+            // The URL to which you want to redirect the payer after completing the payer authentication process. You
+            // must provide this URL, unless you are certain that there will be no interaction with the payer.
+            final String redirectResponseUrl = ApiRequestService.getCurrentContext(httpServletRequest) +
+                    "/process3ds2Redirect?" + "merchantId=" + config.getMerchantId() + "&sessionId=" +
+                    hostedSession.getId();
             String updateResp = ApiRequestService
                     .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
-                            ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect?" +
-                                    "merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId());//process3ds2Redirect
+                            redirectResponseUrl);
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
             updateSessionRequest.setSessionId(hostedSession.getId());
 
