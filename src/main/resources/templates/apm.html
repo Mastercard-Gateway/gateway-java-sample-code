@@ -60,33 +60,29 @@
                 console.error("error.explanation : ", error.explanation);
                 console.error("error.field : ", error.field);
             } else {
-                $("#apm-info").html("Available APM(s) for merchant <strong>" + merchantId + "</strong> using <strong>" + currency + "</strong> currency.");
-                if (APM.isSupported(APM.METHOD_IDEAL) && isActiveCurrencyByMethod(data, APM.METHOD_IDEAL)) {
+                if (APM.isSupported(APM.METHOD_IDEAL) && isActiveCurrencyByMethods(data, [APM.METHOD_IDEAL])) {
                     $("#idealButton").show();
                 }
-                if (APM.isSupported(APM.METHOD_SOFORT) && isActiveCurrencyByMethod(data, APM.METHOD_SOFORT)) {
+                if (APM.isSupported(APM.METHOD_SOFORT) && isActiveCurrencyByMethods(data, [APM.METHOD_SOFORT])) {
                     $("#sofortButton").show();
                 }
-                if (APM.isSupported(APM.METHOD_GIROPAY) && isActiveCurrencyByMethod(data, APM.METHOD_GIROPAY)) {
+                if (APM.isSupported(APM.METHOD_GIROPAY) && isActiveCurrencyByMethods(data, [APM.METHOD_GIROPAY])) {
                     $("#giropayButton").show();
                 }
-                if (APM.isSupported(APM.METHOD_ALIPAY) && isActiveCurrencyByMethod(data, APM.METHOD_ALIPAY)) {
+                if (APM.isSupported(APM.METHOD_ALIPAY) && isActiveCurrencyByMethods(data, [APM.METHOD_ALIPAY])) {
                     $("#alipayButton").show();
                 }
-                if (APM.isSupported(APM.METHOD_ENETS) && isActiveCurrencyByMethod(data, APM.METHOD_ENETS)) {
+                if (APM.isSupported(APM.METHOD_ENETS) && isActiveCurrencyByMethods(data, [APM.METHOD_ENETS])) {
                     $("#enetsButton").show();
                 }
-                if (APM.isSupported(APM.METHOD_POLI) && isActiveCurrencyByMethod(data, APM.METHOD_POLI)) {
+                if (APM.isSupported(APM.METHOD_POLI) && isActiveCurrencyByMethods(data, [APM.METHOD_POLI])) {
                     $("#poliButton").show();
                 }
-                if (!isActiveCurrencyByMethod(data, APM.METHOD_IDEAL) &&
-                    !isActiveCurrencyByMethod(data, APM.METHOD_SOFORT) &&
-                    !isActiveCurrencyByMethod(data, APM.METHOD_GIROPAY) &&
-                    !isActiveCurrencyByMethod(data, APM.METHOD_ALIPAY) &&
-                    !isActiveCurrencyByMethod(data, APM.METHOD_ENETS) &&
-                    !isActiveCurrencyByMethod(data, APM.METHOD_POLI)) {
+                if (!isActiveCurrencyByMethods(data, APM.getSupportedMethods())) {
                     $("#apm-info").addClass('alert alert-warning')
                         .html("There is no active APM supporting <strong>" + currency + "</strong> currency for merchant <strong>" + merchantId + "</strong>");
+                } else {
+                    $("#apm-info").html("Available APM(s) for merchant <strong>" + merchantId + "</strong> using <strong>" + currency + "</strong> currency.");
                 }
             }
         }
@@ -151,12 +147,14 @@
         }
     }
 
-    function isActiveCurrencyByMethod(data, method) {
+    function isActiveCurrencyByMethods(data, methods) {
         if (data && data.result === "SUCCESS") {
-            var activeCurrencies = data.restApiResponse.paymentTypes[method].currencies;
-            return activeCurrencies.some(function (item) {
-                if (item.currency === currency) {
-                    return true;
+            return methods.some(function (method) {
+                var apmMethod = data.restApiResponse.paymentTypes[method.toLowerCase()];
+                if (typeof apmMethod !== "undefined") {
+                    return apmMethod.currencies.some(function (item) {
+                        return item.currency === currency;
+                    });
                 }
             });
         }
