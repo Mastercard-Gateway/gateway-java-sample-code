@@ -187,17 +187,17 @@ public class WebController {
             String correlationId = Utils.createUniqueId("APM_");
             req.setApiOperation("UPDATE_SESSION");
             req.setOrderAmount("50.00");
-            req.setOrderCurrency("EUR");
+            req.setOrderCurrency(config.getCurrency());
             req.setBrowserPaymentOperation("PAY");
             // NOTE: Uncomment the below for local testing
-            //req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
+            // req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             // NOTE: Comment out the below for local testing
             req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
             mav.setViewName("apm");
             mav.addObject("config", config);
-            mav.addObject("apmApiVersion", "1.0.0");
+            mav.addObject("apmApiVersion", config.getApmVersion());
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
             mav.addObject("baseUrl", getBaseUrl());
@@ -207,6 +207,21 @@ public class WebController {
         } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
+        return mav;
+    }
+
+    /**
+     * APM receipt page
+     *
+     * @return ModelAndView for apmReceipt.html
+     */
+    @GetMapping("/apmReceipt")
+    public ModelAndView showAPMReceipt() {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("config", config);
+        mav.addObject("baseUrl", getBaseUrl());
+        mav.addObject("apmApiVersion", config.getApmVersion());
+        mav.setViewName("apmReceipt");
         return mav;
     }
 
