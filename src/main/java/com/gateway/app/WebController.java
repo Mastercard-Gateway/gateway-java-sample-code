@@ -350,8 +350,14 @@ public class WebController {
     /**
      * Display 3DSecure-2.0 operation page
      *
+     * The solution brings 3DS v2 & v1 payment authentication flows that can be called from the browser side using
+     * Session Id based Authentication. As a first step in establishing the authentication channel, the merchant's
+     * servers needs to communicate with the gateway server for creating the session. Once the session is created, all
+     * the subsequent API operations needed for managing the 3DS integration flows can be called directly from the
+     * browser using the 3DS JS API.
      * @param httpServletRequest
      * @return ModelAndView for 3dSecure2.html
+     * @see com.gateway.client.ApiOperation
      */
     @GetMapping("/3dSecure2")
     public ModelAndView showSecure2Id(HttpServletRequest httpServletRequest) {
@@ -359,10 +365,16 @@ public class WebController {
 
         try {
             //CREATE_SESSION
+            // The API works off of Session Id based authentication. As a first step, you must create a session to
+            // securely provide sensitive data, which you can then update with the request fields and values you wish to
+            // store in the session.
             HostedSession hostedSession = ApiRequestService.createHostedSession(config);
 
             //UPDATE_SESSION FOR 3DS2
+            // The Update Session call allows you to add payment and payer data into a session that can subsequently
+            // become the input to determine the risk associated with a payer in an authentication operation.
             ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
+
             // The URL to which you want to redirect the payer after completing the payer authentication process. You
             // must provide this URL, unless you are certain that there will be no interaction with the payer.
             final String redirectResponseUrl = ApiRequestService.getCurrentContext(httpServletRequest) +
