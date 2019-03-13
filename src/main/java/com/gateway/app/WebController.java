@@ -45,6 +45,16 @@ public class WebController {
     }
 
     /**
+     * Display Configuration Page as Index Page
+     *
+     * @return ModelAndView for Home Page displaying config.html
+     */
+    @GetMapping("/")
+    public ModelAndView showHomePage() {
+        return createHostedSessionModel("config");
+    }
+
+    /**
      * Display AUTHORIZE operation page
      *
      * @return ModelAndView for authorize.html
@@ -222,6 +232,24 @@ public class WebController {
         mav.addObject("baseUrl", getBaseUrl());
         mav.addObject("apmApiVersion", config.getApmVersion());
         mav.setViewName("apmReceipt");
+        return mav;
+    }
+
+    /**
+     * Display the current Gateway Configuration
+     *
+     * @return ModelAndView for config.html
+     */
+    @GetMapping("/config")
+    public ModelAndView showConfig() {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            mav.setViewName("config");
+            mav.addObject("config", config);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
         return mav;
     }
 
