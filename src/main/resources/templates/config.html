@@ -1,0 +1,36 @@
+<!--
+  ~ Copyright (c) 2019 Mastercard. All rights reserved.
+  -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'config')}">
+<body>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div id="config" class="col-md-12">
+                <h3>Configuration</h3>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Merchant ID</td>
+                        <td th:text="${config.merchantId}">...</td>
+                    </tr>
+                    <tr>
+                        <td>API Version</td>
+                        <td th:text="${config.apiVersion}">...</td>
+                    </tr>
+                    <tr>
+                        <td>Gateway URL</td>
+                        <td th:text="${config.gatewayHost}">...</td>
+                    </tr>
+                    <tr>
+                        <td>Default Currency</td>
+                        <td th:text="${config.currency}">...</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+</body>
+</html>
