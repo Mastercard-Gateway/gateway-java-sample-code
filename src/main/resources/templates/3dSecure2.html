@@ -176,6 +176,9 @@
         }
     });
 
+    // Maximum number of retry attempts allowed for ThreeDS library calls due to 429 (Too Many Requests) error
+    const maxRetries = 5;
+
     /**
      * Post the htmlRedirectCode received from Authenticate Payer call
      * Redirect the payer’s browser to the ACS where the issuer’s challenge UI will be presented, after which the payer
@@ -216,21 +219,6 @@
         xhr.send(JSON.stringify(responseBody));
     }
 
-    /**
-     * Calls the ThreeDS.js library to Authenticate the payer
-     */
-    function authenticatePayer() {
-        // Authentication method for authenticating payer using 3DS that was initiated using `initiate3DS` call.
-        // This method will call AUTHENTICATE_PAYER REST API and returns the raw response in `data.response` field.
-        // @param orderId    (required) - Order Id of the transaction
-        // @param transactionId (required) - Transaction Id of the transaction
-        // @param optionalParams (optional) - Any additional REST API `request` params such as billing and shipping details
-        // @param callback function (required)
-        ThreeDS.authenticatePayer(orderId, transactionId, null, function (data) {
-            processAuthenticatePayerResponse(data);
-        });
-    }
-
     /*
     * Something bad happened, the error value will match what is returned by the REST API
     */
@@ -239,33 +227,6 @@
         console.error("error.msg : ", error.msg);
         console.error("error.result : ", error.result);
         console.error("error.status : ", error.status);
-    }
-    /**
-     *
-     * @param data authenticatePayer response
-     */
-    //3
-    function processAuthenticatePayerResponse(data) {
-        if (data.error) {
-            logError(data.error);
-            if (data.error.code === 429) {
-                console.warn("Retrying after 5000");
-                window.setTimeout(authenticatePayer(), 5000);
-            } else {
-                displayError(data);
-            }
-        } else {
-            console.log("Received Authenticate Payer Response ", data.htmlRedirectCode);
-            switch (data.gatewayRecommendation) {
-                //PROCEED_WITH_PAYMENT (currently returning PROCEED_WITH_AUTHENTICATION - known issue to be fixed in 19.1)
-                // You can proceed with the payment as authentication is granted.
-                case "PROCEED_WITH_AUTHENTICATION":
-                case "PROCEED_WITH_PAYMENT":
-                //challenge flow
-                    redirectToACS(data.htmlRedirectCode);
-                    break;
-            }
-        }
     }
 
     /**
@@ -290,7 +251,46 @@
                     console.log("After Initiate 3DS ", data);
                     switch (data.gatewayRecommendation) {
                         case "PROCEED_WITH_AUTHENTICATION":
-                            authenticatePayer();
+                            let retriesLeft = maxRetries;
+
+                            let promiseAuthenticatePayer = new Promise((resolve, reject) => {
+                                //Calls the ThreeDS.js library to Authenticate the payer
+                                const authenticatePayer = function (retriesLeft) {
+                                    // Authentication method for authenticating payer using 3DS that was initiated using `initiate3DS` call.
+                                    // This method will call AUTHENTICATE_PAYER REST API and returns the raw response in `data.response` field.
+                                    // @param orderId    (required) - Order Id of the transaction
+                                    // @param transactionId (required) - Transaction Id of the transaction
+                                    // @param optionalParams (optional) - Any additional REST API `request` params such as billing and shipping details
+                                    // @param callback function (required)
+                                    ThreeDS.authenticatePayer(orderId, transactionId, null, function (data) {
+                                        // processAuthenticatePayerResponse(data, retriesLeft);
+                                        if (data.error) {
+                                            logError(data.error);
+                                            if (data.error.code === 429 && retriesLeft > 0) {
+                                                console.warn("Retrying after 5000");
+                                                window.setTimeout(authenticatePayer(retriesLeft - 1), 5000);
+                                            } else {
+                                                reject(data);
+                                            }
+                                        } else resolve(data);
+                                    });
+                                };
+                                authenticatePayer(maxRetries);
+                            })
+                                .then(function (authResponse) {
+                                    console.log("Received Authenticate Payer Response ", authResponse.htmlRedirectCode);
+
+                                    switch (authResponse.gatewayRecommendation) {
+                                        //PROCEED_WITH_PAYMENT (currently returning PROCEED_WITH_AUTHENTICATION - known issue to be fixed in 19.1)
+                                        // You can proceed with the payment as authentication is granted.
+                                        case "PROCEED_WITH_AUTHENTICATION":
+                                        case "PROCEED_WITH_PAYMENT":
+                                            //challenge flow
+                                            redirectToACS(authResponse.htmlRedirectCode);
+                                            break;
+                                    }
+                                })
+                                .catch(errorData => displayError(errorData));
                             break;
                         case "DO_NOT_PROCEED":
                             displayError(data);
