@@ -114,8 +114,6 @@ public class ApiResponseService {
 
     }
 
-    /* essentials_exclude_start */
-
     /**
      * Parses JSON response from AUTHORIZE transaction into TransactionResponse object
      *
@@ -128,6 +126,7 @@ public class ApiResponseService {
 
     }
 
+    /* essentials_exclude_start */
     /**
      * Parses JSON response from Masterpass transaction into TransactionResponse object
      *
@@ -139,6 +138,7 @@ public class ApiResponseService {
         return parseTransactionResponse(response);
 
     }
+    /* essentials_exclude_end */
 
     /**
      * Parses JSON response from a transaction into TransactionResponse object
@@ -167,7 +167,6 @@ public class ApiResponseService {
             throw e;
         }
     }
-    /* essentials_exclude_end */
 
     /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object
