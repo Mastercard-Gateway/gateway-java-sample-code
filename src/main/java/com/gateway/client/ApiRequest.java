@@ -298,6 +298,7 @@ public class ApiRequest {
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
+    /* essentials_exclude_end */
 
     public String getAcceptVersions() {
         return acceptVersions;
@@ -315,5 +316,5 @@ public class ApiRequest {
         this.redirectResponseUrl = redirectResponseUrl;
         return this;
     }
-    /* essentials_exclude_end */
+
 }
