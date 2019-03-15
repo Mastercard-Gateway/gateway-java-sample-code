@@ -79,10 +79,8 @@ public class AppConfiguration {
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
         config.setApmVersion(apmVersion);
+        config.setApiThreeDsVersion(threeDSApiVersion);
 
-        if (threeDSApiVersion != null) {
-            config.setApiThreeDsVersion(threeDSApiVersion);
-        }
         return config;
     }
 }

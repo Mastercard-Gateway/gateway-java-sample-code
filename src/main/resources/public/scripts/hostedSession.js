@@ -48,7 +48,8 @@ PaymentSession.configure({
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
             if (response.status) {
-                if ("ok" == response.status) {
+                clearErrorMessages();
+                if ("ok" == response.status && finalSubmit == true) {
                     console.log("Session updated with data: " + response.session.id);
 
                     if (!afterSessionUpdated) {
@@ -77,8 +78,10 @@ PaymentSession.configure({
                 } else if ("system_error" == response.status) {
                     handleError("Session update failed with system error: " + response.errors.message)
                 }
+                finalSubmit = false;
             } else {
                 handleError("Session update failed: " + response);
+                finalSubmit = false;
             }
         }
     }
@@ -86,13 +89,10 @@ PaymentSession.configure({
 
 PaymentSession.setFocus('card.number', scope);
 
-PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
-    borderColor: 'red',
-    borderWidth: '3px'
-}, scope);
-
 function pay(callback) {
     $("#loading-bar-spinner").show();
+    finalSubmit = true;
+    expiryMonth = expiryYear = cardNumber = securityCode = false;
 
     // UPDATE CALLBACK FUNCTION THAT WILL BE CALLED ONCE THE SESSION HAS BEEN UPDATED
     if (callback)
@@ -134,3 +134,8 @@ function handleError(message) {
     $errorAlert.show();
 }
 
+function clearErrorMessages(){
+    var $errorAlert = $('#error-alert');
+    $errorAlert.html("");
+    $errorAlert.hide();
+}
