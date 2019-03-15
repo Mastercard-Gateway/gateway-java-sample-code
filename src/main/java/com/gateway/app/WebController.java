@@ -32,16 +32,6 @@ public class WebController {
     }
 
     /**
-     * Display Configuration Page as Index Page
-     *
-     * @return ModelAndView for Home Page displaying config.html
-     */
-    @GetMapping("/")
-    public ModelAndView showHomePage() {
-        return createHostedSessionModel("config");
-    }
-
-    /**
      * Display AUTHORIZE operation page
      *
      * @return ModelAndView for authorize.html
