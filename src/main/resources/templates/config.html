@@ -1,0 +1,68 @@
+<!--
+  ~ Copyright (c) 2019 Mastercard. All rights reserved.
+  -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'config')}">
+<body>
+<script type="text/javascript" th:src="@{${baseUrl} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div id="config" class="col-md-12">
+                <h3>Configuration</h3>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Merchant ID</td>
+                        <td th:text="${config.merchantId}"></td>
+                    </tr>
+                    <tr>
+                        <td>API Version</td>
+                        <td th:text="${config.apiVersion}"></td>
+                    </tr>
+                    <tr>
+                        <td>Gateway URL</td>
+                        <td th:text="${config.gatewayHost}"></td>
+                    </tr>
+                    <tr>
+                        <td>Default Currency</td>
+                        <td th:text="${config.currency}"></td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Mode</td>
+                        <td id="transactionMode"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+<script th:inline="javascript">
+
+    /*<![CDATA[*/
+    var merchantId = /*[[${config.merchantId}]]*/ null;
+    var sessionId = /*[[${hostedSession.id}]]*/ null;
+    var apiVersion = /*[[${config.apiVersion}]]*/ null;
+    /*]]>*/
+
+    APM.configure(merchantId, sessionId, {
+            configuration: {
+                wsVersion: apiVersion,
+                userLanguage: 'en-US'
+            }
+        }, function (data) {
+            if (data && data.result === "ERROR") {
+                var error = data.restApiResponse.error;
+                //Something bad happened, the error value will match what is returned by the REST API
+                console.error("error.cause : ", error.cause);
+                console.error("error.explanation : ", error.explanation);
+                console.error("result : ", data.restApiResponse.result);
+                $("#transactionMode").text(error.cause + ' : ' + error.explanation);
+            } else {
+                $("#transactionMode").text(data.restApiResponse.transactionMode);
+            }
+        }
+    );
+</script>
+</body>
+</html>
