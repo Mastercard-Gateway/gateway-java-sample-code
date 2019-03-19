@@ -234,18 +234,15 @@ public class WebController {
     public ModelAndView showConfig() {
         ModelAndView mav = new ModelAndView();
 
-        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-
         try {
-            RESTApiClient connection = new RESTApiClient();
-            String resp = connection.postTransaction(requestUrl, config);
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+            if (config.getTransactionMode() == null) {
+                config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+            }
 
             mav.setViewName("config");
             mav.addObject("config", config);
             mav.addObject("apmApiVersion", config.getApmVersion());
             mav.addObject("baseUrl", getBaseUrl());
-            mav.addObject("hostedSession", hostedSession);
         } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
