@@ -30,39 +30,12 @@
                     </tr>
                     <tr>
                         <td>Transaction Mode</td>
-                        <td id="transactionMode"></td>
+                        <td th:text="${config.transactionMode}"></td>
                     </tr>
                 </table>
             </div>
         </div>
     </div> <!-- row -->
 </div>
-<script th:inline="javascript">
-
-    /*<![CDATA[*/
-    var merchantId = /*[[${config.merchantId}]]*/ null;
-    var sessionId = /*[[${hostedSession.id}]]*/ null;
-    var apiVersion = /*[[${config.apiVersion}]]*/ null;
-    /*]]>*/
-
-    APM.configure(merchantId, sessionId, {
-            configuration: {
-                wsVersion: apiVersion,
-                userLanguage: 'en-US'
-            }
-        }, function (data) {
-            if (data && data.result === "ERROR") {
-                var error = data.restApiResponse.error;
-                //Something bad happened, the error value will match what is returned by the REST API
-                console.error("error.cause : ", error.cause);
-                console.error("error.explanation : ", error.explanation);
-                console.error("result : ", data.restApiResponse.result);
-                $("#transactionMode").text(error.cause + ' : ' + error.explanation);
-            } else {
-                $("#transactionMode").text(data.restApiResponse.transactionMode);
-            }
-        }
-    );
-</script>
 </body>
 </html>
