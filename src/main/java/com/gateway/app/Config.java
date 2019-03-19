@@ -4,6 +4,8 @@
 
 package com.gateway.app;
 
+import com.gateway.model.TransactionMode;
+
 public class Config {
 
     private final String httpProxyHost;
@@ -21,6 +23,17 @@ public class Config {
     private String currency;
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
+    private TransactionMode transactionMode;
+
+
+    public TransactionMode getTransactionMode() {
+        return transactionMode;
+    }
+
+    public Config setTransactionMode(TransactionMode transactionMode) {
+        this.transactionMode = transactionMode;
+        return this;
+    }
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
 
