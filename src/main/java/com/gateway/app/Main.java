@@ -27,7 +27,7 @@ public class Main {
 
     @RequestMapping("/")
     ModelAndView index() {
-        return new ModelAndView("redirect:/pay");
+        return new ModelAndView("redirect:/config");
     }
 
     private static void initWebhooksNotificationsFolder() {
