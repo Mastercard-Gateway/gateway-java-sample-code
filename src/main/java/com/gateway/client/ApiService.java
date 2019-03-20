@@ -61,7 +61,10 @@ public class ApiService {
                 if (System.getProperty("http.proxyHost") != null && System.getProperty("http.proxyPort") != null) {
                     int port = Integer.parseInt(System.getProperty("http.proxyPort"));
                     logger.info("Using proxy settings - Host = " + System.getProperty("http.proxyHost") + "Port = " + port);
-                    HttpHost proxy = new HttpHost(System.getProperty("http.proxyHost"), port, (port == 8443 ? "https" : "http"));
+//                    HttpHost proxy = new HttpHost(System.getProperty("http.proxyHost"), port, (port == 8443 ? "https" : "http"));
+                      //Testing without HTTPS
+                      HttpHost proxy = new HttpHost(System.getProperty("http.proxyHost"), port);
+
 
                     RequestConfig requestConfig= RequestConfig.custom()
                             .setProxy(proxy)
