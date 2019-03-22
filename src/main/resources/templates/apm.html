@@ -54,11 +54,11 @@
             }
         }, function (data) {
             if (data && data.result === "ERROR") {
-                var error = data;
+                var error = data.restApiResponse.error;
                 //Something bad happened, the error value will match what is returned by the REST API
                 console.error("error.cause : ", error.cause);
                 console.error("error.explanation : ", error.explanation);
-                console.error("error.field : ", error.field);
+                console.error("result : ", data.restApiResponse.result);
             } else {
                 if (APM.isSupported(APM.METHOD_IDEAL) && isActiveCurrencyByMethods(data, [APM.METHOD_IDEAL])) {
                     $("#idealButton").show();
