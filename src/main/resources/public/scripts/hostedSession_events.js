@@ -2,19 +2,25 @@
  * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
-var finalSubmit = expiryMonth = expiryYear = cardNumber = securityCode = false;
+var finalSubmit = expiryMonth = expiryYear = cardNumber = securityCode = nameOnCard = false;
 
 
-PaymentSession.onBlur(['card.number'], function(selector)
-{
+PaymentSession.onBlur(['card.number'], function(selector) {
     console.log("Blur event executed for " + selector);
     finalSubmit = false;
     cardNumber = true;
     PaymentSession.updateSessionFromForm('card');
 });
 
-PaymentSession.onBlur(['card.expiryMonth'], function(selector)
-{
+PaymentSession.onBlur(['card.nameOnCard'], function(selector) {
+    console.log("Blur event executed for " + selector);
+    finalSubmit = false;
+    nameOnCard = true;
+    $("label[for='card-holder-name']").css({fontWeight:"normal"});
+    PaymentSession.updateSessionFromForm('card');
+});
+
+PaymentSession.onBlur(['card.expiryMonth'], function(selector) {
     console.log("Blur event executed for " + selector);
 	finalSubmit = false;
 	expiryMonth = true;
@@ -22,8 +28,7 @@ PaymentSession.onBlur(['card.expiryMonth'], function(selector)
 	PaymentSession.updateSessionFromForm('card');
 });
 
-PaymentSession.onBlur(['card.expiryYear'], function(selector)
-{
+PaymentSession.onBlur(['card.expiryYear'], function(selector) {
     console.log("Blur event executed for " + selector);
 	finalSubmit = false;
 	expiryYear = true;
@@ -31,19 +36,24 @@ PaymentSession.onBlur(['card.expiryYear'], function(selector)
 	PaymentSession.updateSessionFromForm('card');
 });
 
-PaymentSession.onBlur(['card.securityCode'], function(selector)
-{
+PaymentSession.onBlur(['card.securityCode'], function(selector) {
     console.log("Blur event executed for " + selector);
     finalSubmit = false;
     securityCode = true;
     PaymentSession.updateSessionFromForm('card');
 });
 
-
 PaymentSession.onFocus(['card.expiryYear'], function(selector) {
     console.log(selector);
     console.log("Focus event executed for " + selector);
     $("label[for='expiry-year']").css({fontWeight:"bold"});
+
+});
+
+PaymentSession.onFocus(['card.nameOnCard'], function(selector) {
+    console.log(selector);
+    console.log("Focus event executed for " + selector);
+    $("label[for='card-holder-name']").css({fontWeight:"bold"});
 
 });
 
@@ -62,15 +72,13 @@ PaymentSession.onMouseOut(['card.number'], function(selector) {
     $("label[for='card-number']").css({fontWeight:"normal"})
 });
 
-PaymentSession.setFocus('card.number');
-
-PaymentSession.setFocusStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
+PaymentSession.setFocusStyle(["card.nameOnCard","card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
     borderColor: 'red',
     borderWidth: '3px',
     borderStyle:'solid',
 },scope);
 
-PaymentSession.setHoverStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
+PaymentSession.setHoverStyle(["card.nameOnCard","card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
     borderColor: 'blue',
     borderWidth: '3px',
     borderStyle:'solid'
