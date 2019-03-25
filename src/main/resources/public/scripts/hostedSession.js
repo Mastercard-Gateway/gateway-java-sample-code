@@ -29,6 +29,7 @@ PaymentSession.configure({
     fields: {
         // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
         card: {
+            nameOnCard: "#card-holder-name",
             number: "#card-number",
             securityCode: "#security-code",
             expiryMonth: "#expiry-month",
@@ -43,6 +44,8 @@ PaymentSession.configure({
                 if ("ok" == response.status) {
                     console.log("Payment Session initialized for scope: " + response.scopeId);
                 }
+                document.getElementById('card-holder-name') ?
+                    PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
             }
         },
         formSessionUpdate: function (response) {
