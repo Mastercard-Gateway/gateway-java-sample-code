@@ -48,6 +48,9 @@ h6 {
 form, .contents {
     padding: 15px;
 }
+form#threedsChallengeRedirectForm {
+    padding: 0px;
+}
 .form-control[readonly] {
     background-color: #ffffff;
 }

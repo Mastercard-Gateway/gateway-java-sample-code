@@ -1,11 +1,23 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gateway.client.*;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.gateway.client.ApiException;
+import com.gateway.client.ApiProtocol;
+import com.gateway.client.ApiRequest;
+import com.gateway.client.ApiRequestService;
+import com.gateway.client.ApiResponseService;
+import com.gateway.client.ExceptionService;
+import com.gateway.client.HostedSession;
+import com.gateway.client.NVPApiClient;
+import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
@@ -14,12 +26,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.Map;
 
 @Controller
 public class ApiController {
@@ -531,4 +545,50 @@ public class ApiController {
         }
         return mav;
     }
+
+    /**
+     * Provided in the UpdateSession operation call as <pre>authentication.redirectResponseUrl</pre>, the payer will be
+     * redirected to this URL will be after completing the payer authentication process.
+     */
+    @PostMapping(value = "/process3ds2Redirect")
+    public ModelAndView process3ds2Redirect(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("receipt");
+        try {
+
+            // When the result of the Authenticate Payer operation indicates that you can proceed with the payment, you
+            // may initiate an Authorize or Pay operation.
+            if (request.getParameter("response.gatewayRecommendation")
+                    .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+                // The gateway will use the authentication.transactionId (provided in the request) to lookup the
+                // authentication results that is stored when you asked to perform authentication. The gateway will
+                // pass the required information to the acquirer.
+                TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
+                mav.setViewName("receipt");
+                mav.addObject("response", paymentResponse);
+                mav.addObject("config", config);
+
+            } else {
+                throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED_WITH_PAYMENT.toString());
+
+            }
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+    /**
+     * Make payment using the session and display receipt
+     * @return
+     */
+    @PutMapping(value = "/error")
+    public ModelAndView displayError(@RequestBody HttpServletRequest request)
+    {
+        ModelAndView mav = new ModelAndView();
+
+
+        return ExceptionService.constructGeneralErrorResponse(mav, new Exception(request.getParameter("apiResponse")));
+    }
+
+
 }

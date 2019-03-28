@@ -1,8 +1,12 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.app.Config;
@@ -18,10 +22,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
 
 public class ApiResponseService {
 
@@ -43,6 +43,10 @@ public class ApiResponseService {
             hostedSession.setVersion(jsonSession.get("version").getAsString());
             if (json.get("successIndicator") != null)
                 hostedSession.setSuccessIndicator(json.get("successIndicator").getAsString());
+            if (jsonSession.get("updateStatus") != null)
+                hostedSession.setUpdateStatus(jsonSession.get("updateStatus").getAsString());
+            if (jsonSession.get("aes256Key") != null)
+                hostedSession.setAes256Key(jsonSession.get("aes256Key").getAsString());
 
             return hostedSession;
         } catch (Exception e) {
@@ -110,6 +114,18 @@ public class ApiResponseService {
 
     }
 
+    /**
+     * Parses JSON response from AUTHORIZE transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    public static TransactionResponse parseAuthorizeResponse(String response) {
+
+        return parseTransactionResponse(response);
+
+    }
+
     /* essentials_exclude_start */
     /**
      * Parses JSON response from Masterpass transaction into TransactionResponse object
@@ -119,6 +135,18 @@ public class ApiResponseService {
      */
     public static TransactionResponse parseMasterpassResponse(String response) {
 
+        return parseTransactionResponse(response);
+
+    }
+    /* essentials_exclude_end */
+
+    /**
+     * Parses JSON response from a transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    private static TransactionResponse parseTransactionResponse(String response) {
         try {
 
             TransactionResponse resp = new TransactionResponse();
@@ -138,9 +166,7 @@ public class ApiResponseService {
             logger.error("Unable to parse wallet response", e);
             throw e;
         }
-
     }
-    /* essentials_exclude_end */
 
     /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object

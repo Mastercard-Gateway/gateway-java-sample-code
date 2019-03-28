@@ -1,0 +1,315 @@
+<!--
+  ~ Copyright (c) 2019 MasterCard. All rights reserved.
+  -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'3dSecure2')}">
+<body>
+<script th:inline="javascript">
+    var JavaSample = {
+        operation: function () {
+            return "PAY";
+        },
+        secureIdResponseUrl: function () {
+            return encodeURI(window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1] + "/process3ds2Redirect");
+        }
+    };
+</script>
+<script th:src="@{${config.apiBaseURL} + '/static/threeDS/' + ${config.apiThreeDsVersion} + '/three-ds.min.js'}"
+        type="text/javascript"></script>
+<!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
+<style id="antiClickjack">body { display: none !important; }</style>
+<!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
+<script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
+<div class="col-9">
+    <div class="row">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <h3>Pay with EMV 3DS</h3>
+                <div class="alert alert-warning" role="alert">
+                    <p><strong>NOTE:</strong> You can also do an authorization using 3D Secure 2.0, depending on your
+                        merchant settings.</p>
+                    <p>Here are the processes that occur for this transaction:</p>
+                    <ol>
+                        <li>Use the <a target="_blank"
+                                       th:href="@{${config.apiBaseURL} + '/api/documentation/apiDocumentation/rest-json/'
+                                                                       + ${config.apiVersion}
+                                                                       + '/latest/operation/Session%3a%20Create%20Session.html'}">CREATE_SESSION</a>
+                            operation to collect sensitive card data.
+                        </li>
+                        <li>Use the <a target="_blank" th:href="@{${config.apiBaseURL}
+                                + '/api/documentation/apiDocumentation/rest-json/version/'
+                                + ${config.apiVersion}
+                                + '/operation/Session%3a%20Update%20Session.html'}">UPDATE_SESSION</a>
+                            operation to update the session details such as
+                            <code>authentication.channel = PAYER_BROWSER</code>.
+                        </li>
+                        <li>Initiate Authentication
+                        <li>Authenticate Payer</li>
+                        <li>Use the <a target="_blank"
+                                       th:href="@{${config.apiBaseURL}
+                                + '/api/documentation/apiDocumentation/rest-json/version/'
+                                + ${config.apiVersion}
+                                + '/operation/3DS%3a%20Process%20ACS%20Result.html'}">PROCESS_ACS_RESULT</a> to check if
+                            the authentication was successful.
+                        </li>
+                        <li>Use session.id and 3DSecureId to complete the transaction using <a
+                                th:href="@{${config.apiBaseURL}
+                            + '/api/documentation/apiDocumentation/rest-json/version/'
+                            + ${config.apiVersion}
+                            + '/operation/Transaction%3a%20%20Pay.html'}"
+                                target="_blank">PAY</a> or <a
+                                th:href="@{${config.apiBaseURL}
+                                + '/api/documentation/apiDocumentation/rest-json/version/'
+                                + ${config.apiVersion}+'/operation/Transaction%3a%20%20Authorize.html'}"
+                                target="_blank">AUTHORIZE</a>.
+                        </li>
+                    </ol>
+                    <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL}
+                    + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.
+                    </p>
+                </div>
+                <div class="mb-4" id="3dSecure2">
+                    <input type="hidden" readonly="readonly" name="method" value="PUT" size="20" maxlength="80"/>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="session-id">Session Id</label>
+                        <div class="col-md-7">
+                            <input id="session-id" required="" class="form-control input-md" type="text"
+                                   name="session-id" th:value="${hostedSession.id}" size="8" maxlength="13" readonly/>
+                        </div>
+                    </div>
+                    <h6>Payment details</h6>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="card-number">Card number</label>
+                        <div class="col-md-7">
+                            <input id="card-number" type="text" placeholder="" class="form-control input-md"
+                                   readonly required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
+                        <div class="col-md-7">
+                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md"
+                                   required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
+                        <div class="col-md-7">
+                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md"
+                                   required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="security-code">Security code</label>
+                        <div class="col-md-7">
+                            <input class="form-control input-md" id="security-code" placeholder="" readonly
+                                   type="text"/>
+                        </div>
+                    </div>
+                </div>
+                <div id="3DSUI" hidden="true"></div>
+                <div display="none" id="3DSUIPostData"></div>
+                <div>
+                    <h6>Order details</h6>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-id">Order ID (Auto generated unique Order
+                            ID)</label>
+                        <div class="col-md-7">
+                            <input id="order-id" type="text" th:value="${request.orderId}" class="form-control input-md"
+                                   required="" readonly/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-amount">Order amount</label>
+                        <div class="col-md-7">
+                            <input id="order-amount" type="text" th:value="${request.orderAmount}" maxlength="14"
+                                   class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-currency">Order currency</label>
+                        <div class="col-md-7">
+                            <input id="order-currency" type="text" th:value="${request.orderCurrency}" maxlength="3"
+                                   class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="order-description">Order description</label>
+                        <div class="col-md-7">
+                            <input id="order-description" type="text" th:value="${request.orderDescription}"
+                                   maxlength="127" class="form-control input-md" required=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="transaction-id">Transaction ID (Auto generated unique
+                            Transaction ID)</label>
+                        <div class="col-md-7">
+                            <input id="transaction-id" type="text" th:value="${request.transactionId}"
+                                   class="form-control input-md" required="" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <button class="mt-4 btn btn-primary" id="payButton" onclick="payWithThreeDS();">Pay with EMV 3DS
+                </button>
+            </div>
+        </div>
+    </div> <!-- row -->
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var merchantId = /*[[${config.merchantId}]]*/ null;
+    var sessionId = /*[[${hostedSession.id}]]*/ null;
+    var orderId = /*[[${request.orderId}]]*/ null;
+    var transactionId = /*[[${request.transactionId}]]*/ null;
+    /*]]>*/
+
+    ThreeDS.configure({
+        merchantId: merchantId,
+        hostedSessionId: sessionId,
+        containerId: '3DSUI',
+        configuration: {userLanguage: "en-AU", wsVersion: /*[[${config.apiVersion}]]*/ null},
+        callback: function (data) {
+            if (ThreeDS.isConfigured())
+                console.log("Done with configure");
+        }
+    });
+
+    // Maximum number of retry attempts allowed for ThreeDS library calls due to 429 (Too Many Requests) error
+    const maxRetries = 5;
+
+    /**
+     * Post the htmlRedirectCode received from Authenticate Payer call
+     * Redirect the payer’s browser to the ACS where the issuer’s challenge UI will be presented, after which the payer
+     * will be redirected back to your web site. In other cases, where no ACS challenge UI is present, the contents of
+     * will direct the authentication.redirect.simple field payer’s browser straight back to your website.
+     * @param params data.htmlRedirectCode
+     */
+    function redirectToACS(params) {
+        var content = params;
+        document.body.innerHTML = content;
+        var contentScript = $(content).find("script")[0];
+        if (contentScript !== undefined) {
+            var script = document.createElement("script");
+            script.innerText = contentScript.innerText;
+            document.body.appendChild(script);
+        var acsIframe = document.getElementById('challengeFrame') || document.getElementById('redirectTo3ds1Frame');
+        acsIframe.style.position = 'absolute';
+        }
+    }
+
+    /**
+     * Displays the error page with the response from the api
+     * @param apiResponse the response from the api that contains the error
+     */
+    function displayError(apiResponse) {
+        var responseBody = {
+            "apiResponse": apiResponse
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', 'error', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                document.documentElement.innerHTML = this.response;
+            }
+        }
+        xhr.send(JSON.stringify(responseBody));
+    }
+
+    /*
+    * Something bad happened, the error value will match what is returned by the REST API
+    */
+    function logError(error) {
+        console.error("error.code : ", error.code);
+        console.error("error.msg : ", error.msg);
+        console.error("error.result : ", error.result);
+        console.error("error.status : ", error.status);
+    }
+
+    /**
+     * Use the ThreeDS Library to Initiate 3DS Authentication for the arguments passed.
+     */
+    function initiateAuthentication() {
+        // This method will call INITIATE_AUTHENTICATION REST API and returns the raw response in `data.response` field.
+        // It uses the same `orderId` and `transactionId` used in Update Session which was made prior to this call.
+        // @param orderId    (required) - Order Id of the transaction
+        // @param transactionId (required) - Transaction Id of the transaction
+        // @param callback function (required)
+        ThreeDS.initiateAuthentication(orderId, transactionId, function (data) {
+            if (data) {
+                if (data.error) {
+                    var error = data.error;
+                    logError(error);
+                    if (error.code === 400) {
+                        console.warn("Retrying after 5000");
+                        window.setTimeout(initiateAuthentication(), 5000);
+                    }
+                } else {
+                    console.log("After Initiate 3DS ", data);
+                    switch (data.gatewayRecommendation) {
+                        case "PROCEED_WITH_AUTHENTICATION":
+                            let retriesLeft = maxRetries;
+
+                            let promiseAuthenticatePayer = new Promise((resolve, reject) => {
+                                //Calls the ThreeDS.js library to Authenticate the payer
+                                const authenticatePayer = function (retriesLeft) {
+                                    // Authentication method for authenticating payer using 3DS that was initiated using `initiate3DS` call.
+                                    // This method will call AUTHENTICATE_PAYER REST API and returns the raw response in `data.response` field.
+                                    // @param orderId    (required) - Order Id of the transaction
+                                    // @param transactionId (required) - Transaction Id of the transaction
+                                    // @param optionalParams (optional) - Any additional REST API `request` params such as billing and shipping details
+                                    // @param callback function (required)
+                                    ThreeDS.authenticatePayer(orderId, transactionId, null, function (data) {
+                                        // processAuthenticatePayerResponse(data, retriesLeft);
+                                        if (data.error) {
+                                            logError(data.error);
+                                            if (data.error.code === 429 && retriesLeft > 0) {
+                                                console.warn("Retrying after 5000");
+                                                window.setTimeout(authenticatePayer(retriesLeft - 1), 5000);
+                                            } else {
+                                                reject(data);
+                                            }
+                                        } else resolve(data);
+                                    });
+                                };
+                                authenticatePayer(maxRetries);
+                            })
+                                .then(function (authResponse) {
+                                    console.log("Received Authenticate Payer Response ", authResponse.htmlRedirectCode);
+
+                                    switch (authResponse.gatewayRecommendation) {
+                                        //PROCEED_WITH_PAYMENT (currently returning PROCEED_WITH_AUTHENTICATION - known issue to be fixed in 19.1)
+                                        // You can proceed with the payment as authentication is granted.
+                                        case "PROCEED_WITH_AUTHENTICATION":
+                                        case "PROCEED_WITH_PAYMENT":
+                                            //challenge flow
+                                            redirectToACS(authResponse.htmlRedirectCode);
+                                            break;
+                                    }
+                                })
+                                .catch(errorData => displayError(errorData));
+                            break;
+                        case "DO_NOT_PROCEED":
+                            displayError(data);
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Use the ThreeDS Library to process the payment, from Initiate Payment, to Authenticate Payer.
+     */
+    function payWithThreeDS() {
+        // TODO updateSession and initiateAuthentication once fields are valid (before click Pay)
+        // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
+        pay(initiateAuthentication);
+    }
+</script>
+<script src="scripts/hostedSession.js"></script>
+</body>
+</html>

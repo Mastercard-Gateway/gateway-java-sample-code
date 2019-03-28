@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 var finalSubmit = expiryMonth = expiryYear = cardNumber = securityCode = false;
@@ -68,7 +68,7 @@ PaymentSession.setFocusStyle(["card.number","card.expiryMonth","card.expiryYear"
     borderColor: 'red',
     borderWidth: '3px',
     borderStyle:'solid',
-});
+},scope);
 
 PaymentSession.setHoverStyle(["card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
     borderColor: 'blue',

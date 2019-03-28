@@ -1,11 +1,15 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
 
+import com.gateway.model.TransactionMode;
+
 public class Config {
 
+    private final String httpProxyHost;
+    private final Integer httpProxyPort;
     private String merchantId;
     private String apiPassword;
     private String apiBaseURL;
@@ -13,13 +17,40 @@ public class Config {
     private String apmVersion;
     private String gatewayHost;
     private String apiUsername;
+    private String apiThreeDsVersion;
     private String keyStore;
     private String keyStorePassword;
     private String currency;
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
+    private TransactionMode transactionMode;
+
+
+    public TransactionMode getTransactionMode() {
+        return transactionMode;
+    }
+
+    public Config setTransactionMode(TransactionMode transactionMode) {
+        this.transactionMode = transactionMode;
+        return this;
+    }
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
+
+    public Config() {
+        httpProxyHost = System.getProperty("http.proxyHost");
+        httpProxyPort = System.getProperty("http.proxyPort") != null ?
+                Integer.valueOf(System.getProperty("http.proxyPort")) : null;
+    }
+
+    public String getHttpProxyHost() {
+        return httpProxyHost;
+    }
+
+    public Integer getHttpProxyPort() {
+        return httpProxyPort;
+    }
+
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
     public String getMerchantId() {
@@ -54,7 +85,9 @@ public class Config {
         this.apiVersion = apiVersion;
     }
 
-    public String getApmVersion() { return apmVersion; }
+    public String getApmVersion() {
+        return apmVersion;
+    }
 
     public void setApmVersion(String apmVersion) {
         this.apmVersion = apmVersion;
@@ -114,5 +147,13 @@ public class Config {
 
     public void setAuthenticationType(AuthenticationType authenticationType) {
         this.authenticationType = authenticationType;
+    }
+
+    public void setApiThreeDsVersion(String apiThreeDsVersion) {
+        this.apiThreeDsVersion = apiThreeDsVersion;
+    }
+
+    public String getApiThreeDsVersion() {
+        return apiThreeDsVersion;
     }
 }

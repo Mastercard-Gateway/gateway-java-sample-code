@@ -1,15 +1,31 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
+/**
+ *    The Hosted Session JavaScript client library enables you to collect sensitive payment details from the payer in
+ *    payment form fields, hosted by the Mastercard Payment Gateway. For more information, see {@link https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentSession.html payment session}
+ *    See https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html Implementing a Hosted Session Integration
+ */
+
+// APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE
 if (self === top) {
     var antiClickjack = document.getElementById("antiClickjack");
     if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
 } else {
     top.location = self.location;
 }
+// The optional named instance of a card payment data set within a session.
+// See https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html?locale=en_US#x_multipleCards
+const scope = $(".mb-4")[0].id;
+
+// HOLD THE CALLBACK FUNCTION THAT WILL BE CALLED AFTER THE HOSTED FIELDS IN THE SESSION HAVE BEEN UPDATED
+// See pay(callback)
+var afterSessionUpdated;
+var sessionId = (!$("#session-id")[0]) ? "" : $("#session-id")[0].value;
 
 PaymentSession.configure({
+    session: sessionId,
     fields: {
         // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
         card: {
@@ -23,7 +39,11 @@ PaymentSession.configure({
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
         initialized: function (response) {
-            // HANDLE INITIALIZATION RESPONSE
+            if (response.status) {
+                if ("ok" == response.status) {
+                    console.log("Payment Session initialized for scope: " + response.scopeId);
+                }
+            }
         },
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
@@ -32,28 +52,11 @@ PaymentSession.configure({
                 if ("ok" == response.status && finalSubmit == true) {
                     console.log("Session updated with data: " + response.session.id);
 
-                    // Submit fields
-                    var data = {
-                        apiOperation: JavaSample.operation(),
-                        sessionId: response.session.id,
-                        transactionId: $('#transaction-id').val(),
-                        orderId: $('#order-id').val(),
-                        orderAmount: $('#order-amount').val(),
-                        orderCurrency: $('#order-currency').val(),
-                        orderDescription: $('#order-description').val(),
-                        secureIdResponseUrl: JavaSample.secureIdResponseUrl()
-                    };
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', JavaSample.endpoint(), true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState == XMLHttpRequest.DONE) {
-                            document.documentElement.innerHTML =this.response;
-                        }
-                    };
-                    xhr.send(JSON.stringify(data));
-
+                    if (!afterSessionUpdated) {
+                        submitFields(response.session.id);
+                    } else {
+                        afterSessionUpdated();
+                    }
                 } else if ("fields_in_error" == response.status) {
 
                     console.log("Session update failed with field errors.");
@@ -82,17 +85,45 @@ PaymentSession.configure({
             }
         }
     }
-});
+}, scope);
 
+PaymentSession.setFocus('card.number', scope);
 
-
-
-function pay() {
+function pay(callback) {
     $("#loading-bar-spinner").show();
     finalSubmit = true;
     expiryMonth = expiryYear = cardNumber = securityCode = false;
+
+    // UPDATE CALLBACK FUNCTION THAT WILL BE CALLED ONCE THE SESSION HAS BEEN UPDATED
+    if (callback)
+        afterSessionUpdated = callback;
+
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-    PaymentSession.updateSessionFromForm('card');
+    // USAGE PaymentSession.updateSessionFromForm(paymentType, [scope])
+    PaymentSession.updateSessionFromForm('card', null, scope);
+}
+
+function submitFields(sessionId) {
+    var data = {
+        apiOperation: JavaSample.operation(),
+        sessionId: sessionId,
+        transactionId: $('#transaction-id').val(),
+        orderId: $('#order-id').val(),
+        orderAmount: $('#order-amount').val(),
+        orderCurrency: $('#order-currency').val(),
+        orderDescription: $('#order-description').val(),
+        secureIdResponseUrl: JavaSample.secureIdResponseUrl()
+    };
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', JavaSample.endpoint(), true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.documentElement.innerHTML = this.response;
+        }
+    };
+    xhr.send(JSON.stringify(data));
 }
 
 function handleError(message) {

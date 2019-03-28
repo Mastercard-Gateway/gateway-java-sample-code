@@ -28,6 +28,103 @@
                         </div>
                     </div>
                 </div>
+                <div class="tab">
+                    <input id="tab-one" type="checkbox" name="tabs" />
+                    <label class="tab-title" for="tab-one"
+                    >Customize Checkout Configurations</label
+                    >
+                    <div class="tab-content">
+                        <form id="order-form" onSubmit="orderFormSubmitHandler()">
+                            <div class="row">
+                                <div class="form-group col-md-3">
+                                    <label class="control-label" for="order-amount"
+                                    >Amount</label
+                                    >
+                                    <input
+                                            id="order-amount"
+                                            type="number"
+                                            min="1"
+                                            max="999999999"
+                                            maxlength="10"
+                                            class="form-control input-md"
+                                            required
+                                            placeholder="e.g. 50.00"
+                                    />
+                                </div>
+                                <div class="form-group col-md-9">
+                                    <label class="control-label" for="order-currency"
+                                    >Currency</label
+                                    >
+                                    <select
+                                            id="order-currency"
+                                            class="form-control input-md"
+                                            required
+                                            th:field="*{currencies}">
+                                        <option th:each="currency : *{currencies}"
+                                                th:value="${currency.key}"
+                                                th:title="${currency.value}"
+                                                th:text="${currency.key} + ' - ' + ${currency.value}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <label class="control-label" for="order-description"
+                                    >Description</label
+                                    >
+                                    <textarea
+                                            id="order-description"
+                                            class="form-control"
+                                            rows="4"
+                                            required
+                                            placeholder="e.g. Ordered goods"
+                                    ></textarea>
+                                </div>
+                            </div>
+                            <h6 class="panel-title">Advanced Settings</h6>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label class="control-label" for="order-session-id"
+                                    >Custom Session ID</label
+                                    >
+                                    <input
+                                            id="order-session-id"
+                                            type="text"
+                                            minlength="31"
+                                            maxlength="50"
+                                            class="form-control input-md"
+                                            placeholder="e.g. SESSION0002407875347I28666942L5"
+                                            autocomplete="off"
+                                    />
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="control-label" for="order-return-url"
+                                    >Return URL</label
+                                    >
+                                    <input
+                                            id="order-return-url"
+                                            type="url"
+                                            class="form-control input-md"
+                                            placeholder="e.g. http://www.mystore.com/returnurl"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <button
+                                            id="order-submit"
+                                            type="submit"
+                                            class="btn btn-primary pull-right"
+                                            disabled
+                                    >
+                                        Update configuration
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div> <!-- row -->
@@ -40,6 +137,13 @@
         data-afterRedirect="Checkout.restoreFormFields">
 </script>
 
+<!--NOTE: Uncomment out the below for local testing-->
+<!--<script th:src="@{'https://localhost/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"-->
+    <!--data-error="errorCallback"-->
+    <!--data-cancel="cancelCallback"-->
+    <!--data-beforeRedirect="Checkout.saveFormFields"-->
+    <!--data-afterRedirect="Checkout.restoreFormFields">-->
+<!--</script>-->
 <script th:inline="javascript">
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
@@ -81,15 +185,71 @@
         console.log("COMPLETE: ", response);
     }
 
-    Checkout.configure({
+    /** Getting values from Order form **/
+    var orderform = $('#order-form');
+    var checkoutScript = $('#checkout-script');
+    var currencyInput = $('#order-currency');
+    var amountInput = $('#order-amount');
+    var descriptionInput = $('#order-description');
+    var sessionIdInput = $('#order-session-id');
+    var returnUrlInput = $('#order-return-url');
+    var orderSubmit = $('#order-submit');
+    var lightboxButton = $('#lightbox-with-session');
+    var fullpageButton = $('#page-with-session');
+    var tabCheckout = $('#tab-one');
+    var isSessionStorageSupported = storageAvailable('sessionStorage');
+
+    // Toggling Tab
+    tabCheckout.change(function() {
+        if (this.checked && isSessionStorageSupported) {
+            sessionStorage.setItem('tabChecked', 'checked');
+        } else if (!this.checked && isSessionStorageSupported) {
+            sessionStorage.setItem('tabChecked', 'unchecked');
+        }
+    });
+
+    function toggleTab() {
+        if (isSessionStorageSupported) {
+            var isChecked = sessionStorage.getItem('tabChecked') || 'unchecked';
+
+            if (isChecked === 'checked') {
+                tabCheckout.prop('checked', true);
+            } else {
+                tabCheckout.prop('checked', false);
+            }
+        }
+    }
+
+    // Toggling buttons
+    orderform
+        .change(function() {
+            if (orderSubmit.prop('disabled')) {
+                orderSubmit.prop('disabled', false);
+                lightboxButton.prop('disabled', true);
+                fullpageButton.prop('disabled', true);
+            }
+        })
+        .submit(function() {
+            orderSubmit.prop('disabled', true);
+            lightboxButton.prop('disabled', false);
+            fullpageButton.prop('disabled', false);
+        });
+
+    // Initializing form
+    toggleTab();
+    var order = initializeOrderObj();
+    setOrderFormValues(order);
+    setReturnUrl(order.returnUrl);
+
+    var configObject = {
         merchant: merchantId,
         order: {
-            currency: currency,
-            description: 'Ordered goods',
-            amount: '50.00'
+            currency: order.currency,
+            description: order.description,
+            amount: order.amount
         },
         session: {
-            id: sessionId
+            id: order.sessionId || sessionId
         },
         interaction: {
             merchant: {
@@ -97,7 +257,126 @@
             }
         },
         hppdebug: true
-    });
+    };
+
+    function orderFormSubmitHandler() {
+        order = getOrderFormValues();
+        storeOrderFormValues(order);
+    }
+
+
+    /**
+     * Returns an object with the initial values for the order
+     * @returns {{amount: string | * | string, currency: string | *, description: string | * | string, sessionId: string | *, returnUrl: string | * | string}}
+     */
+    function initializeOrderObj() {
+        var stored = pullStoredValues();
+
+        return {
+            amount: stored.amount || '50',
+            currency: stored.currency || currency,
+            description: stored.description || 'Ordered goods',
+            sessionId: stored.sessionId || sessionId,
+            returnUrl: stored.returnUrl || '',
+        };
+    }
+
+    /**
+     * Returns an object with the values pulled from the form
+     * @returns {{currency: *, amount: *, description: *, sessionId: *, returnUrl: *}}
+     */
+    function getOrderFormValues() {
+        return {
+            currency: currencyInput.val(),
+            amount: amountInput.val(),
+            description: descriptionInput.val(),
+            sessionId: sessionIdInput.val(),
+            returnUrl: returnUrlInput.val(),
+        };
+    }
+
+    /**
+     * Restores the form values using the data object param
+     * @param order
+     */
+    function setOrderFormValues(order) {
+        currencyInput.val(order.currency);
+        amountInput.val(order.amount);
+        descriptionInput.val(order.description);
+        returnUrlInput.val(order.returnUrl);
+        sessionIdInput.val(order.sessionId);
+    }
+
+    /**
+     * Saves the form values in Session Storage (if available)
+     * @param order
+     */
+    function storeOrderFormValues(order) {
+        if (isSessionStorageSupported) {
+            sessionStorage.setItem('amount', order.amount);
+            sessionStorage.setItem('currency', order.currency);
+            sessionStorage.setItem('description', order.description);
+            sessionStorage.setItem('returnUrl', order.returnUrl);
+            sessionStorage.setItem('sessionId', order.sessionId);
+        }
+    }
+
+    /**
+     * If Session Storage is available this method initializes and returns an object with the values pulled from the session
+     */
+    function pullStoredValues() {
+        var stored = {};
+        if (isSessionStorageSupported) {
+            stored.amount = sessionStorage.getItem('amount');
+            stored.currency = sessionStorage.getItem('currency');
+            stored.description = sessionStorage.getItem('description');
+            stored.returnUrl = sessionStorage.getItem('returnUrl');
+            stored.sessionId = sessionStorage.getItem('sessionId');
+            // Removing sessionID to avoid caching issues with the SESSION
+            sessionStorage.removeItem('sessionId');
+        }
+
+        return stored;
+    }
+
+    function setReturnUrl(url) {
+        if (url) {
+            checkoutScript.attr('data-complete', order.returnUrl);
+        }
+    }
+
+
+    /**
+     * Utility to verify if Session/Local Storage is available
+     * @param type sessionStorage / localStorage
+     * @returns {boolean}
+     */
+    function storageAvailable(type) {
+        try {
+            var storage = window[type],
+                x = '__storage_test__';
+            storage.setItem(x, x);
+            storage.removeItem(x);
+            return true;
+        } catch (e) {
+            return (
+                e instanceof DOMException &&
+                // everything except Firefox
+                (e.code === 22 ||
+                    // Firefox
+                    e.code === 1014 ||
+                    // test name field too, because code might not be present
+                    // everything except Firefox
+                    e.name === 'QuotaExceededError' ||
+                    // Firefox
+                    e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+                // acknowledge QuotaExceededError only if there's something already stored
+                storage.length !== 0
+            );
+        }
+    }
+
+    Checkout.configure(configObject);
 </script>
 
 </body>

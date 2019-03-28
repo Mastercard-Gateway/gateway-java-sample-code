@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
@@ -41,6 +41,9 @@ public class AppConfiguration {
     @Value("${webhooks.notification.secret}")
     private String webhooksNotificationSecret;
 
+    @Value("${gateway.threeds.api.version}")
+    private String threeDSApiVersion;
+
     @Bean
     public Config buildConfig() {
 
@@ -76,6 +79,7 @@ public class AppConfiguration {
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
         config.setApmVersion(apmVersion);
+        config.setApiThreeDsVersion(threeDSApiVersion);
 
         return config;
     }

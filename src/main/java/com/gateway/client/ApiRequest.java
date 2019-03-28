@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
@@ -38,6 +38,11 @@ public class ApiRequest {
     private String secureIdResponseUrl;
     private String paymentAuthResponse;
 
+    //3DS2 properties
+    private String authenticationChannel;
+    private String acceptVersions;
+    private String redirectResponseUrl;
+
     // Wallet properties
     /* essentials_exclude_start */
     private String masterpassOriginUrl;
@@ -75,8 +80,9 @@ public class ApiRequest {
         return apiOperation;
     }
 
-    public void setApiOperation(String apiOperation) {
+    public ApiRequest setApiOperation(String apiOperation) {
         this.apiOperation = apiOperation;
+        return this;
     }
 
     public String getSourceType() {
@@ -195,8 +201,9 @@ public class ApiRequest {
         return apiMethod;
     }
 
-    public void setApiMethod(String apiMethod) {
+    public ApiRequest setApiMethod(String apiMethod) {
          this.apiMethod = apiMethod;
+         return this;
     }
 
     public String getSessionId() {
@@ -239,6 +246,26 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
+    /**
+     * Indicates the channel in which the authentication request is being initiated.
+     *
+     * @return
+     * @see ApiAuthenticationChannel
+     */
+    public String getAuthenticationChannel() {
+        return authenticationChannel;
+    }
+
+    /**
+     * @param authenticationChannel
+     * @return
+     * @see ApiAuthenticationChannel
+     */
+    public ApiRequest setAuthenticationChannel(String authenticationChannel) {
+        this.authenticationChannel = authenticationChannel;
+        return this;
+    }
+
     /* essentials_exclude_start */
     public String getMasterpassOriginUrl() {
         return masterpassOriginUrl;
@@ -272,4 +299,22 @@ public class ApiRequest {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
     /* essentials_exclude_end */
+
+    public String getAcceptVersions() {
+        return acceptVersions;
+    }
+
+    public ApiRequest setAcceptVersions(String acceptVersions) {
+        this.acceptVersions = acceptVersions; return this;
+    }
+
+    public String getRedirectResponseUrl() {
+        return redirectResponseUrl;
+    }
+
+    public ApiRequest setRedirectResponseUrl(String redirectResponseUrl) {
+        this.redirectResponseUrl = redirectResponseUrl;
+        return this;
+    }
+
 }

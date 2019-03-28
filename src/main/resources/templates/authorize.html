@@ -7,7 +7,7 @@
             return "AUTHORIZE";
         },
         endpoint: function() {
-            return "/sample/processHostedSession";
+            return "/processHostedSession/";
         },
         secureIdResponseUrl: function() {
             return null;
@@ -30,7 +30,7 @@
                 <div id="error-alert" class="alert alert-danger" role="alert">
                     <p>The following error(s) occurred:</p>
                 </div>
-                <div class="mb-4">
+                <div class="mb-4" id="authorize">
                     <h6>Payment details</h6>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="card-number">Card number</label>

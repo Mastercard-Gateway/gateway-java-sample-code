@@ -1,18 +1,31 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
 
-import com.gateway.client.*;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
+import com.gateway.client.ApiException;
+import com.gateway.client.ApiProtocol;
+import com.gateway.client.ApiRequest;
+import com.gateway.client.ApiRequestService;
+import com.gateway.client.ApiResponseService;
+import com.gateway.client.ExceptionService;
+import com.gateway.client.HostedSession;
+import com.gateway.client.RESTApiClient;
+import com.gateway.client.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import static com.gateway.client.ApiOperation.UPDATE_SESSION;
+
 
 @Controller
 public class WebController {
@@ -221,18 +234,15 @@ public class WebController {
     public ModelAndView showConfig() {
         ModelAndView mav = new ModelAndView();
 
-        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-
         try {
-            RESTApiClient connection = new RESTApiClient();
-            String resp = connection.postTransaction(requestUrl, config);
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+            if (config.getTransactionMode() == null) {
+                config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+            }
 
             mav.setViewName("config");
             mav.addObject("config", config);
             mav.addObject("apmApiVersion", config.getApmVersion());
             mav.addObject("baseUrl", getBaseUrl());
-            mav.addObject("hostedSession", hostedSession);
         } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
@@ -333,6 +343,85 @@ public class WebController {
         return createHostedSessionModel("3dSecure");
     }
 
+    private static final Map<String, String> currencies = new HashMap<String, String>(){
+        {
+            put("AUD", "Australian Dollar");
+            put("BRL", "Brazilian Real");
+            put("CAD", "Canadian Dollar");
+            put("CHF", "Swiss Franc");
+            put("CZK", "Czech Rep. Koruna");
+            put("DKK", "Danish Krone");
+            put("EUR", "Euro");
+            put("GBP", "UK Pound Sterling");
+            put("HKD", "Hong Kong Dollar");
+            put("HUF", "Hungarian Forint");
+            put("ILS", "Israeli Sheqel");
+            put("JPY", "Japanese Yen");
+            put("MXN", "Mexican Peso");
+            put("MYR", "Malaysian Ringgit");
+            put("NOK", "Norwegian Krone");
+            put("NZD", "New Zealand Dollar");
+            put("PHP", "Philippine Peso");
+            put("PLN", "Polish Zloty");
+            put("SEK", "Swedish Krona");
+            put("SGD", "Singapore Dollar");
+            put("THB", "Thai Baht");
+            put("TWD", "New Taiwan Dollar");
+            put("USD", "US Dollar");
+        }
+    };
+
+    /**
+     * Display 3DSecure-2.0 operation page
+     *
+     * The solution brings 3DS v2 & v1 payment authentication flows that can be called from the browser side using
+     * Session Id based Authentication. As a first step in establishing the authentication channel, the merchant's
+     * servers needs to communicate with the gateway server for creating the session. Once the session is created, all
+     * the subsequent API operations needed for managing the 3DS integration flows can be called directly from the
+     * browser using the 3DS JS API.
+     * @param httpServletRequest
+     * @return ModelAndView for 3dSecure2.html
+     * @see com.gateway.client.ApiOperation
+     */
+    @GetMapping("/3dSecure2")
+    public ModelAndView showSecure2Id(HttpServletRequest httpServletRequest) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            //CREATE_SESSION
+            // The API works off of Session Id based authentication. As a first step, you must create a session to
+            // securely provide sensitive data, which you can then update with the request fields and values you wish to
+            // store in the session.
+            HostedSession hostedSession = ApiRequestService.createHostedSession(config);
+
+            //UPDATE_SESSION FOR 3DS2
+            // The Update Session call allows you to add payment and payer data into a session that can subsequently
+            // become the input to determine the risk associated with a payer in an authentication operation.
+            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
+
+            // The URL to which you want to redirect the payer after completing the payer authentication process. You
+            // must provide this URL, unless you are certain that there will be no interaction with the payer.
+            final String redirectResponseUrl = ApiRequestService.getCurrentContext(httpServletRequest) +
+                    "/process3ds2Redirect?" + "merchantId=" + config.getMerchantId() + "&sessionId=" +
+                    hostedSession.getId();
+            String updateResp = ApiRequestService
+                    .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
+                            redirectResponseUrl);
+            hostedSession = ApiResponseService.parseSessionResponse(updateResp);
+            updateSessionRequest.setSessionId(hostedSession.getId());
+
+            mav.setViewName("3dSecure2");
+            mav.addObject("config", config)
+                    .addObject("hostedSession", hostedSession)
+                    .addObject("request", updateSessionRequest);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
     /**
      * Display page for Hosted Checkout operation
      *
@@ -358,6 +447,7 @@ public class WebController {
 
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
+            mav.addObject("currencies", currencies);
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("baseUrl", getBaseUrl());
         } catch (ApiException e) {
