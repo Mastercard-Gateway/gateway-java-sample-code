@@ -45,7 +45,7 @@ PaymentSession.configure({
                     console.log("Payment Session initialized for scope: " + response.scopeId);
                 }
                 document.getElementById('card-holder-name') ?
-                    PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
+                    PaymentSession.setFocus('card.nameOnCard', scope) : PaymentSession.setFocus('card.number', scope);
             }
         },
         formSessionUpdate: function (response) {
