@@ -12,12 +12,8 @@ PaymentSession.onBlur(['card.number'], function(selector) {
     PaymentSession.updateSessionFromForm('card');
 });
 
-PaymentSession.onBlur(['card.nameOnCard'], function(selector) {
-    console.log("Blur event executed for " + selector);
-    finalSubmit = false;
-    nameOnCard = true;
+PaymentSession.onBlur(['card.nameOnCard'], function() {
     $("label[for='card-holder-name']").css({fontWeight:"normal"});
-    PaymentSession.updateSessionFromForm('card');
 });
 
 PaymentSession.onBlur(['card.expiryMonth'], function(selector) {
@@ -50,11 +46,8 @@ PaymentSession.onFocus(['card.expiryYear'], function(selector) {
 
 });
 
-PaymentSession.onFocus(['card.nameOnCard'], function(selector) {
-    console.log(selector);
-    console.log("Focus event executed for " + selector);
+PaymentSession.onFocus(['card.nameOnCard'], function() {
     $("label[for='card-holder-name']").css({fontWeight:"bold"});
-
 });
 
 PaymentSession.onChange(['card.expiryMonth'], function(selector) {
