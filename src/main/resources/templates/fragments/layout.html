@@ -2,12 +2,13 @@
 <html th:fragment="layout (template, viewName)" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>Gateway Java Sample</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-    <base href="/sample/">
-    <link rel="stylesheet" type="text/css" href="stylesheets/main.css" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css"/>
 
     <script th:src="@{webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{webjars/jquery-ui/jquery-ui.min.js}"></script>
@@ -15,48 +16,88 @@
 </head>
 
 <body>
-<div class="jumbotron text-center">
+<div class="jumbotron text-center main-top">
     <div class="container">
-        <h1 href="/">Gateway Java Sample Code</h1>
-        <p>This set contains working example code to help you integrate your application into the payment gateway. Below are the transaction types covered in this example.</p>
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1>Gateway Java Sample Code</h1>
+                <p>This set contains working example code to help you integrate your application into the payment gateway. Below are the transaction types covered in this example.</p>
+            </div>
+        </div>
     </div>
 </div>
 <div class="container">
     <div class="row">
-        <div class="col-3 sidebar">
-            <h6><a th:class="${viewName == 'pay'}? 'active'" href="pay">Pay</a></h6>
-            <h6><a th:class="${viewName == 'payWithToken'}? 'active'" href="payWithToken">Pay with Token</a></h6>
-            <h6><a th:class="${viewName == 'authorize'}? 'active'" href="authorize">Authorize</a></h6>
-            <h6><a th:class="${viewName == 'capture'}? 'active'" href="capture">Capture</a></h6>
-            <h6><a th:class="${viewName == 'refund'}? 'active'" href="refund">Refund</a></h6>
-            <h6><a th:class="${viewName == 'void'}? 'active'" href="void">Void</a></h6>
-            <h6><a th:class="${viewName == 'verify'}? 'active'" href="verify">Verify</a></h6>
-            <h6><a th:class="${viewName == 'retrieve'}? 'active'" href="retrieve">Retrieve Order</a></h6>
-            <h6><a th:class="${viewName == 'hostedCheckout'}? 'active'" href="hostedCheckout">Hosted Checkout</a></h6>
-            <h6><a th:class="${viewName == '3dSecure2'}? 'active'" href="3dSecure2">Pay with EMV 3DS</a></h6>
-            <!--<essentials_exclude>-->
-            <!--<targeted_exclude>-->
-            <h6><a th:class="${viewName == 'paypal'}? 'active'" href="paypal">Pay with PayPal</a></h6>
-            <!--</targeted_exclude>-->
-            <!--</essentials_exclude>-->
-            <!--<essentials_exclude>-->
-            <h6><a th:class="${viewName == 'unionpay'}? 'active'" href="unionpay">Pay with UnionPay SecurePay</a></h6>
-            <!--</essentials_exclude>-->
-            <h6><a th:class="${viewName == 'apm'}? 'active'" href="apm">APMs - Standalone</a></h6>
-            <!--<essentials_exclude>-->
-            <h6><a th:class="${viewName == 'masterpass'}? 'active'" href="masterpass">Pay with Masterpass</a></h6>
-            <!--</essentials_exclude>-->
-            <h6><a th:class="${viewName == 'payThroughNVP'}? 'active'" href="payThroughNVP">Pay through NVP</a></h6>
-            <h6><a th:class="${viewName == 'webhooks'}? 'active'" href="webhooks">Webhooks</a></h6>
-            <h6><a th:class="${viewName == 'config'}? 'active'" href="config">Configuration</a></h6>
+        <div class="col-12 col-md-3">
+            <button id="sidebar-open" class="btn btn-sidebar-nav btn-sidebar-open d-md-none" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30" focusable="false">
+                    <title>Open Menu</title>
+                    <path stroke="black" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path>
+                </svg>
+            </button>
+            <div id="sidebar" class="sidebar">
+                <button id="sidebar-close" class="btn btn-sidebar-nav btn-sidebar-close d-md-none" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30"
+                         focusable="false">
+                        <title>Close Menu</title>
+                        <line x1="6" y1="25" x2="25" y2="6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10"/>
+                        <line x1="6" y1="6" x2="25" y2="25" stroke="black" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10"/>
+                    </svg>
+                </button>
+                <nav class="sidebar-links">
+                    <h6><a th:class="${viewName == 'pay'}? 'active'" href="pay">Pay</a></h6>
+                    <h6><a th:class="${viewName == 'payWithToken'}? 'active'" href="payWithToken">Pay with Token</a>
+                    </h6>
+                    <h6><a th:class="${viewName == 'authorize'}? 'active'" href="authorize">Authorize</a></h6>
+                    <h6><a th:class="${viewName == 'capture'}? 'active'" href="capture">Capture</a></h6>
+                    <h6><a th:class="${viewName == 'refund'}? 'active'" href="refund">Refund</a></h6>
+                    <h6><a th:class="${viewName == 'void'}? 'active'" href="void">Void</a></h6>
+                    <h6><a th:class="${viewName == 'verify'}? 'active'" href="verify">Verify</a></h6>
+                    <h6><a th:class="${viewName == 'retrieve'}? 'active'" href="retrieve">Retrieve Order</a></h6>
+                    <h6><a th:class="${viewName == 'hostedCheckout'}? 'active'" href="hostedCheckout">Hosted
+                        Checkout</a></h6>
+                    <h6><a th:class="${viewName == '3dSecure2'}? 'active'" href="3dSecure2">Pay with EMV 3DS</a></h6>
+                    <!--<essentials_exclude>-->
+                    <!--<targeted_exclude>-->
+                    <h6><a th:class="${viewName == 'paypal'}? 'active'" href="paypal">Pay with PayPal</a></h6>
+                    <!--</targeted_exclude>-->
+                    <!--</essentials_exclude>-->
+                    <!--<essentials_exclude>-->
+                    <h6><a th:class="${viewName == 'unionpay'}? 'active'" href="unionpay">Pay with UnionPay
+                        SecurePay</a></h6>
+                    <!--</essentials_exclude>-->
+                    <h6><a th:class="${viewName == 'apm'}? 'active'" href="apm">APMs - Standalone</a></h6>
+                    <!--<essentials_exclude>-->
+                    <h6><a th:class="${viewName == 'masterpass'}? 'active'" href="masterpass">Pay with Masterpass</a>
+                    </h6>
+                    <!--</essentials_exclude>-->
+                    <h6><a th:class="${viewName == 'payThroughNVP'}? 'active'" href="payThroughNVP">Pay through NVP</a>
+                    </h6>
+                    <h6><a th:class="${viewName == 'webhooks'}? 'active'" href="webhooks">Webhooks</a></h6>
+                    <h6><a th:class="${viewName == 'config'}? 'active'" href="config">Configuration</a></h6>
+                </nav>
+            </div>
         </div>
         <div th:replace="${template}"/>
     </div>
 </div>
-<div id="loading-bar-spinner" class="spinner"><div class="spinner-icon"></div></div>
+<div class="overlay"></div>
+<div id="loading-bar-spinner" class="spinner">
+    <div class="spinner-icon"></div>
+</div>
 <script type="text/javascript">
-    $( "form" ).submit(function() {
+    $("form").submit(function () {
         $("#loading-bar-spinner").show();
+    });
+
+    $("#sidebar-close, .overlay").on("click", function () {
+        $("#sidebar").removeClass("active");
+        $(".overlay").removeClass("active");
+    });
+
+    $("#sidebar-open").on("click", function () {
+        $("#sidebar").addClass("active");
+        $(".overlay").addClass("active");
     });
 </script>
 </body>
