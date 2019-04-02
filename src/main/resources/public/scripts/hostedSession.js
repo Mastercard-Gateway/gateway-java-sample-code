@@ -15,21 +15,20 @@ if (self === top) {
 } else {
     top.location = self.location;
 }
-// The optional named instance of a card payment data set within a session.
-// See https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html?locale=en_US#x_multipleCards
-const scope = $(".mb-4")[0].id;
 
 // HOLD THE CALLBACK FUNCTION THAT WILL BE CALLED AFTER THE HOSTED FIELDS IN THE SESSION HAVE BEEN UPDATED
 // See pay(callback)
 var afterSessionUpdated;
 var sessionId = (!$("#session-id")[0]) ? "" : $("#session-id")[0].value;
 
+var cardHolderNameField = document.getElementById('card-holder-name');
+
 PaymentSession.configure({
     session: sessionId,
     fields: {
-        // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
         card: {
-            nameOnCard: "#card-holder-name",
+            // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
+            nameOnCard: cardHolderNameField ? "#card-holder-name" : null,
             number: "#card-number",
             securityCode: "#security-code",
             expiryMonth: "#expiry-month",
@@ -39,14 +38,9 @@ PaymentSession.configure({
     //SPECIFY YOUR MITIGATION OPTION HERE
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
-        initialized: function (response) {
-            if (response.status) {
-                if ("ok" == response.status) {
-                    console.log("Payment Session initialized for scope: " + response.scopeId);
-                }
-                document.getElementById('card-holder-name') ?
-                    PaymentSession.setFocus('card.nameOnCard', scope) : PaymentSession.setFocus('card.number', scope);
-            }
+        initialized: function () {
+            cardHolderNameField ?
+                PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
         },
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
@@ -85,9 +79,7 @@ PaymentSession.configure({
             }
         }
     }
-}, scope);
-
-PaymentSession.setFocus('card.number', scope);
+});
 
 
 
@@ -99,8 +91,7 @@ function pay(callback) {
         afterSessionUpdated = callback;
 
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-    // USAGE PaymentSession.updateSessionFromForm(paymentType, [scope])
-    PaymentSession.updateSessionFromForm('card', null, scope);
+    PaymentSession.updateSessionFromForm('card');
 }
 
 function submitFields(sessionId) {
