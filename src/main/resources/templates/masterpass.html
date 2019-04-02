@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'masterpass')}">
 
 <body>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <form action="#" class="col-12 form-horizontal" th:action="@{/processMasterpass}" th:object="${apiRequest}" method="post">
             <h3>Pay with Masterpass</h3>
