@@ -43,7 +43,6 @@ PaymentSession.onFocus(['card.expiryYear'], function(selector) {
     console.log(selector);
     console.log("Focus event executed for " + selector);
     $("label[for='expiry-year']").css({fontWeight:"bold"});
-
 });
 
 PaymentSession.onFocus(['card.nameOnCard'], function() {
@@ -68,8 +67,8 @@ PaymentSession.onMouseOut(['card.number'], function(selector) {
 PaymentSession.setFocusStyle(["card.nameOnCard","card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
     borderColor: 'red',
     borderWidth: '3px',
-    borderStyle:'solid',
-},scope);
+    borderStyle:'solid'
+});
 
 PaymentSession.setHoverStyle(["card.nameOnCard","card.number","card.expiryMonth","card.expiryYear","card.securityCode"], {
     borderColor: 'blue',
