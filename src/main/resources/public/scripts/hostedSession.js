@@ -16,6 +16,8 @@ if (self === top) {
     top.location = self.location;
 }
 
+$("#loading-bar-spinner").show();
+
 // HOLD THE CALLBACK FUNCTION THAT WILL BE CALLED AFTER THE HOSTED FIELDS IN THE SESSION HAVE BEEN UPDATED
 // See pay(callback)
 var afterSessionUpdated;
@@ -38,7 +40,11 @@ PaymentSession.configure({
     //SPECIFY YOUR MITIGATION OPTION HERE
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
-        initialized: function () {
+        initialized: function (response) {
+            $("#loading-bar-spinner").hide();
+            if ("ok" == response.status) {
+                console.log("Payment Session initialized");
+            }
             cardHolderNameField ?
                 PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
         },
