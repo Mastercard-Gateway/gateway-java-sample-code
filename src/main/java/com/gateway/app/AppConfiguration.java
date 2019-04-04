@@ -61,12 +61,12 @@ public class AppConfiguration {
             config.setAuthenticationType(Config.AuthenticationType.CERTIFICATE);
             config.setKeyStore(keystore);
             config.setKeyStorePassword(keystorePassword);
-            config.setGatewayHost(gatewayHost);
+            config.setGatewayHost(gatewayHost.trim());
         }
         else if (apiPassword != null) {
             config.setAuthenticationType(Config.AuthenticationType.PASSWORD);
-            config.setApiPassword(apiPassword);
-            config.setGatewayHost(baseURL);
+            config.setApiPassword(apiPassword.trim());
+            config.setGatewayHost(baseURL.trim());
         }
 
         if (webhooksNotificationSecret != null) {
