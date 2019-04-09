@@ -235,8 +235,14 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         try {
-            if (config.getTransactionMode() == null) {
-                config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+            if (config.getApiVersion() >= 52) {
+                if (config.getSupportedPaymentOperations() == null) {
+                    config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
+                }
+            } else {
+                 if (config.getTransactionMode() == null) {
+                    config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+                 }
             }
 
             mav.setViewName("config");
