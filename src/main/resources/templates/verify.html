@@ -47,7 +47,7 @@
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
                             <!--<input id="expiry-month" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
-                            <select id="expiry-month" class="form-control input-md" required="" readonly>
+                            <select id="expiry-month" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
                                 <option value="">Select Month</option>
                                 <option value="01">January</option>
                                 <option value="02">February</option>
@@ -68,7 +68,7 @@
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
                             <!--<input id="expiry-year" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
-                            <select id="expiry-year" class="form-control input-md" required="" readonly>
+                            <select id="expiry-year" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
                                 <option value="">Select Year</option>
                                 <option>21</option>
                                 <option>22</option>
