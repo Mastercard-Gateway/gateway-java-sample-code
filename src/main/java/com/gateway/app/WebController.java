@@ -451,6 +451,10 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
+            if (config.getSupportedPaymentOperations() == null) {
+                config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
+            }
+
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("currencies", currencies);

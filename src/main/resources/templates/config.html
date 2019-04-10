@@ -30,9 +30,13 @@
                             <td th:text="${config.currency}"></td>
                         </tr>
                         <tr>
-                            <td th:if="${config.transactionMode}">Transaction Mode</td>
-                            <td th:unless="${config.transactionMode}">Supported Payment Operation</td>
-                            <td th:text="${config.transactionMode} ? ${config.transactionMode} : ${config.supportedPaymentOperations[0].supportedPaymentOperation}"></td>
+                            <td>Transaction Mode(s)</td>
+                            <td th:if="${config.transactionMode}">
+                                <span th:text="${config.transactionMode}"></span>
+                            </td>
+                            <td th:if="${config.supportedPaymentOperations}" th:each="item, itemStatus : ${config.supportedPaymentOperations}">
+                                <span th:text="${!itemStatus.last} ? ${item.supportedPaymentOperation} + ', ': ${item.supportedPaymentOperation}"></span>
+                            </td>
                         </tr>
                     </table>
                 </div> <!-- .table-responsive -->
