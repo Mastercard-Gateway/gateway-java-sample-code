@@ -143,6 +143,7 @@
     var sessionId = /*[[${hostedSession.id}]]*/ null;
     var currency = /*[[${config.currency}]]*/ null;
     var apiVersion = /*[[${config.apiVersion}]]*/ null;
+    var supportedPaymentOperations = /*[[${config.supportedPaymentOperations}]]*/ null;
     /*]]>*/
 
     // This method preserves the current state of successIndicator and orderId, so they're not overwritten when we return to this page after redirect
@@ -253,9 +254,10 @@
         hppdebug: true
     };
 
-    if(apiVersion >= 52) {
-        // Operation type can be either "PURCHASE" or "AUTHORIZE"
-        configObject.interaction.operation = 'PURCHASE';
+    if (apiVersion >= 52) {
+        configObject.interaction.operation = supportedPaymentOperations.length
+            ? supportedPaymentOperations[0].supportedPaymentOperation
+            : 'PURCHASE';
     }
 
     function orderFormSubmitHandler() {

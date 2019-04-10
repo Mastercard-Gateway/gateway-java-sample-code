@@ -31,6 +31,11 @@ public final class PaymentOptionsResponse {
         return this;
     }
 
+    /**
+     * The supported payment operations available for the merchant (aka transaction mode for api version 51 backwards)
+     *
+     * @return
+     */
     public List<Map<String, SupportedPaymentOperation>> getSupportedPaymentOperations() {
         return supportedPaymentOperations;
     }
