@@ -65,16 +65,16 @@ PaymentSession.configure({
                     console.log("Session update failed with field errors.");
 
                     if (response.errors.cardNumber) {
-                        handleError("Card number missing or invalid.");
+                        handleError("Card number missing or invalid.",'cardNumber');
                     }
                     if (response.errors.expiryYear) {
-                        handleError("Expiry year missing or invalid.");
+                        handleError("Expiry year missing or invalid.",'expiryYear');
                     }
                     if (response.errors.expiryMonth) {
-                        handleError("Expiry month missing or invalid.");
+                        handleError("Expiry month missing or invalid.",'expiryMonth');
                     }
                     if (response.errors.securityCode) {
-                        handleError("Security code invalid.");
+                        handleError("Security code invalid.",'securityCode');
                     }
                 } else if ("request_timeout" == response.status) {
                     handleError("Session update failed with request timeout: " + response.errors.message);
