@@ -64,13 +64,137 @@ public class WebControllerTest {
 
     @Test
     public void showConfig_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
-
         mockMvc.perform(get("/config"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("config"))
                 .andExpect(model().attributeExists("config"))
                 .andExpect(model().attributeExists("apmApiVersion"))
                 .andExpect(model().attributeExists("baseUrl"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showPay_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/pay"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pay"))
+                .andExpect(model().attributeExists("request"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showPayWithToken_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/payWithToken"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("payWithToken"))
+                .andExpect(model().attributeExists("request"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showAuthorize_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/authorize"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("authorize"))
+                .andExpect(model().attributeExists("request"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showCapture_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/capture"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("capture"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showRefund_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/refund"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("refund"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showVoid_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+
+        mockMvc.perform(get("/void"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("void"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showVerify_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/verify"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("verify"))
+                .andExpect(model().attributeExists("request"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+
+    @Test
+    public void showRetrieve_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/retrieve"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("retrieve"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andDo(print());
+    }
+
+    /* essentials_exclude_start */
+    /* targeted_exclude_start */
+    @Test
+    public void showPaypal_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/paypal"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("paypal"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+    /* targeted_exclude_end */
+    /* essentials_exclude_end */
+
+    /* essentials_exclude_start */
+    @Test
+    public void showUnionPay_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/unionpay"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("unionpay"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+    /* essentials_exclude_end */
+
+    /* essentials_exclude_start */
+    @Test
+    public void showMasterPass_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/masterpass"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("masterpass"))
+                .andExpect(model().attributeExists("apiRequest"))
+                .andExpect(model().attributeExists("config"))
+                .andDo(print());
+    }
+    /* essentials_exclude_end */
+
+    @Test
+    public void showPayThroughNVP_thenRetrievedStatusAndViewNameAndAttributeAreCorrect() throws Exception {
+        mockMvc.perform(get("/payThroughNVP"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("payThroughNVP"))
+                .andExpect(model().attributeExists("request"))
+                .andExpect(model().attributeExists("config"))
                 .andDo(print());
     }
 }
