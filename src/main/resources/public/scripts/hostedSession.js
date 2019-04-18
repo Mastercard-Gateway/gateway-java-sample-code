@@ -51,7 +51,8 @@ PaymentSession.configure({
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
             if (response.status) {
-                if ("ok" == response.status) {
+                clearErrorMessages();
+                if ("ok" == response.status && finalSubmit == true) {
                     console.log("Session updated with data: " + response.session.id);
 
                     if (!afterSessionUpdated) {
@@ -64,33 +65,35 @@ PaymentSession.configure({
                     console.log("Session update failed with field errors.");
 
                     if (response.errors.cardNumber) {
-                        handleError("Card number missing or invalid.");
+                        handleError("Card number missing or invalid.",'cardNumber');
                     }
                     if (response.errors.expiryYear) {
-                        handleError("Expiry year missing or invalid.");
+                        handleError("Expiry year missing or invalid.",'expiryYear');
                     }
                     if (response.errors.expiryMonth) {
-                        handleError("Expiry month missing or invalid.");
+                        handleError("Expiry month missing or invalid.",'expiryMonth');
                     }
                     if (response.errors.securityCode) {
-                        handleError("Security code invalid.");
+                        handleError("Security code invalid.",'securityCode');
                     }
                 } else if ("request_timeout" == response.status) {
                     handleError("Session update failed with request timeout: " + response.errors.message);
                 } else if ("system_error" == response.status) {
                     handleError("Session update failed with system error: " + response.errors.message)
                 }
+                finalSubmit = false;
             } else {
                 handleError("Session update failed: " + response);
+                finalSubmit = false;
             }
         }
     }
 });
 
-
-
 function pay(callback) {
     $("#loading-bar-spinner").show();
+    finalSubmit = true;
+    expiryMonth = expiryYear = cardNumber = securityCode = false;
 
     // UPDATE CALLBACK FUNCTION THAT WILL BE CALLED ONCE THE SESSION HAS BEEN UPDATED
     if (callback)
@@ -131,3 +134,8 @@ function handleError(message) {
     $errorAlert.show();
 }
 
+function clearErrorMessages(){
+    var $errorAlert = $('#error-alert');
+    $errorAlert.html("");
+    $errorAlert.hide();
+}

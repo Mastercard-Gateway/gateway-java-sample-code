@@ -27,6 +27,9 @@
                     <p>In order to run the Authorize API operation, please make sure the merchant is configured to "Authorize and Capture" payment mode.</p>
                     <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
+                <div id="error-alert" class="alert alert-danger" role="alert">
+                    <p>The following error(s) occurred:</p>
+                </div>
                 <div class="mb-4" id="authorize">
                     <h6>Payment details</h6>
                     <div class="form-group">
