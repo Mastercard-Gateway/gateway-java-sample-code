@@ -1,0 +1,73 @@
+{
+  "3DSecure": {
+    "veResEnrolled": "Y",
+    "xid": "AgEAAA85hxvbYEb2t7itAsHeCTw="
+  },
+  "authentication": {
+    "transactionId": "three"
+  },
+  "authorizationResponse": {
+    "autoExpiry": "2019-05-18T18:00:00Z",
+    "posData": "1605S0100130",
+    "transactionIdentifier": "AmexTidTest"
+  },
+  "gatewayEntryPoint": "WEB_SERVICES_API",
+  "merchant": "TESTMERCHANTID",
+  "order": {
+    "amount": 100,
+    "chargeback": {
+      "amount": 0,
+      "currency": "AUD"
+    },
+    "creationTime": "2019-04-18T18:16:58.790Z",
+    "currency": "AUD",
+    "id": "7655c56a-bccb-4974-aae2-721240fbaa94",
+    "merchantCategoryCode": "4567",
+    "reference": "7655c56a-bccb-4974-aae2-721240fbaa94",
+    "status": "AUTHORIZED",
+    "totalAuthorizedAmount": 100,
+    "totalCapturedAmount": 0,
+    "totalRefundedAmount": 0
+  },
+  "response": {
+    "acquirerCode": "00",
+    "gatewayCode": "APPROVED"
+  },
+  "result": "SUCCESS",
+  "sourceOfFunds": {
+    "provided": {
+      "card": {
+        "brand": "MASTERCARD",
+        "expiry": {
+          "month": "5",
+          "year": "21"
+        },
+        "fundingMethod": "CREDIT",
+        "issuer": "BANCO DEL PICHINCHA, C.A.",
+        "number": "512345xxxxxx0008",
+        "scheme": "MASTERCARD",
+        "storedOnFile": "NOT_STORED"
+      }
+    },
+    "type": "CARD"
+  },
+  "timeOfRecord": "2019-04-18T18:16:58.790Z",
+  "transaction": {
+    "acquirer": {
+      "batch": 1,
+      "id": "SYSTEST_ACQ1",
+      "merchantId": "9625635149"
+    },
+    "amount": 100,
+    "authorizationCode": "000009",
+    "currency": "AUD",
+    "frequency": "SINGLE",
+    "id": "1",
+    "receipt": "1904181",
+    "reference": "7655c56a-bccb-4974-aae2-721240fbaa94",
+    "source": "INTERNET",
+    "terminal": "001",
+    "type": "AUTHORIZATION"
+  },
+  "version": "51"
+}
