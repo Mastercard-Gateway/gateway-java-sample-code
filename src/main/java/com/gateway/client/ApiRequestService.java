@@ -21,7 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import static com.gateway.client.ApiAuthenticationChannel.PAYER_BROWSER;
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiOperation.PAY;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
+import static com.gateway.client.Utils.Prefixes.ORDER;
+import static com.gateway.client.Utils.Prefixes.TRANS;
 
 public class ApiRequestService {
 
@@ -77,8 +80,8 @@ public class ApiRequestService {
         req.setApiOperation(apiOperation);
         req.setOrderAmount("5000");
         req.setOrderCurrency(config.getCurrency());
-        req.setOrderId(Utils.createUniqueId("order-"));
-        req.setTransactionId(Utils.createUniqueId("trans-"));
+        req.setOrderId(Utils.createUniqueId(ORDER));
+        req.setTransactionId(Utils.createUniqueId(TRANS));
 
         switch (ApiOperation.valueOf(apiOperation)) {
             case CAPTURE:
@@ -222,9 +225,18 @@ public class ApiRequestService {
         JsonObject order = new JsonObject();
         if (Utils.notNullOrEmpty(request.getApiOperation()) &&
                 (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")
-                        || request.getApiOperation().equals(UPDATE_SESSION.toString()))) {
+                        || request.getApiOperation().equals(UPDATE_SESSION.toString())
+                        || request.getApiOperation().equals(PAY.toString()))) {
             // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
-            if (Utils.notNullOrEmpty(request.getOrderId())) order.addProperty("id", request.getOrderId());
+            if (Utils.notNullOrEmpty(request.getOrderId())) {
+                if (request.getApiOperation().equals(PAY.toString()) &&
+                        Utils.notNullOrEmpty(request.getAuthenticationTransactionId())) {
+                    //for PAY wth 3ds
+                    order.addProperty("reference", request.getOrderId());
+                } else {
+                    order.addProperty("id", request.getOrderId());
+                }
+            }
         }
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
@@ -236,6 +248,10 @@ public class ApiRequestService {
             authentication.addProperty("acceptVersions", request.getAcceptVersions());
         if (Utils.notNullOrEmpty(request.getRedirectResponseUrl()))
             authentication.addProperty("redirectResponseUrl", request.getRedirectResponseUrl());
+        // The transactionId you used for the Initiate Authentication operation.
+        if (request.getApiOperation().equals(PAY.toString()) &&
+                Utils.notNullOrEmpty(request.getAuthenticationTransactionId()))
+            authentication.addProperty("transactionId", request.getAuthenticationTransactionId());
 
         JsonObject wallet = new JsonObject();
         /* essentials_exclude_start */
@@ -260,6 +276,9 @@ public class ApiRequestService {
             transaction.addProperty("currency", request.getTransactionCurrency());
         if (Utils.notNullOrEmpty(request.getTargetTransactionId()))
             transaction.addProperty("targetTransactionId", request.getTargetTransactionId());
+        //for PAY wth 3ds
+        if (request.getApiOperation().equals(PAY.toString()) && Utils.notNullOrEmpty(request.getOrderId()))
+            transaction.addProperty("reference", request.getOrderId());
 
         JsonObject expiry = new JsonObject();
         if (Utils.notNullOrEmpty(request.getExpiryMonth())) expiry.addProperty("month", request.getExpiryMonth());
@@ -362,8 +381,8 @@ public class ApiRequestService {
         try {
             ApiRequest req = new ApiRequest();
             req.setApiOperation("INITIATE_BROWSER_PAYMENT");
-            req.setTransactionId(Utils.createUniqueId("trans-"));
-            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setTransactionId(Utils.createUniqueId(TRANS));
+            req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
@@ -496,19 +515,28 @@ public class ApiRequestService {
             // Make a  Payment Options Inquiry first to determine for which is operation the Merchant is enabled (PAY/AUTHORIZE)
             String apiOperation = ApiRequestService.getApiOperationFromPaymentOptionsInquiry(config).toString();
 
-            ApiRequest paymentRequest = ApiRequestService.createApiRequest(apiOperation, config);
+            ApiRequest paymentRequest = new ApiRequest();
+            paymentRequest.setApiOperation(apiOperation);
             paymentRequest.setSessionId(request.getParameter("sessionId"));
-            paymentRequest.setTransactionId(request.getParameter("transaction.id"));
+            paymentRequest.setAuthenticationTransactionId(request.getParameter("transaction.id"));
             paymentRequest.setOrderId(request.getParameter("order.id"));
             paymentRequest.setSourceType("CARD");
 
 
             String paymentData = ApiRequestService.buildJSONPayload(paymentRequest);
-            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest);
+            String paymentRequestUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, paymentRequest) +
+                    "/transaction/1";// + Utils.createUniqueId(Utils.Prefixes.TRANS);
 
             // Perform API operation
-            String apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
-
+            //Thread.sleep(30000);
+            String apiResponse;
+            try {
+                apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
+            } catch (Exception e) {
+                logger.debug("Retrying", e);
+                apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
+                throw e;
+            }
             return ApiResponseService.parseAuthorizeResponse(apiResponse);
         } catch (Exception e) {
             logger.debug("Unhandled exception caught", e);
@@ -548,12 +576,14 @@ public class ApiRequestService {
      */
     public static ApiOperation getApiOperationFromPaymentOptionsInquiry(Config config) throws Exception {
 
-        PaymentOptionsResponse paymentOptions = retrievePaymentOptionsInquiry(config);
-        switch (paymentOptions.getTransactionMode()) {
+        if (config.getTransactionMode() == null) {
+            config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+        }
+        switch (config.getTransactionMode()) {
             case AUTHORIZE_CAPTURE:
                 return ApiOperation.AUTHORIZE;
             case PURCHASE:
-                return ApiOperation.PAY;
+                return PAY;
             default:
                 throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
         }
