@@ -1,4 +1,6 @@
 # Gateway Java Sample Code
+[![Build Status](https://travis-ci.org/Mastercard-Gateway/gateway-java-sample-code.svg?branch=master)](https://travis-ci.org/Mastercard-Gateway/gateway-java-sample-code)
+
 This is a sample application to help developers start building Java applications using the Gateway Java SDK.
 
 ## Prerequisites 
