@@ -39,7 +39,7 @@ This is a sample application to help developers start building Java applications
 1. Navigate to *http://localhost:5000* to test locally
 
 ## Proxy Configuration
-If you are behind a proxy you need to add a couple of flags before running the .jar (in Step 4)  
+If you are behind a web proxy, you'll need to add a couple of flags before running the .jar (in Step 4)  
 
 `java -Dhttp.proxyHost=YOUR_PROXY_URL -Dhttp.proxyPort=YOUR_PROXY_PORT -jar dist/gateway-java-sample-code-1.0.jar`
 
