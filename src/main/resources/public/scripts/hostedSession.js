@@ -45,8 +45,8 @@ PaymentSession.configure({
             if ("ok" == response.status) {
                 console.log("Payment Session initialized");
             }
-            cardHolderNameField ?
-                PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
+            // cardHolderNameField ?
+            //     PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
         },
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
