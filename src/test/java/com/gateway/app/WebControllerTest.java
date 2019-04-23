@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {
+        "gateway.base.url=https://test-gateway.com",
+        "gateway.merchant.id=testMerchant",
+        "gateway.api.password=testP4ssword",
+        "gateway.api.version=51",
+        "gateway.apm.api.version=1.1.0"
+})
 public class WebControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -43,14 +51,7 @@ public class WebControllerTest {
 
     @Before
     public void setUp() {
-        config.setMerchantId("TESTMERCHANTID");
-        config.setApiPassword("APIPASSWORD1234");
-        config.setApiBaseURL("https://test-gateway.com");
-        config.setGatewayHost("https://test-gateway.com");
-        config.setCurrency("USD");
-        config.setApiVersion(51);
         config.setTransactionMode(TransactionMode.AUTHORIZE_CAPTURE);
-        config.setApmVersion("1.1.0");
     }
 
     @Test
