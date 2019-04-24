@@ -591,11 +591,13 @@ public class ApiController {
     public ModelAndView process3ds2Redirect(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("receipt");
         try {
-
+            String gatewayRecommendation = request.getParameter("response.gatewayRecommendation") != null ?
+                    request.getParameter("response.gatewayRecommendation") :
+                    request.getParameter("gatewayRecommendation");
             // When the result of the Authenticate Payer operation indicates that you can proceed with the payment, you
             // may initiate an Authorize or Pay operation.
-            if (request.getParameter("response.gatewayRecommendation")
-                    .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+            if (gatewayRecommendation != null &&
+                    gatewayRecommendation.equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
                 // The gateway will use the authentication.transactionId (provided in the request) to lookup the
                 // authentication results that is stored when you asked to perform authentication. The gateway will
                 // pass the required information to the acquirer.

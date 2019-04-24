@@ -4,11 +4,10 @@
 
 package com.gateway.app;
 
+import java.util.List;
+
 import com.gateway.model.SupportedPaymentOperation;
 import com.gateway.model.TransactionMode;
-
-import java.util.List;
-import java.util.Map;
 
 public class Config {
 
@@ -28,12 +27,12 @@ public class Config {
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
     private TransactionMode transactionMode;
-    private List<Map<String, SupportedPaymentOperation>> supportedPaymentOperations;
+    private List<SupportedPaymentOperation> supportedPaymentOperations;
 
 
-    public List<Map<String, SupportedPaymentOperation>> getSupportedPaymentOperations() { return supportedPaymentOperations; }
+    public List<SupportedPaymentOperation> getSupportedPaymentOperations() { return supportedPaymentOperations; }
 
-    public Config setSupportedPaymentOperations(List<Map<String, SupportedPaymentOperation>> supportedPaymentOperations) {
+    public Config setSupportedPaymentOperations(List<SupportedPaymentOperation> supportedPaymentOperations) {
         this.supportedPaymentOperations = supportedPaymentOperations;
         return this;
     }
