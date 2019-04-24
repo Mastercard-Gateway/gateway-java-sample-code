@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'apmReceipt')}">
 <body>
 <script type="text/javascript" th:src="@{${baseUrl} + '/static/apm/' + ${apmApiVersion} + '/apm.min.js'}"></script>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <div class="contents col-12">
             <div id="receipt" class="col-md-12">

@@ -4,6 +4,9 @@
 
 package com.gateway.app;
 
+import java.util.List;
+
+import com.gateway.model.SupportedPaymentOperation;
 import com.gateway.model.TransactionMode;
 
 public class Config {
@@ -24,7 +27,15 @@ public class Config {
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
     private TransactionMode transactionMode;
+    private List<SupportedPaymentOperation> supportedPaymentOperations;
 
+
+    public List<SupportedPaymentOperation> getSupportedPaymentOperations() { return supportedPaymentOperations; }
+
+    public Config setSupportedPaymentOperations(List<SupportedPaymentOperation> supportedPaymentOperations) {
+        this.supportedPaymentOperations = supportedPaymentOperations;
+        return this;
+    }
 
     public TransactionMode getTransactionMode() {
         return transactionMode;

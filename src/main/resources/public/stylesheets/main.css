@@ -67,6 +67,7 @@ form input[type="text"] {
 }
 form h3, form .alert-warning {
     margin-left: 15px;
+    margin-right: 15px;
 }
 input {
     border: 1px solid #CCCCCC !important;
@@ -281,8 +282,8 @@ input {
     font-weight: normal;
     position: relative;
     display: block;
-    padding: 0 0 0 1em;
-    line-height: 3;
+    margin: 0;
+    padding: 1em;
     cursor: pointer;
     font-size: 18px;
 }
@@ -328,4 +329,25 @@ input {
 }
 #order-submit {
     border: none;
+}
+
+.hs-validation-tooltip.bs-tooltip-left.tooltip .arrow::before {
+    border-left-color: #ff1a1a;
+}
+
+.hs-validation-tooltip.bs-tooltip-right.tooltip .arrow::before {
+    border-right-color: #ff1a1a;
+}
+
+.hs-validation-tooltip.bs-tooltip-top.tooltip .arrow::before {
+    border-top-color: #ff1a1a;
+}
+
+.hs-validation-tooltip.bs-tooltip-bottom.tooltip .arrow::before {
+    border-bottom-color: #ff1a1a;
+}
+
+.hs-validation-tooltip.tooltip .tooltip-inner {
+    background-color: #ff1a1a;
+    font-weight: bold;
 }

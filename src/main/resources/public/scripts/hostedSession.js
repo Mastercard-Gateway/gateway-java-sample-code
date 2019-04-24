@@ -15,21 +15,22 @@ if (self === top) {
 } else {
     top.location = self.location;
 }
-// The optional named instance of a card payment data set within a session.
-// See https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html?locale=en_US#x_multipleCards
-const scope = $(".mb-4")[0].id;
+
+$("#loading-bar-spinner").show();
 
 // HOLD THE CALLBACK FUNCTION THAT WILL BE CALLED AFTER THE HOSTED FIELDS IN THE SESSION HAVE BEEN UPDATED
 // See pay(callback)
 var afterSessionUpdated;
 var sessionId = (!$("#session-id")[0]) ? "" : $("#session-id")[0].value;
 
+var cardHolderNameField = document.getElementById('card-holder-name');
+
 PaymentSession.configure({
     session: sessionId,
     fields: {
-        // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
         card: {
-            nameOnCard: "#card-holder-name",
+            // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
+            nameOnCard: cardHolderNameField ? "#card-holder-name" : null,
             number: "#card-number",
             securityCode: "#security-code",
             expiryMonth: "#expiry-month",
@@ -40,13 +41,12 @@ PaymentSession.configure({
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
         initialized: function (response) {
-            if (response.status) {
-                if ("ok" == response.status) {
-                    console.log("Payment Session initialized for scope: " + response.scopeId);
-                }
-                document.getElementById('card-holder-name') ?
-                    PaymentSession.setFocus('card.nameOnCard', scope) : PaymentSession.setFocus('card.number', scope);
+            $("#loading-bar-spinner").hide();
+            if ("ok" == response.status) {
+                console.log("Payment Session initialized");
             }
+            // cardHolderNameField ?
+            //     PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
         },
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
@@ -65,16 +65,16 @@ PaymentSession.configure({
                     console.log("Session update failed with field errors.");
 
                     if (response.errors.cardNumber) {
-                        handleError("Card number missing or invalid.");
+                        handleError("Card number missing or invalid.",'cardNumber');
                     }
                     if (response.errors.expiryYear) {
-                        handleError("Expiry year missing or invalid.");
+                        handleError("Expiry year missing or invalid.",'expiryYear');
                     }
                     if (response.errors.expiryMonth) {
-                        handleError("Expiry month missing or invalid.");
+                        handleError("Expiry month missing or invalid.",'expiryMonth');
                     }
                     if (response.errors.securityCode) {
-                        handleError("Security code invalid.");
+                        handleError("Security code invalid.",'securityCode');
                     }
                 } else if ("request_timeout" == response.status) {
                     handleError("Session update failed with request timeout: " + response.errors.message);
@@ -88,9 +88,7 @@ PaymentSession.configure({
             }
         }
     }
-}, scope);
-
-PaymentSession.setFocus('card.number', scope);
+});
 
 function pay(callback) {
     $("#loading-bar-spinner").show();
@@ -102,8 +100,7 @@ function pay(callback) {
         afterSessionUpdated = callback;
 
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-    // USAGE PaymentSession.updateSessionFromForm(paymentType, [scope])
-    PaymentSession.updateSessionFromForm('card', null, scope);
+    PaymentSession.updateSessionFromForm('card');
 }
 
 function submitFields(sessionId) {

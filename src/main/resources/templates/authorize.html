@@ -7,7 +7,7 @@
             return "AUTHORIZE";
         },
         endpoint: function() {
-            return "/processHostedSession/";
+            return "processHostedSession";
         },
         secureIdResponseUrl: function() {
             return null;
@@ -18,7 +18,7 @@
 <style id="antiClickjack">body{display:none !important;}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
 <script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
@@ -48,7 +48,7 @@
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
                             <!--<input id="expiry-month" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
-                            <select id="expiry-month" class="form-control input-md" required="" readonly>
+                            <select id="expiry-month" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
                                 <option value="">Select Month</option>
                                 <option value="01">January</option>
                                 <option value="02">February</option>
@@ -69,7 +69,7 @@
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
                             <!--<input id="expiry-year" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
-                            <select id="expiry-year" class="form-control input-md" required="" readonly>
+                            <select id="expiry-year" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
                                 <option value="">Select Year</option>
                                 <option>21</option>
                                 <option>22</option>

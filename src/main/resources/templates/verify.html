@@ -18,16 +18,13 @@
 <style id="antiClickjack">body{display:none !important;}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
 <script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
                 <h3>Verify</h3>
                 <div class="alert alert-warning" role="alert">
                     <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
-                </div>
-                <div id="error-alert" class="alert alert-danger" role="alert">
-                    <p>The following error(s) occurred:</p>
                 </div>
                 <div class="mb-4" id="verify">
                     <h6>Payment details</h6>
@@ -47,7 +44,7 @@
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
                             <!--<input id="expiry-month" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
-                            <select id="expiry-month" class="form-control input-md" required="" readonly>
+                            <select id="expiry-month" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
                                 <option value="">Select Month</option>
                                 <option value="01">January</option>
                                 <option value="02">February</option>
@@ -68,7 +65,7 @@
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
                             <!--<input id="expiry-year" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
-                            <select id="expiry-year" class="form-control input-md" required="" readonly>
+                            <select id="expiry-year" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
                                 <option value="">Select Year</option>
                                 <option>21</option>
                                 <option>22</option>

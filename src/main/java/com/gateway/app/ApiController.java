@@ -29,10 +29,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import static com.gateway.client.Utils.Prefixes.THREEDS;
 
 
 @Controller
@@ -446,7 +447,7 @@ public class ApiController {
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
 
             // Create a unique identifier to use for 3DSecure
-            String secureId = Utils.createUniqueId("3ds-");
+            String secureId = Utils.createUniqueId(THREEDS);
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = request.getSession();
@@ -554,16 +555,18 @@ public class ApiController {
     public ModelAndView process3ds2Redirect(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("receipt");
         try {
-
+            String gatewayRecommendation = request.getParameter("response.gatewayRecommendation") != null ?
+                    request.getParameter("response.gatewayRecommendation") :
+                    request.getParameter("gatewayRecommendation");
             // When the result of the Authenticate Payer operation indicates that you can proceed with the payment, you
             // may initiate an Authorize or Pay operation.
-            if (request.getParameter("response.gatewayRecommendation")
-                    .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+            if (gatewayRecommendation != null &&
+                    gatewayRecommendation.equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
                 // The gateway will use the authentication.transactionId (provided in the request) to lookup the
                 // authentication results that is stored when you asked to perform authentication. The gateway will
                 // pass the required information to the acquirer.
                 TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
-                mav.setViewName("receipt");
+//                mav.setViewName("receipt");
                 mav.addObject("response", paymentResponse);
                 mav.addObject("config", config);
 
@@ -571,24 +574,27 @@ public class ApiController {
                 throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED_WITH_PAYMENT.toString());
 
             }
-        } catch (Exception e) {
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        }
+        catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
 
-    /**
-     * Make payment using the session and display receipt
-     * @return
-     */
-    @PutMapping(value = "/error")
-    public ModelAndView displayError(@RequestBody HttpServletRequest request)
-    {
-        ModelAndView mav = new ModelAndView();
-
-
-        return ExceptionService.constructGeneralErrorResponse(mav, new Exception(request.getParameter("apiResponse")));
-    }
+//    /**
+//     * Make payment using the session and display receipt
+//     * @return
+//     */
+//    @PutMapping(value = "/error")
+//    public ModelAndView displayError(@RequestBody HttpServletRequest request)
+//    {
+//        ModelAndView mav = new ModelAndView();
+//
+//
+//        return ExceptionService.constructGeneralErrorResponse(mav, new Exception(request.getParameter("apiResponse")));
+//    }
 
 
 }

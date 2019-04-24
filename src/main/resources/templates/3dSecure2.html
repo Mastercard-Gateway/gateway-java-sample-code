@@ -21,7 +21,7 @@
 <style id="antiClickjack">body { display: none !important; }</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
 <script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
@@ -90,14 +90,14 @@
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
                             <input id="expiry-month" type="text" placeholder="" class="form-control input-md"
-                                   readonly required=""/>
+                                   th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}" required=""/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
                             <input id="expiry-year" type="text" placeholder="" class="form-control input-md"
-                                   readonly required=""/>
+                                   th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}" required=""/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -124,14 +124,14 @@
                         <label class="col-md-7 control-label" for="order-amount">Order amount</label>
                         <div class="col-md-7">
                             <input id="order-amount" type="text" th:value="${request.orderAmount}" maxlength="14"
-                                   class="form-control input-md" required=""/>
+                                   class="form-control input-md" readonly required=""/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="order-currency">Order currency</label>
                         <div class="col-md-7">
                             <input id="order-currency" type="text" th:value="${request.orderCurrency}" maxlength="3"
-                                   class="form-control input-md" required=""/>
+                                   class="form-control input-md" readonly required=""/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -168,6 +168,7 @@
     ThreeDS.configure({
         merchantId: merchantId,
         hostedSessionId: sessionId,
+        sessionId: sessionId,//since ThreeDS 1.2.0
         containerId: '3DSUI',
         configuration: {userLanguage: "en-AU", wsVersion: /*[[${config.apiVersion}]]*/ null},
         callback: function (data) {
@@ -285,7 +286,8 @@
                                         // You can proceed with the payment as authentication is granted.
                                         case "PROCEED_WITH_AUTHENTICATION":
                                         case "PROCEED_WITH_PAYMENT":
-                                            //challenge flow
+                                            //challenge flow for ThreeDS <1.2.0
+                                            console.log("Redirecting to ACS", authResponse.htmlRedirectCode);
                                             redirectToACS(authResponse.htmlRedirectCode);
                                             break;
                                     }
