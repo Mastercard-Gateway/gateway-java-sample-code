@@ -6,20 +6,26 @@ package com.gateway.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.gateway.app.Config;
+import com.gateway.model.SupportedPaymentOperation;
 import com.gateway.response.PaymentOptionsResponse;
 import com.gateway.response.TransactionResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.gateway.client.ApiAuthenticationChannel.PAYER_BROWSER;
+import static com.gateway.client.ApiOperation.AUTHORIZE;
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.PAY;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
@@ -528,13 +534,11 @@ public class ApiRequestService {
                     "/transaction/1";// + Utils.createUniqueId(Utils.Prefixes.TRANS);
 
             // Perform API operation
-            //Thread.sleep(30000);
             String apiResponse;
             try {
-                apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
+                apiResponse = connection.sendTransaction3DS(paymentData, paymentRequestUrl, config);
             } catch (Exception e) {
                 logger.debug("Retrying", e);
-                apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
                 throw e;
             }
             return ApiResponseService.parseAuthorizeResponse(apiResponse);
@@ -557,7 +561,23 @@ public class ApiRequestService {
 
         try {
             String paymentOptionsInquiryResponse = connection.getTransaction(paymentOptionsInquiryUrl, config);
-            return new Gson().fromJson(paymentOptionsInquiryResponse, PaymentOptionsResponse.class);
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(new TypeToken<List<SupportedPaymentOperation>>() {
+                    }.getType(),
+                    (JsonDeserializer<List<SupportedPaymentOperation>>)(json, typeOfT, context) -> {
+                        List<Map<String, SupportedPaymentOperation>> items = new Gson()
+                                .fromJson(json, new TypeToken<List<Map<String, SupportedPaymentOperation>>>() {
+                                }.getType());
+                        List<SupportedPaymentOperation> supportedPaymentOperations = new ArrayList<>();
+                        for (Map<String, SupportedPaymentOperation> pair : items) {
+                            supportedPaymentOperations.add(pair.get("supportedPaymentOperation"));
+                        }
+                        return supportedPaymentOperations;
+                    });
+            Gson gson = gsonBuilder.create();
+
+            return gson.fromJson(paymentOptionsInquiryResponse, PaymentOptionsResponse.class);
         } catch (Exception e) {
             logger.debug("Unable to retrieve Payment Options", e);
             throw e;
@@ -575,17 +595,30 @@ public class ApiRequestService {
      * @see https://secure.uat.tnspayments.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
      */
     public static ApiOperation getApiOperationFromPaymentOptionsInquiry(Config config) throws Exception {
-
-        if (config.getTransactionMode() == null) {
-            config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+        if (config.getTransactionMode() == null && config.getSupportedPaymentOperations() == null) {
+            PaymentOptionsResponse paymentOptionsInquiry =
+                    ApiRequestService.retrievePaymentOptionsInquiry(config);
+            config.setTransactionMode(paymentOptionsInquiry.getTransactionMode());
+            config.setSupportedPaymentOperations(paymentOptionsInquiry.getSupportedPaymentOperations());
         }
-        switch (config.getTransactionMode()) {
-            case AUTHORIZE_CAPTURE:
-                return ApiOperation.AUTHORIZE;
-            case PURCHASE:
+        if (config.getTransactionMode() != null) {
+            switch (config.getTransactionMode()) {
+                case AUTHORIZE_CAPTURE:
+                    return AUTHORIZE;
+                case PURCHASE:
+                    return PAY;
+                default:
+                    throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+            }
+        } else {
+            if (config.getSupportedPaymentOperations().contains(SupportedPaymentOperation.AUTHORIZE)) {
+                return AUTHORIZE;
+            }
+            if (config.getSupportedPaymentOperations().contains(SupportedPaymentOperation.PURCHASE)) {
                 return PAY;
-            default:
-                throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+            }
         }
+        throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+
     }
 }
