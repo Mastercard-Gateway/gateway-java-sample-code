@@ -90,7 +90,19 @@ PaymentSession.configure({
     }
 });
 
+function isMobileBrowser() {
+    return navigator.userAgent.indexOf('Mobile') >= 0 || navigator.userAgent.indexOf('Android') >= 0;
+}
+
 function pay(callback) {
+    if(isMobileBrowser()){
+        setTimeout(payClick,200,callback);
+    }else{
+        payClick(callback);
+    }
+}
+
+function payClick(callback){
     $("#loading-bar-spinner").show();
     finalSubmit = true;
     expiryMonth = expiryYear = cardNumber = securityCode = false;
