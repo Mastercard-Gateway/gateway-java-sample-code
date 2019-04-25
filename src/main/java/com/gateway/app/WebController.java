@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 import static com.gateway.client.Utils.Prefixes.APM;
 import static com.gateway.client.Utils.Prefixes.ORDER;
@@ -175,7 +176,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
+        req.setApiOperation(CREATE_SESSION.toString());
         req.setOrderId(Utils.createUniqueId(ORDER));
         req.setTransactionId(Utils.createUniqueId(TRANS));
 
@@ -188,13 +189,10 @@ public class WebController {
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
             String correlationId = Utils.createUniqueId(APM);
-            req.setApiOperation("UPDATE_SESSION");
+            req.setApiOperation(UPDATE_SESSION.toString());
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setBrowserPaymentOperation("PAY");
-            // NOTE: Uncomment the below for local testing
-            // req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
-            // NOTE: Comment out the below for local testing
             req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
@@ -442,7 +440,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
+        req.setApiOperation(CREATE_SESSION.toString());
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
