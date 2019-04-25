@@ -602,7 +602,6 @@ public class ApiController {
                 // authentication results that is stored when you asked to perform authentication. The gateway will
                 // pass the required information to the acquirer.
                 TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
-//                mav.setViewName("receipt");
                 mav.addObject("response", paymentResponse);
                 mav.addObject("config", config);
 
@@ -618,19 +617,5 @@ public class ApiController {
         }
         return mav;
     }
-
-//    /**
-//     * Make payment using the session and display receipt
-//     * @return
-//     */
-//    @PutMapping(value = "/error")
-//    public ModelAndView displayError(@RequestBody HttpServletRequest request)
-//    {
-//        ModelAndView mav = new ModelAndView();
-//
-//
-//        return ExceptionService.constructGeneralErrorResponse(mav, new Exception(request.getParameter("apiResponse")));
-//    }
-
 
 }

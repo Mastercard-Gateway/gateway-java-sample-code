@@ -7,6 +7,7 @@ package com.gateway.client;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import static com.gateway.client.ApiAuthenticationChannel.PAYER_BROWSER;
 import static com.gateway.client.ApiOperation.AUTHORIZE;
+import static com.gateway.client.ApiOperation.CREATE_CHECKOUT_SESSION;
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiOperation.INITIATE_BROWSER_PAYMENT;
 import static com.gateway.client.ApiOperation.PAY;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 import static com.gateway.client.Utils.Prefixes.ORDER;
@@ -109,6 +112,8 @@ public class ApiRequestService {
                 break;
             case UPDATE_SESSION:
                 req.setApiMethod("PUT");
+                break;
+            default:
                 break;
         }
 
@@ -229,21 +234,19 @@ public class ApiRequestService {
 
         // Used for hosted checkout - CREATE_CHECKOUT_SESSION operation
         JsonObject order = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) &&
-                (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")
-                        || request.getApiOperation().equals(UPDATE_SESSION.toString())
-                        || request.getApiOperation().equals(PAY.toString()))) {
-            // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
-            if (Utils.notNullOrEmpty(request.getOrderId())) {
-                if (request.getApiOperation().equals(PAY.toString()) &&
+        // Need to add order ID in the request body only for some operations. Its presence in the body will cause an error for the other operations.
+        if (Utils.notNullOrEmpty(request.getOrderId()) && Utils.notNullOrEmpty(request.getApiOperation()) &&
+                Arrays.asList(CREATE_CHECKOUT_SESSION.toString(), UPDATE_SESSION.toString(), PAY.toString())
+                        .contains(request.getApiOperation())) {
+            // Need to add order ID as reference in the request body only for PAY when having authenticated with 3DS2
+            if (request.getApiOperation().equals(PAY.toString()) &&
                         Utils.notNullOrEmpty(request.getAuthenticationTransactionId())) {
-                    //for PAY wth 3ds
-                    order.addProperty("reference", request.getOrderId());
+                order.addProperty("reference", request.getOrderId());
                 } else {
                     order.addProperty("id", request.getOrderId());
                 }
-            }
         }
+
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
@@ -255,7 +258,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getRedirectResponseUrl()))
             authentication.addProperty("redirectResponseUrl", request.getRedirectResponseUrl());
         // The transactionId you used for the Initiate Authentication operation.
-        if (request.getApiOperation().equals(PAY.toString()) &&
+        if (request.getApiOperation() != null && request.getApiOperation().equals(PAY.toString()) &&
                 Utils.notNullOrEmpty(request.getAuthenticationTransactionId()))
             authentication.addProperty("transactionId", request.getAuthenticationTransactionId());
 
@@ -283,7 +286,8 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getTargetTransactionId()))
             transaction.addProperty("targetTransactionId", request.getTargetTransactionId());
         //for PAY wth 3ds
-        if (request.getApiOperation().equals(PAY.toString()) && Utils.notNullOrEmpty(request.getOrderId()))
+        if (request.getApiOperation() != null && request.getApiOperation().equals(PAY.toString()) &&
+                Utils.notNullOrEmpty(request.getOrderId()))
             transaction.addProperty("reference", request.getOrderId());
 
         JsonObject expiry = new JsonObject();
@@ -319,9 +323,9 @@ public class ApiRequestService {
         JsonObject interaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
-            if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
+            if (request.getApiOperation().equals(CREATE_CHECKOUT_SESSION.toString())) {
                 interaction.addProperty("returnUrl", request.getReturnUrl());
-            } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT")
+            } else if (request.getApiOperation().equals(INITIATE_BROWSER_PAYMENT.toString())
                     || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")
                     || request.getApiOperation().equals(UPDATE_SESSION.toString())) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
@@ -386,7 +390,7 @@ public class ApiRequestService {
     public static ApiRequest createBrowserPaymentsRequest(HttpServletRequest request, String operation, String source, Config config) throws Exception {
         try {
             ApiRequest req = new ApiRequest();
-            req.setApiOperation("INITIATE_BROWSER_PAYMENT");
+            req.setApiOperation(INITIATE_BROWSER_PAYMENT.toString());
             req.setTransactionId(Utils.createUniqueId(TRANS));
             req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
@@ -534,13 +538,7 @@ public class ApiRequestService {
                     "/transaction/1";// + Utils.createUniqueId(Utils.Prefixes.TRANS);
 
             // Perform API operation
-            String apiResponse;
-            try {
-                apiResponse = connection.sendTransaction3DS(paymentData, paymentRequestUrl, config);
-            } catch (Exception e) {
-                logger.debug("Retrying", e);
-                throw e;
-            }
+            String apiResponse = connection.sendTransaction3DS(paymentData, paymentRequestUrl, config);
             return ApiResponseService.parseAuthorizeResponse(apiResponse);
         } catch (Exception e) {
             logger.debug("Unhandled exception caught", e);
