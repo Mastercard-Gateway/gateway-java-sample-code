@@ -22,7 +22,7 @@ This is a sample application to help developers start building Java applications
             prompt> export GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
             prompt> export GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
             prompt> export GATEWAY_VERSION=YOUR_VERSION (optional - default is version 52)
-            prompt> export GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is 1.1.0)
+            prompt> export GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is 1.2.0)
             prompt> export GATEWAY_APM_VERSION=YOUR_APM_VERSION (optional - default is version 1.1.0)
     - On Windows, use the ```set``` command:
             
@@ -31,7 +31,7 @@ This is a sample application to help developers start building Java applications
             prompt> set GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
             prompt> set GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
             prompt> set GATEWAY_VERSION=YOUR_VERSION (optional - default is version 52)
-            prompt> set GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is version 1.1.0)
+            prompt> set GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is version 1.2.0)
             prompt> set GATEWAY_APM_VERSION=YOUR_APM_VERSION (optional - default is version 1.1.0)
 
 1. Run the following:

@@ -19,6 +19,8 @@ import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.gateway.client.ApiOperation.CREATE_CHECKOUT_SESSION;
+import static com.gateway.client.ApiOperation.INITIATE_BROWSER_PAYMENT;
 import static org.junit.Assert.assertEquals;
 
 public class ApiRequestServiceTest {
@@ -177,7 +179,7 @@ public class ApiRequestServiceTest {
     @Test
     public void parsePayPalRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        request.setApiOperation(INITIATE_BROWSER_PAYMENT.toString());
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setBrowserPaymentOperation("PAY");
@@ -197,7 +199,7 @@ public class ApiRequestServiceTest {
     @Test
     public void parseUnionPayRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        request.setApiOperation(INITIATE_BROWSER_PAYMENT.toString());
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setBrowserPaymentOperation("PAY");
@@ -214,7 +216,7 @@ public class ApiRequestServiceTest {
     @Test
     public void parseCreateSessionRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setApiOperation("CREATE_CHECKOUT_SESSION");
+        request.setApiOperation(CREATE_CHECKOUT_SESSION.toString());
         request.setOrderId("DS9SJ3J39A");
         request.setOrderCurrency("USD");
         request.setReturnUrl("http://www.mysite.com/receipt");
