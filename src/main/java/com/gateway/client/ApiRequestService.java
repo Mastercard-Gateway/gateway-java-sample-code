@@ -558,4 +558,22 @@ public class ApiRequestService {
                 throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
         }
     }
+
+    /**
+     * Retrieve a Gateway session using the RETRIEVE_SESSION API
+     * @param config        contains frequently used information like Merchant ID, API password, etc.
+     * @param sessionId     used to target a specific session
+     * @return parsed session or throw exception
+     */
+    public static HostedSession retrieveSession(Config config, String sessionId) throws Exception {
+        String url = getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+        RESTApiClient sessionConnection = new RESTApiClient();
+        try {
+            String sessionResponse = sessionConnection.getTransaction(url, config);
+            return ApiResponseService.parseSessionResponse(sessionResponse);
+        } catch (Exception e) {
+            logger.error("Unable to retrieve session", e);
+            throw e;
+        }
+    }
 }
