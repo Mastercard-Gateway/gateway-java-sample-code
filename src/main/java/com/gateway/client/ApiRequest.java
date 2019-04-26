@@ -42,6 +42,7 @@ public class ApiRequest {
     private String authenticationChannel;
     private String acceptVersions;
     private String redirectResponseUrl;
+    private String authenticationTransactionId;
 
     // Wallet properties
     /* essentials_exclude_start */
@@ -314,6 +315,15 @@ public class ApiRequest {
 
     public ApiRequest setRedirectResponseUrl(String redirectResponseUrl) {
         this.redirectResponseUrl = redirectResponseUrl;
+        return this;
+    }
+
+    public String getAuthenticationTransactionId() {
+        return authenticationTransactionId;
+    }
+
+    public ApiRequest setAuthenticationTransactionId(String authenticationTransactionId) {
+        this.authenticationTransactionId = authenticationTransactionId;
         return this;
     }
 
