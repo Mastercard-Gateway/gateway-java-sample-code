@@ -19,8 +19,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>1.5.2.RELEASE</spring-boot.version>
         <webjars-bootstrap.version>4.0.0</webjars-bootstrap.version>
-        <webjars-jquery-ui.version>1.11.4</webjars-jquery-ui.version>
-        <webjars-jquery.version>2.2.4</webjars-jquery.version>
+        <webjars-jquery-ui.version>1.12.1</webjars-jquery-ui.version>
+        <webjars-jquery.version>3.4.1</webjars-jquery.version>
         <thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
