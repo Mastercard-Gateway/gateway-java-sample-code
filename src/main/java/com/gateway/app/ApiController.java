@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.ApiException;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
@@ -29,10 +30,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import static com.gateway.client.Utils.Prefixes.THREEDS;
 
 
 @Controller
@@ -42,6 +44,41 @@ public class ApiController {
 
     @Autowired
     public Config config;
+
+    /**
+     * Beautify the API request and response so they're readable in the view
+     *
+     * @param mav The ModelAndView object from the controller
+     * @param apiResponse The response from the API
+     * @param payload The request payload (want to display this to the user, as it's helpful to see both request and
+     * response)
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param apiRequest contains information about the API request (method, operation, etc)
+     * @param requestUrl API request URL
+     * @return Modified ModelAndView object or throw exception
+     * @throws Exception
+     */
+    private static ModelAndView formatApiResponse(ModelAndView mav, String apiResponse, String payload, Config config,
+            ApiRequest apiRequest, String requestUrl) throws Exception {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Object prettyResp = mapper.readValue(apiResponse, Object.class);
+            Object prettyPayload = mapper.readValue(payload, Object.class);
+
+            mav.setViewName("apiResponse");
+            mav.addObject("config", config);
+            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+            mav.addObject("operation", apiRequest.getApiOperation());
+            mav.addObject("method", apiRequest.getApiMethod());
+            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+            mav.addObject("requestUrl", requestUrl);
+            return mav;
+        } catch (Exception e) {
+            logger.error("Unable to format API response");
+            throw e;
+        }
+
+    }
 
     /* essentials_exclude_start */
     /**
@@ -230,7 +267,7 @@ public class ApiController {
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
             // Format request/response for easy viewing
-            mav = ApiResponseService.formatApiResponse(mav, apiResponse, jsonPayload, config, apiRequest, requestUrl);
+            mav = formatApiResponse(mav, apiResponse, jsonPayload, config, apiRequest, requestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -275,7 +312,7 @@ public class ApiController {
             String paymentResponse = paymentConnection.sendTransaction(paymentPayload, paymentRequestUrl, config);
 
             // Format request/response for easy viewing
-            mav = ApiResponseService.formatApiResponse(mav, paymentResponse, paymentPayload, config, payRequest, paymentRequestUrl);
+            mav = formatApiResponse(mav, paymentResponse, paymentPayload, config, payRequest, paymentRequestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -346,7 +383,7 @@ public class ApiController {
             }
 
             // Format request/response for easy viewing
-            mav = ApiResponseService.formatApiResponse(mav, resp, jsonPayload, config, request, requestUrl);
+            mav = formatApiResponse(mav, resp, jsonPayload, config, request, requestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -440,13 +477,13 @@ public class ApiController {
 
         try {
             // Retrieve session
-            HostedSession session = ApiResponseService.retrieveSession(config, apiRequest.getSessionId());
+            HostedSession session = ApiRequestService.retrieveSession(config, apiRequest.getSessionId());
 
             // Construct CHECK_3DS_ENROLLMENT API request
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
 
             // Create a unique identifier to use for 3DSecure
-            String secureId = Utils.createUniqueId("3ds-");
+            String secureId = Utils.createUniqueId(THREEDS);
 
             // Save this value in HttpSession to retrieve after returning from issuer authentication form
             HttpSession httpSession = request.getSession();
@@ -532,7 +569,7 @@ public class ApiController {
                 String apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
 
                 // Format request/response for easy viewing
-                mav = ApiResponseService.formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
+                mav = formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
             } else {
                 mav.setViewName("error");
                 mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());
@@ -554,16 +591,17 @@ public class ApiController {
     public ModelAndView process3ds2Redirect(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("receipt");
         try {
-
+            String gatewayRecommendation = request.getParameter("response.gatewayRecommendation") != null ?
+                    request.getParameter("response.gatewayRecommendation") :
+                    request.getParameter("gatewayRecommendation");
             // When the result of the Authenticate Payer operation indicates that you can proceed with the payment, you
             // may initiate an Authorize or Pay operation.
-            if (request.getParameter("response.gatewayRecommendation")
-                    .equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+            if (gatewayRecommendation != null &&
+                    gatewayRecommendation.equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
                 // The gateway will use the authentication.transactionId (provided in the request) to lookup the
                 // authentication results that is stored when you asked to perform authentication. The gateway will
                 // pass the required information to the acquirer.
                 TransactionResponse paymentResponse = ApiRequestService.performTransaction(request, config);
-                mav.setViewName("receipt");
                 mav.addObject("response", paymentResponse);
                 mav.addObject("config", config);
 
@@ -571,24 +609,13 @@ public class ApiController {
                 throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED_WITH_PAYMENT.toString());
 
             }
-        } catch (Exception e) {
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        }
+        catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
         return mav;
     }
-
-    /**
-     * Make payment using the session and display receipt
-     * @return
-     */
-    @PutMapping(value = "/error")
-    public ModelAndView displayError(@RequestBody HttpServletRequest request)
-    {
-        ModelAndView mav = new ModelAndView();
-
-
-        return ExceptionService.constructGeneralErrorResponse(mav, new Exception(request.getParameter("apiResponse")));
-    }
-
 
 }

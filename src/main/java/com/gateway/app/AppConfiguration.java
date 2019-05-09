@@ -61,7 +61,8 @@ public class AppConfiguration {
             config.setAuthenticationType(Config.AuthenticationType.CERTIFICATE);
             config.setKeyStore(keystore);
             config.setKeyStorePassword(keystorePassword);
-            config.setGatewayHost(gatewayHost.trim());
+            if (gatewayHost != null)
+                config.setGatewayHost(gatewayHost.trim());
         }
         else if (apiPassword != null) {
             config.setAuthenticationType(Config.AuthenticationType.PASSWORD);
@@ -79,10 +80,8 @@ public class AppConfiguration {
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
         config.setApmVersion(apmVersion);
+        config.setApiThreeDsVersion(threeDSApiVersion);
 
-        if (threeDSApiVersion != null) {
-            config.setApiThreeDsVersion(threeDSApiVersion);
-        }
         return config;
     }
 }

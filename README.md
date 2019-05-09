@@ -23,28 +23,29 @@ This is a sample application to help developers start building Java applications
             prompt> export GATEWAY_API_PASSWORD=YOUR_API_PASSWORD
             prompt> export GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
             prompt> export GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
-            prompt> export GATEWAY_VERSION=YOUR_VERSION (optional - default is version 51)
-            prompt> export GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is 1.1.0)
+            prompt> export GATEWAY_VERSION=YOUR_VERSION (optional - default is version 52)
+            prompt> export GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is 1.2.0)
             prompt> export GATEWAY_APM_VERSION=YOUR_APM_VERSION (optional - default is version 1.1.0)
     - On Windows, use the ```set``` command:
-
+            
             prompt> set GATEWAY_MERCHANT_ID=YOUR_MERCHANT_ID
             prompt> set GATEWAY_API_PASSWORD=YOUR_API_PASSWORD
             prompt> set GATEWAY_BASE_URL=YOUR_GATEWAY_BASE_URL
             prompt> set GATEWAY_CURRENCY=YOUR_CURRENCY (optional - default is USD)
-            prompt> set GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is version 1.1.0)
+            prompt> set GATEWAY_VERSION=YOUR_VERSION (optional - default is version 52)
+            prompt> set GATEWAY_THREEDS_VERSION=YOUR_THREEDS_VERSION (optional - default is version 1.2.0)
             prompt> set GATEWAY_APM_VERSION=YOUR_APM_VERSION (optional - default is version 1.1.0)
 
 1. Run the following:
 
-        java -jar dist/gateway-java-sample-code-1.1.0.jar
+        java -jar dist/gateway-java-sample-code-1.2.0.jar
 
 1. Navigate to *http://localhost:5000* to test locally
 
 ## Proxy Configuration
 If you are behind a proxy you need to add a couple of flags before running the .jar (in Step 4)  
 
-`java -Dhttp.proxyHost=YOUR_PROXY_URL -Dhttp.proxyPort=YOUR_PROXY_PORT -jar dist/gateway-java-sample-code-1.0.jar`
+`java -Dhttp.proxyHost=YOUR_PROXY_URL -Dhttp.proxyPort=YOUR_PROXY_PORT -jar dist/gateway-java-sample-code-1.2.0.jar`
 
 ## Disclaimer
 This software is intended for **TEST/REFERENCE** purposes **ONLY** and is not intended to be used in a production environment.

@@ -24,7 +24,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
+import static com.gateway.client.Utils.Prefixes.APM;
+import static com.gateway.client.Utils.Prefixes.ORDER;
+import static com.gateway.client.Utils.Prefixes.TRANS;
 
 
 @Controller
@@ -77,11 +81,11 @@ public class WebController {
         try {
             ApiRequest req = new ApiRequest();
             req.setSourceType("CARD");
-            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
-            req.setTransactionId(Utils.createUniqueId("trans-"));
+            req.setTransactionId(Utils.createUniqueId(TRANS));
             mav.setViewName("payWithToken");
             mav.addObject("request", req);
             mav.addObject("config", config);
@@ -172,9 +176,9 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
-        req.setOrderId(Utils.createUniqueId("order-"));
-        req.setTransactionId(Utils.createUniqueId("trans-"));
+        req.setApiOperation(CREATE_SESSION.toString());
+        req.setOrderId(Utils.createUniqueId(ORDER));
+        req.setTransactionId(Utils.createUniqueId(TRANS));
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -184,14 +188,11 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            String correlationId = Utils.createUniqueId("APM_");
-            req.setApiOperation("UPDATE_SESSION");
+            String correlationId = Utils.createUniqueId(APM);
+            req.setApiOperation(UPDATE_SESSION.toString());
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setBrowserPaymentOperation("PAY");
-            // NOTE: Uncomment the below for local testing
-            // req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
-            // NOTE: Comment out the below for local testing
             req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
@@ -255,18 +256,6 @@ public class WebController {
         return mav;
     }
 
-    /**
-     * APM with Hosted Checkout receipt page
-     *
-     * @return ModelAndView for apmHostedCheckoutReceipt.html
-     */
-    @GetMapping("/apmHostedCheckoutReceipt")
-    public ModelAndView showAPMwithHCOReceipt() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("apmHostedCheckoutReceipt");
-        return mav;
-    }
-
     /* essentials_exclude_start */
     /**
      * Show Masterpass page - this is only for demonstration purposes so that the user of this sample code can enter API payload details
@@ -281,7 +270,7 @@ public class WebController {
         try {
             mav.setViewName("masterpass");
             ApiRequest req = new ApiRequest();
-            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
@@ -346,7 +335,7 @@ public class WebController {
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
         ApiRequest req = ApiRequestService.createApiRequest("VOID", config);
-        req.setTransactionId(Utils.createUniqueId("trans-"));
+        req.setTransactionId(Utils.createUniqueId(TRANS));
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -451,7 +440,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
+        req.setApiOperation(CREATE_SESSION.toString());
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -491,8 +480,8 @@ public class WebController {
 
         // Add some prefilled data - can be changed by user
         ApiRequest request = new ApiRequest();
-        request.setOrderId(Utils.createUniqueId("order-"));
-        request.setTransactionId(Utils.createUniqueId("trans-"));
+        request.setOrderId(Utils.createUniqueId(ORDER));
+        request.setTransactionId(Utils.createUniqueId(TRANS));
         request.setOrderAmount("50.00");
         request.setOrderCurrency(config.getCurrency());
         request.setOrderDescription("Wonderful product that you should buy!");

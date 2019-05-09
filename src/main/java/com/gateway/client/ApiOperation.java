@@ -32,5 +32,5 @@ public enum ApiOperation {
     UPDATE_AUTHORIZATION,
     VOID,
     REFUND,
-    CAPTURE
-}
+    CAPTURE,
+    INITIATE_BROWSER_PAYMENT}
