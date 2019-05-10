@@ -330,23 +330,3 @@ input {
 #order-submit {
     border: none;
 }
-
-.hs-validation-tooltip.bs-tooltip-left.tooltip .arrow::before {
-    border-left-color: #ff1a1a;
-}
-
-.hs-validation-tooltip.bs-tooltip-right.tooltip .arrow::before {
-    border-right-color: #ff1a1a;
-}
-
-.hs-validation-tooltip.bs-tooltip-top.tooltip .arrow::before {
-    border-top-color: #ff1a1a;
-}
-
-.hs-validation-tooltip.bs-tooltip-bottom.tooltip .arrow::before {
-    border-bottom-color: #ff1a1a;
-}
-
-.hs-validation-tooltip.tooltip .tooltip-inner {
-    background-color: #ff1a1a;
-}

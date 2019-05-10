@@ -68,7 +68,7 @@ PaymentSession.onFocus(['card.nameOnCard','card.number','card.expiryMonth','card
         $("label[for='card-holder-name']").css({fontWeight:"bold"});
     }
     console.log("Focus event executed for " + selector);
-    for(var sel in selectors){
+    for(sel in selectors){
         if(selectors[sel] === selector){
             setOnFocusField(sel);
             currentFocusField = sel;
@@ -106,29 +106,34 @@ PaymentSession.setHoverStyle(["card.nameOnCard","card.number","card.expiryMonth"
     borderStyle:'solid'
 });
 
-function handleError(message, selectorField) {
+function handleError(message,selectorField) {
     $("#loading-bar-spinner").hide();
-    if ((selectorField && focusFields[selectorField].focus && currentFocusField !== selectorField) || finalSubmit === true) {
-        $(selectors[selectorField]).next().tooltip({
-            title: message,
-            trigger: 'manual',
-            placement: 'right',
-            html: true,
-            template: [
-                '<div class="tooltip hs-validation-tooltip" role="tooltip">',
-                    '<div class="arrow" style="border-color: #ff1a1a;"></div>',
-                    '<div class="tooltip-inner" style="background-color: #f00"></div>',
-                '</div>'
-            ].join(''),
-            animation: true
-        });
-        $(selectors[selectorField]).next().tooltip('show');
-    } else if (selectorField && focusFields[selectorField].focus && currentFocusField === selectorField) {
+    var $errorAlertContainer = $('#error-alert');
+    if( (focusFields[selectorField].focus && currentFocusField !== selectorField) || finalSubmit === true){
+        var $errorFieldContainer = $errorAlertContainer.find("#error-"+selectorField);
+        if($errorFieldContainer.length <= 0){
+            // create new container and append to error Alert Container
+            var idValue = "error-"+selectorField;
+            var para = "<p id=\""+idValue+"\"></p>";
+            $errorAlertContainer.append(para);
+            $errorFieldContainer = $errorAlertContainer.find("#error-"+selectorField);
+        }
+
+        $errorFieldContainer.html("");
+        $errorFieldContainer.html( message);
+    }else if(focusFields[selectorField].focus && currentFocusField === selectorField){
         // clear particular error message
-        $(selectors[selectorField]).next().tooltip('hide');
+        $errorAlertContainer.find("#error-"+selectorField).remove();
+    }
+    // hide error message container only if does not contain any child error messages.
+    if($errorAlertContainer.find("[id^='error']").length > 0){
+        $errorAlertContainer.show();
+    }else{
+        $errorAlertContainer.hide();
     }
 }
 
 function clearErrorMessageOnFocus(focusField){
-    $(selectors[focusField]).next().tooltip('hide');
+    var $errorAlertContainer = $('#error-alert');
+    $errorAlertContainer.find("#error-"+focusField).remove();
 }

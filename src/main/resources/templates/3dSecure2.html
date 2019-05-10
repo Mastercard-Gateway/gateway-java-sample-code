@@ -168,7 +168,6 @@
     ThreeDS.configure({
         merchantId: merchantId,
         hostedSessionId: sessionId,
-        sessionId: sessionId,//since ThreeDS 1.2.0
         containerId: '3DSUI',
         configuration: {userLanguage: "en-AU", wsVersion: /*[[${config.apiVersion}]]*/ null},
         callback: function (data) {
@@ -286,8 +285,7 @@
                                         // You can proceed with the payment as authentication is granted.
                                         case "PROCEED_WITH_AUTHENTICATION":
                                         case "PROCEED_WITH_PAYMENT":
-                                            //challenge flow for ThreeDS <1.2.0
-                                            console.log("Redirecting to ACS", authResponse.htmlRedirectCode);
+                                            //challenge flow
                                             redirectToACS(authResponse.htmlRedirectCode);
                                             break;
                                     }
