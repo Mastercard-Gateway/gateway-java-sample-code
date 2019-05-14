@@ -4,6 +4,11 @@
 
 package com.gateway.app;
 
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.client.ApiException;
 import com.gateway.client.ApiProtocol;
 import com.gateway.client.ApiRequest;
@@ -39,6 +44,41 @@ public class ApiController {
 
     @Autowired
     public Config config;
+
+    /**
+     * Beautify the API request and response so they're readable in the view
+     *
+     * @param mav The ModelAndView object from the controller
+     * @param apiResponse The response from the API
+     * @param payload The request payload (want to display this to the user, as it's helpful to see both request and
+     * response)
+     * @param config contains frequently used information like Merchant ID, API password, etc.
+     * @param apiRequest contains information about the API request (method, operation, etc)
+     * @param requestUrl API request URL
+     * @return Modified ModelAndView object or throw exception
+     * @throws Exception
+     */
+    private static ModelAndView formatApiResponse(ModelAndView mav, String apiResponse, String payload, Config config,
+            ApiRequest apiRequest, String requestUrl) throws Exception {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Object prettyResp = mapper.readValue(apiResponse, Object.class);
+            Object prettyPayload = mapper.readValue(payload, Object.class);
+
+            mav.setViewName("apiResponse");
+            mav.addObject("config", config);
+            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
+            mav.addObject("operation", apiRequest.getApiOperation());
+            mav.addObject("method", apiRequest.getApiMethod());
+            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
+            mav.addObject("requestUrl", requestUrl);
+            return mav;
+        } catch (Exception e) {
+            logger.error("Unable to format API response");
+            throw e;
+        }
+
+    }
 
     /* essentials_exclude_start */
     /**
@@ -227,7 +267,7 @@ public class ApiController {
             String apiResponse = apiConnection.sendTransaction(jsonPayload, requestUrl, config);
 
             // Format request/response for easy viewing
-            mav = ApiResponseService.formatApiResponse(mav, apiResponse, jsonPayload, config, apiRequest, requestUrl);
+            mav = formatApiResponse(mav, apiResponse, jsonPayload, config, apiRequest, requestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -272,7 +312,7 @@ public class ApiController {
             String paymentResponse = paymentConnection.sendTransaction(paymentPayload, paymentRequestUrl, config);
 
             // Format request/response for easy viewing
-            mav = ApiResponseService.formatApiResponse(mav, paymentResponse, paymentPayload, config, payRequest, paymentRequestUrl);
+            mav = formatApiResponse(mav, paymentResponse, paymentPayload, config, payRequest, paymentRequestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -343,7 +383,7 @@ public class ApiController {
             }
 
             // Format request/response for easy viewing
-            mav = ApiResponseService.formatApiResponse(mav, resp, jsonPayload, config, request, requestUrl);
+            mav = formatApiResponse(mav, resp, jsonPayload, config, request, requestUrl);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -437,7 +477,7 @@ public class ApiController {
 
         try {
             // Retrieve session
-            HostedSession session = ApiResponseService.retrieveSession(config, apiRequest.getSessionId());
+            HostedSession session = ApiRequestService.retrieveSession(config, apiRequest.getSessionId());
 
             // Construct CHECK_3DS_ENROLLMENT API request
             String jsonPayload = ApiRequestService.buildJSONPayload(apiRequest);
@@ -529,7 +569,7 @@ public class ApiController {
                 String apiResponse = paymentConnection.sendTransaction(paymentData, paymentRequestUrl, config);
 
                 // Format request/response for easy viewing
-                mav = ApiResponseService.formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
+                mav = formatApiResponse(mav, apiResponse, paymentData, config, paymentRequest, paymentRequestUrl);
             } else {
                 mav.setViewName("error");
                 mav.addObject("cause", ApiResponses.AUTHENTICATION_FAILED.toString());

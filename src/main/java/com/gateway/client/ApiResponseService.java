@@ -4,8 +4,6 @@
 
 package com.gateway.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gateway.app.Config;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
@@ -17,7 +15,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -272,24 +269,6 @@ public class ApiResponseService {
     }
 
     /**
-     * Retrieve a Gateway session using the RETRIEVE_SESSION API
-     * @param config        contains frequently used information like Merchant ID, API password, etc.
-     * @param sessionId     used to target a specific session
-     * @return parsed session or throw exception
-     */
-    public static HostedSession retrieveSession(Config config, String sessionId) throws Exception {
-        String url = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
-        RESTApiClient sessionConnection = new RESTApiClient();
-        try {
-            String sessionResponse = sessionConnection.getTransaction(url, config);
-            return parseSessionResponse(sessionResponse);
-        } catch (Exception e) {
-            logger.error("Unable to retrieve session", e);
-            throw e;
-        }
-    }
-
-    /**
      * Retrieve redirect URL from browser payment response
      *
      * @param response      response from API
@@ -305,40 +284,6 @@ public class ApiResponseService {
             logger.error("Unable to get browser payment redirect URL", e);
             throw e;
         }
-    }
-
-    /**
-     * Beautify the API request and response so they're readable in the view
-     *
-     * @param mav           The ModelAndView object from the controller
-     * @param apiResponse   The response from the API
-     * @param payload       The request payload (want to display this to the user, as it's helpful to see both request and response)
-     * @param config        contains frequently used information like Merchant ID, API password, etc.
-     * @param apiRequest    contains information about the API request (method, operation, etc)
-     * @param requestUrl    API request URL
-     * @return              Modified ModelAndView object or throw exception
-     * @throws Exception
-     */
-    public static ModelAndView formatApiResponse(ModelAndView mav, String apiResponse, String payload, Config config, ApiRequest apiRequest, String requestUrl) throws Exception {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            Object prettyResp = mapper.readValue(apiResponse, Object.class);
-            Object prettyPayload = mapper.readValue(payload, Object.class);
-
-            mav.setViewName("apiResponse");
-            mav.addObject("config", config);
-            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", apiRequest.getApiOperation());
-            mav.addObject("method", apiRequest.getApiMethod());
-            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", requestUrl);
-            return mav;
-        }
-        catch (Exception e) {
-            logger.error("Unable to format API response");
-            throw e;
-        }
-
     }
 
 }

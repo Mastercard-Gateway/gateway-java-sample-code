@@ -4,6 +4,9 @@
 
 package com.gateway.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.gateway.app.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,10 +15,19 @@ import com.google.gson.JsonParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static com.gateway.client.ApiOperation.CAPTURE;
+import static com.gateway.client.ApiOperation.CREATE_CHECKOUT_SESSION;
+import static com.gateway.client.ApiOperation.INITIATE_BROWSER_PAYMENT;
+import static com.gateway.client.ApiOperation.PAY;
+import static com.gateway.client.ApiOperation.REFUND;
+import static com.gateway.client.ApiOperation.RETRIEVE_TRANSACTION;
+import static com.gateway.client.ApiOperation.UPDATE_SESSION;
+import static com.gateway.client.ApiOperation.VOID;
+import static com.gateway.client.Utils.Prefixes.ORDER;
+import static com.gateway.client.Utils.Prefixes.TRANS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ApiRequestServiceTest {
 
@@ -173,7 +185,7 @@ public class ApiRequestServiceTest {
     @Test
     public void parsePayPalRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        request.setApiOperation(INITIATE_BROWSER_PAYMENT.toString());
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setBrowserPaymentOperation("PAY");
@@ -193,7 +205,7 @@ public class ApiRequestServiceTest {
     @Test
     public void parseUnionPayRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setApiOperation("INITIATE_BROWSER_PAYMENT");
+        request.setApiOperation(INITIATE_BROWSER_PAYMENT.toString());
         request.setOrderAmount("10.00");
         request.setOrderCurrency("USD");
         request.setBrowserPaymentOperation("PAY");
@@ -210,7 +222,7 @@ public class ApiRequestServiceTest {
     @Test
     public void parseCreateSessionRequest() throws Exception {
         ApiRequest request = new ApiRequest();
-        request.setApiOperation("CREATE_CHECKOUT_SESSION");
+        request.setApiOperation(CREATE_CHECKOUT_SESSION.toString());
         request.setOrderId("DS9SJ3J39A");
         request.setOrderCurrency("USD");
         request.setReturnUrl("http://www.mysite.com/receipt");
@@ -398,4 +410,65 @@ public class ApiRequestServiceTest {
         return gson.toJson(json);
     }
 
+    @Test
+    public void createApiRequest_PAY() {
+        ApiRequest apiRequest = ApiRequestService.createApiRequest(PAY.toString(), config);
+        assertEquals(apiRequest.getApiOperation(), PAY.toString());
+        assertEquals(apiRequest.getOrderAmount(), "5000");
+        assertEquals(apiRequest.getOrderCurrency(), config.getCurrency());
+        assertTrue(apiRequest.getOrderId().startsWith(ORDER.toString()));
+        assertTrue(apiRequest.getTransactionId().startsWith(TRANS.toString()));
+    }
+
+    @Test
+    public void createApiRequest_CAPTURE() {
+        ApiRequest apiRequest = ApiRequestService.createApiRequest(CAPTURE.toString(), config);
+        assertEquals(apiRequest.getApiOperation(), CAPTURE.toString());
+        assertEquals(apiRequest.getOrderAmount(), "5000");
+        assertEquals(apiRequest.getOrderCurrency(), config.getCurrency());
+        assertNull(apiRequest.getOrderId());
+        assertTrue(apiRequest.getTransactionId().startsWith(TRANS.toString()));
+    }
+
+    @Test
+    public void createApiRequest_VOID() {
+        ApiRequest apiRequest = ApiRequestService.createApiRequest(VOID.toString(), config);
+        assertEquals(apiRequest.getApiOperation(), VOID.toString());
+        assertEquals(apiRequest.getOrderAmount(), "5000");
+        assertEquals(apiRequest.getOrderCurrency(), config.getCurrency());
+        assertNull(apiRequest.getOrderId());
+        assertTrue(apiRequest.getTransactionId().startsWith(TRANS.toString()));
+    }
+
+    @Test
+    public void createApiRequest_REFUND() {
+        ApiRequest apiRequest = ApiRequestService.createApiRequest(REFUND.toString(), config);
+        assertEquals(apiRequest.getApiOperation(), REFUND.toString());
+        assertEquals(apiRequest.getOrderAmount(), "5000");
+        assertEquals(apiRequest.getOrderCurrency(), config.getCurrency());
+        assertNull(apiRequest.getOrderId());
+        assertTrue(apiRequest.getTransactionId().startsWith(TRANS.toString()));
+    }
+
+    @Test
+    public void createApiRequest_RETRIEVE_TRANSACTION() {
+        ApiRequest apiRequest = ApiRequestService.createApiRequest(RETRIEVE_TRANSACTION.toString(), config);
+        assertEquals(apiRequest.getApiOperation(), RETRIEVE_TRANSACTION.toString());
+        assertEquals(apiRequest.getOrderAmount(), "5000");
+        assertEquals(apiRequest.getOrderCurrency(), config.getCurrency());
+        assertNull(apiRequest.getOrderId());
+        assertNull(apiRequest.getTransactionId());
+        assertEquals("GET", apiRequest.getApiMethod());
+    }
+
+    @Test
+    public void createApiRequest_UPDATE_SESSION() {
+        ApiRequest apiRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
+        assertEquals(apiRequest.getApiOperation(), UPDATE_SESSION.toString());
+        assertEquals(apiRequest.getOrderAmount(), "5000");
+        assertEquals(apiRequest.getOrderCurrency(), config.getCurrency());
+        assertTrue(apiRequest.getOrderId().startsWith(ORDER.toString()));
+        assertTrue(apiRequest.getTransactionId().startsWith(TRANS.toString()));
+        assertEquals("PUT", apiRequest.getApiMethod());
+    }
 }
