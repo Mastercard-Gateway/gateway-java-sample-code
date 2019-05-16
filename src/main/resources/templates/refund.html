@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'refund')}">
 
 <body>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <form action="#" class="col-12 form-horizontal" th:action="@{/process}" th:object="${apiRequest}" method="post">
             <h3>Refund</h3>

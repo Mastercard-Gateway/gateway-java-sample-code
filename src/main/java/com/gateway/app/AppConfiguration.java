@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
@@ -28,6 +28,9 @@ public class AppConfiguration {
 
     @Value("${gateway.api.version}")
     private String apiVersion;
+
+    @Value("${gateway.apm.api.version}")
+    private String apmVersion;
 
     @Value("${gateway.keystore.path}")
     private String keystore;
@@ -58,12 +61,13 @@ public class AppConfiguration {
             config.setAuthenticationType(Config.AuthenticationType.CERTIFICATE);
             config.setKeyStore(keystore);
             config.setKeyStorePassword(keystorePassword);
-            config.setGatewayHost(gatewayHost);
+            if (gatewayHost != null)
+                config.setGatewayHost(gatewayHost.trim());
         }
         else if (apiPassword != null) {
             config.setAuthenticationType(Config.AuthenticationType.PASSWORD);
-            config.setApiPassword(apiPassword);
-            config.setGatewayHost(baseURL);
+            config.setApiPassword(apiPassword.trim());
+            config.setGatewayHost(baseURL.trim());
         }
 
         if (webhooksNotificationSecret != null) {
@@ -75,10 +79,9 @@ public class AppConfiguration {
         config.setApiUsername("merchant." + merchantId);
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
+        config.setApmVersion(apmVersion);
+        config.setApiThreeDsVersion(threeDSApiVersion);
 
-        if (threeDSApiVersion != null) {
-            config.setApiThreeDsVersion(threeDSApiVersion);
-        }
         return config;
     }
 }

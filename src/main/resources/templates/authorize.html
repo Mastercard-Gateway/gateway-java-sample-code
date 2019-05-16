@@ -7,7 +7,7 @@
             return "AUTHORIZE";
         },
         endpoint: function() {
-            return "/processHostedSession/";
+            return "processHostedSession";
         },
         secureIdResponseUrl: function() {
             return null;
@@ -18,7 +18,7 @@
 <style id="antiClickjack">body{display:none !important;}</style>
 <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
 <script th:src="@{${config.apiBaseURL} + '/form/version/' + ${config.apiVersion} + '/merchant/' + ${config.merchantId} + '/session.js'}"></script>
-<div class="col-9">
+<div class="col-12 col-md-9">
     <div class="row">
         <div class="contents col-12">
             <div class="col-md-12">
@@ -27,8 +27,17 @@
                     <p>In order to run the Authorize API operation, please make sure the merchant is configured to "Authorize and Capture" payment mode.</p>
                     <p class="mb-0">You can find test cards <a th:href="@{${config.apiBaseURL} + '/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html'}">here</a>.</p>
                 </div>
+                <div id="error-alert" class="alert alert-danger" role="alert">
+                    <p>The following error(s) occurred:</p>
+                </div>
                 <div class="mb-4" id="authorize">
                     <h6>Payment details</h6>
+                    <div class="form-group">
+                        <label class="col-md-7 control-label" for="card-holder-name">Card Holder Name</label>
+                        <div class="col-md-7">
+                            <input id="card-holder-name" type="text" placeholder="" class="form-control input-md" readonly/>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="card-number">Card number</label>
                         <div class="col-md-7">
@@ -38,13 +47,41 @@
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-month">Expiry month</label>
                         <div class="col-md-7">
-                            <input id="expiry-month" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <!--<input id="expiry-month" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
+                            <select id="expiry-month" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
+                                <option value="">Select Month</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-7 control-label" for="expiry-year">Expiry year</label>
                         <div class="col-md-7">
-                            <input id="expiry-year" type="text" placeholder="" class="form-control input-md" required=""/>
+                            <!--<input id="expiry-year" type="text" placeholder="" class="form-control input-md" required="" readonly/>-->
+                            <select id="expiry-year" class="form-control input-md" required="" th:attrappend="readonly=${config.apiVersion > 51}?@{/readonly/}">
+                                <option value="">Select Year</option>
+                                <option>21</option>
+                                <option>22</option>
+                                <option>23</option>
+                                <option>24</option>
+                                <option>25</option>
+                                <option>26</option>
+                                <option>27</option>
+                                <option>28</option>
+                                <option>29</option>
+                                <option>30</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">

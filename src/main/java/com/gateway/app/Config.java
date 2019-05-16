@@ -1,15 +1,23 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
 
+import java.util.List;
+
+import com.gateway.model.SupportedPaymentOperation;
+import com.gateway.model.TransactionMode;
+
 public class Config {
 
+    private final String httpProxyHost;
+    private final Integer httpProxyPort;
     private String merchantId;
     private String apiPassword;
     private String apiBaseURL;
     private int apiVersion;
+    private String apmVersion;
     private String gatewayHost;
     private String apiUsername;
     private String apiThreeDsVersion;
@@ -18,8 +26,42 @@ public class Config {
     private String currency;
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
+    private TransactionMode transactionMode;
+    private List<SupportedPaymentOperation> supportedPaymentOperations;
+
+
+    public List<SupportedPaymentOperation> getSupportedPaymentOperations() { return supportedPaymentOperations; }
+
+    public Config setSupportedPaymentOperations(List<SupportedPaymentOperation> supportedPaymentOperations) {
+        this.supportedPaymentOperations = supportedPaymentOperations;
+        return this;
+    }
+
+    public TransactionMode getTransactionMode() {
+        return transactionMode;
+    }
+
+    public Config setTransactionMode(TransactionMode transactionMode) {
+        this.transactionMode = transactionMode;
+        return this;
+    }
 
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
+
+    public Config() {
+        httpProxyHost = System.getProperty("http.proxyHost");
+        httpProxyPort = System.getProperty("http.proxyPort") != null ?
+                Integer.valueOf(System.getProperty("http.proxyPort")) : null;
+    }
+
+    public String getHttpProxyHost() {
+        return httpProxyHost;
+    }
+
+    public Integer getHttpProxyPort() {
+        return httpProxyPort;
+    }
+
     public enum AuthenticationType {CERTIFICATE, PASSWORD}
 
     public String getMerchantId() {
@@ -52,6 +94,14 @@ public class Config {
 
     public void setApiVersion(int apiVersion) {
         this.apiVersion = apiVersion;
+    }
+
+    public String getApmVersion() {
+        return apmVersion;
+    }
+
+    public void setApmVersion(String apmVersion) {
+        this.apmVersion = apmVersion;
     }
 
     public String getGatewayHost() {

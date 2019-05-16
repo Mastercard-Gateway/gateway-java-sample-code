@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
@@ -42,6 +42,7 @@ public class ApiRequest {
     private String authenticationChannel;
     private String acceptVersions;
     private String redirectResponseUrl;
+    private String authenticationTransactionId;
 
     // Wallet properties
     /* essentials_exclude_start */
@@ -246,11 +247,21 @@ public class ApiRequest {
         this.walletProvider = walletProvider;
     }
 
-
+    /**
+     * Indicates the channel in which the authentication request is being initiated.
+     *
+     * @return
+     * @see ApiAuthenticationChannel
+     */
     public String getAuthenticationChannel() {
         return authenticationChannel;
     }
 
+    /**
+     * @param authenticationChannel
+     * @return
+     * @see ApiAuthenticationChannel
+     */
     public ApiRequest setAuthenticationChannel(String authenticationChannel) {
         this.authenticationChannel = authenticationChannel;
         return this;
@@ -288,6 +299,7 @@ public class ApiRequest {
     public void setMasterpassCheckoutUrl(String masterpassCheckoutUrl) {
         this.masterpassCheckoutUrl = masterpassCheckoutUrl;
     }
+    /* essentials_exclude_end */
 
     public String getAcceptVersions() {
         return acceptVersions;
@@ -305,5 +317,14 @@ public class ApiRequest {
         this.redirectResponseUrl = redirectResponseUrl;
         return this;
     }
-    /* essentials_exclude_end */
+
+    public String getAuthenticationTransactionId() {
+        return authenticationTransactionId;
+    }
+
+    public ApiRequest setAuthenticationTransactionId(String authenticationTransactionId) {
+        this.authenticationTransactionId = authenticationTransactionId;
+        return this;
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
@@ -24,7 +24,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import static com.gateway.client.ApiOperation.CREATE_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
+import static com.gateway.client.Utils.Prefixes.APM;
+import static com.gateway.client.Utils.Prefixes.ORDER;
+import static com.gateway.client.Utils.Prefixes.TRANS;
 
 
 @Controller
@@ -34,6 +38,15 @@ public class WebController {
 
     @Autowired
     public Config config;
+
+    /**
+     * If -Dlocal=https (or http) argument is passed, then the base url will be pointing to http(s)://localhost,
+     * otherwise base url will point to the GATEWAY_BASE_URL passed in the env variables.
+     * @return  String base url
+     */
+    private String getBaseUrl() {
+        return System.getProperty("local") != null ? System.getProperty("local") + "://localhost" : config.getApiBaseURL();
+    }
 
     /**
      * Display AUTHORIZE operation page
@@ -68,11 +81,11 @@ public class WebController {
         try {
             ApiRequest req = new ApiRequest();
             req.setSourceType("CARD");
-            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
-            req.setTransactionId(Utils.createUniqueId("trans-"));
+            req.setTransactionId(Utils.createUniqueId(TRANS));
             mav.setViewName("payWithToken");
             mav.addObject("request", req);
             mav.addObject("config", config);
@@ -163,9 +176,9 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
-        req.setOrderId(Utils.createUniqueId("order-"));
-        req.setTransactionId(Utils.createUniqueId("trans-"));
+        req.setApiOperation(CREATE_SESSION.toString());
+        req.setOrderId(Utils.createUniqueId(ORDER));
+        req.setTransactionId(Utils.createUniqueId(TRANS));
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -175,22 +188,20 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
-            String correlationId = Utils.createUniqueId("APM_");
-            req.setApiOperation("UPDATE_SESSION");
+            String correlationId = Utils.createUniqueId(APM);
+            req.setApiOperation(UPDATE_SESSION.toString());
             req.setOrderAmount("50.00");
-            req.setOrderCurrency("EUR");
+            req.setOrderCurrency(config.getCurrency());
             req.setBrowserPaymentOperation("PAY");
-            // NOTE: Uncomment the below for local testing
-            //req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
-            // NOTE: Comment out the below for local testing
             req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
             mav.setViewName("apm");
             mav.addObject("config", config);
-            mav.addObject("apmApiVersion", "1.0.0");
+            mav.addObject("apmApiVersion", config.getApmVersion());
             mav.addObject("hostedSession", hostedSession);
             mav.addObject("request", req);
+            mav.addObject("baseUrl", getBaseUrl());
             mav.addObject("correlationId", correlationId);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
@@ -209,54 +220,39 @@ public class WebController {
     public ModelAndView showAPMReceipt() {
         ModelAndView mav = new ModelAndView();
         mav.addObject("config", config);
-        mav.addObject("apmApiVersion", "1.0.0");
+        mav.addObject("baseUrl", getBaseUrl());
+        mav.addObject("apmApiVersion", config.getApmVersion());
         mav.setViewName("apmReceipt");
         return mav;
     }
 
     /**
-     * Display page for APM with Hosted Checkout
+     * Display the current Gateway Configuration
      *
-     * @return ModelAndView for apmHostedCheckout.html
+     * @return ModelAndView for config.html
      */
-    @GetMapping("/apmHostedCheckout")
-    public ModelAndView showApmHostedCheckout() {
-
+    @GetMapping("/config")
+    public ModelAndView showConfig() {
         ModelAndView mav = new ModelAndView();
 
-        ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
-
-        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-
-        String data = ApiRequestService.buildJSONPayload(req);
-
         try {
-            RESTApiClient connection = new RESTApiClient();
-            String resp = connection.postTransaction(data, requestUrl, config);
+            if (config.getApiVersion() >= 52) {
+                if (config.getSupportedPaymentOperations() == null) {
+                    config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
+                }
+            } else {
+                 if (config.getTransactionMode() == null) {
+                    config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+                 }
+            }
 
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
-
-            mav.setViewName("apmHostedCheckout");
+            mav.setViewName("config");
             mav.addObject("config", config);
-            mav.addObject("hostedSession", hostedSession);
-        } catch (ApiException e) {
-            ExceptionService.constructApiErrorResponse(mav, e);
+            mav.addObject("apmApiVersion", config.getApmVersion());
+            mav.addObject("baseUrl", getBaseUrl());
         } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
-        return mav;
-    }
-
-    /**
-     * APM with Hosted Checkout receipt page
-     *
-     * @return ModelAndView for apmHostedCheckoutReceipt.html
-     */
-    @GetMapping("/apmHostedCheckoutReceipt")
-    public ModelAndView showAPMwithHCOReceipt() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("apmHostedCheckoutReceipt");
         return mav;
     }
 
@@ -274,7 +270,7 @@ public class WebController {
         try {
             mav.setViewName("masterpass");
             ApiRequest req = new ApiRequest();
-            req.setOrderId(Utils.createUniqueId("order-"));
+            req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setOrderDescription("Wonderful product that you should buy!");
@@ -339,7 +335,7 @@ public class WebController {
     public ModelAndView showVoid() {
         ModelAndView mav = new ModelAndView("void");
         ApiRequest req = ApiRequestService.createApiRequest("VOID", config);
-        req.setTransactionId(Utils.createUniqueId("trans-"));
+        req.setTransactionId(Utils.createUniqueId(TRANS));
         mav.addObject("apiRequest", req);
         return mav;
     }
@@ -385,27 +381,39 @@ public class WebController {
     /**
      * Display 3DSecure-2.0 operation page
      *
+     * The solution brings 3DS v2 & v1 payment authentication flows that can be called from the browser side using
+     * Session Id based Authentication. As a first step in establishing the authentication channel, the merchant's
+     * servers needs to communicate with the gateway server for creating the session. Once the session is created, all
+     * the subsequent API operations needed for managing the 3DS integration flows can be called directly from the
+     * browser using the 3DS JS API.
      * @param httpServletRequest
      * @return ModelAndView for 3dSecure2.html
+     * @see com.gateway.client.ApiOperation
      */
     @GetMapping("/3dSecure2")
     public ModelAndView showSecure2Id(HttpServletRequest httpServletRequest) {
         ModelAndView mav = new ModelAndView();
 
         try {
-            RESTApiClient connection = new RESTApiClient();
-
             //CREATE_SESSION
-            String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-            String createResp = connection.postTransaction(requestUrl, config);
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(createResp);
+            // The API works off of Session Id based authentication. As a first step, you must create a session to
+            // securely provide sensitive data, which you can then update with the request fields and values you wish to
+            // store in the session.
+            HostedSession hostedSession = ApiRequestService.createHostedSession(config);
 
             //UPDATE_SESSION FOR 3DS2
-            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION, config);
+            // The Update Session call allows you to add payment and payer data into a session that can subsequently
+            // become the input to determine the risk associated with a payer in an authentication operation.
+            ApiRequest updateSessionRequest = ApiRequestService.createApiRequest(UPDATE_SESSION.toString(), config);
+
+            // The URL to which you want to redirect the payer after completing the payer authentication process. You
+            // must provide this URL, unless you are certain that there will be no interaction with the payer.
+            final String redirectResponseUrl = ApiRequestService.getCurrentContext(httpServletRequest) +
+                    "/process3ds2Redirect?" + "merchantId=" + config.getMerchantId() + "&sessionId=" +
+                    hostedSession.getId();
             String updateResp = ApiRequestService
                     .update3DSSession(ApiProtocol.REST, updateSessionRequest, config, hostedSession.getId(),
-                            ApiRequestService.getCurrentContext(httpServletRequest) + "/process3ds2Redirect?" +
-                                    "merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId());//process3ds2Redirect
+                            redirectResponseUrl);
             hostedSession = ApiResponseService.parseSessionResponse(updateResp);
             updateSessionRequest.setSessionId(hostedSession.getId());
 
@@ -432,7 +440,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
+        req.setApiOperation(CREATE_SESSION.toString());
 
         String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
 
@@ -444,10 +452,15 @@ public class WebController {
 
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
+            if (config.getSupportedPaymentOperations() == null) {
+                config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
+            }
+
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("currencies", currencies);
             mav.addObject("hostedSession", hostedSession);
+            mav.addObject("baseUrl", getBaseUrl());
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {
@@ -467,8 +480,8 @@ public class WebController {
 
         // Add some prefilled data - can be changed by user
         ApiRequest request = new ApiRequest();
-        request.setOrderId(Utils.createUniqueId("order-"));
-        request.setTransactionId(Utils.createUniqueId("trans-"));
+        request.setOrderId(Utils.createUniqueId(ORDER));
+        request.setTransactionId(Utils.createUniqueId(TRANS));
         request.setOrderAmount("50.00");
         request.setOrderCurrency(config.getCurrency());
         request.setOrderDescription("Wonderful product that you should buy!");

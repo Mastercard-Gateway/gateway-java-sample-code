@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
@@ -14,7 +14,7 @@ public class Utils {
      *
      * @return random identifier
      */
-    public static String createUniqueId(String prefix) {
+    public static String createUniqueId(Prefixes prefix) {
         return prefix + RandomStringUtils.random(10, true, true);
     }
 
@@ -26,5 +26,25 @@ public class Utils {
      */
     public static boolean notNullOrEmpty(String value) {
         return (value != null && !value.equals(""));
+    }
+
+    public enum Prefixes {
+        TRANS("trans-"),
+        THREEDS("3ds-"),
+        ORDER("order-"),
+        APM("APM_"),
+        MD("md-");
+
+        private final String prefix;
+
+        Prefixes(String s) {
+            this.prefix = s;
+
+        }
+
+        @Override
+        public String toString() {
+            return prefix;
+        }
     }
 }

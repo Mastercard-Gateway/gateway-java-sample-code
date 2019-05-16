@@ -2,6 +2,13 @@
  * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
+/**
+ *    The Hosted Session JavaScript client library enables you to collect sensitive payment details from the payer in
+ *    payment form fields, hosted by the Mastercard Payment Gateway. For more information, see {@link https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentSession.html payment session}
+ *    See https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html Implementing a Hosted Session Integration
+ */
+
+// APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE
 if (self === top) {
     var antiClickjack = document.getElementById("antiClickjack");
     if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
@@ -9,12 +16,21 @@ if (self === top) {
     top.location = self.location;
 }
 
-const scope = $(".mb-4")[0].id;
+$("#loading-bar-spinner").show();
+
+// HOLD THE CALLBACK FUNCTION THAT WILL BE CALLED AFTER THE HOSTED FIELDS IN THE SESSION HAVE BEEN UPDATED
+// See pay(callback)
+var afterSessionUpdated;
+var sessionId = (!$("#session-id")[0]) ? "" : $("#session-id")[0].value;
+
+var cardHolderNameField = document.getElementById('card-holder-name');
 
 PaymentSession.configure({
+    session: sessionId,
     fields: {
-        // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
         card: {
+            // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
+            nameOnCard: cardHolderNameField ? "#card-holder-name" : null,
             number: "#card-number",
             securityCode: "#security-code",
             expiryMonth: "#expiry-month",
@@ -25,79 +41,101 @@ PaymentSession.configure({
     frameEmbeddingMitigation: ["javascript"],
     callbacks: {
         initialized: function (response) {
-            if (response.status) {
-                if ("ok" == response.status) {
-                    console.log("Payment Session initialized for scope: " + response.scopeId);
-                }
+            $("#loading-bar-spinner").hide();
+            if ("ok" == response.status) {
+                console.log("Payment Session initialized");
             }
+            // cardHolderNameField ?
+            //     PaymentSession.setFocus('card.nameOnCard') : PaymentSession.setFocus('card.number');
         },
         formSessionUpdate: function (response) {
             // HANDLE RESPONSE FOR UPDATE SESSION
             if (response.status) {
-                if ("ok" == response.status) {
+                clearErrorMessages();
+                if ("ok" == response.status && finalSubmit == true) {
                     console.log("Session updated with data: " + response.session.id);
 
-                    // Submit fields
-                    var data = {
-                        apiOperation: JavaSample.operation(),
-                        sessionId: response.session.id,
-                        transactionId: $('#transaction-id').val(),
-                        orderId: $('#order-id').val(),
-                        orderAmount: $('#order-amount').val(),
-                        orderCurrency: $('#order-currency').val(),
-                        orderDescription: $('#order-description').val(),
-                        secureIdResponseUrl: JavaSample.secureIdResponseUrl()
-                    };
-
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', JavaSample.endpoint(), true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState == XMLHttpRequest.DONE) {
-                            document.documentElement.innerHTML =this.response;
-                        }
-                    };
-                    xhr.send(JSON.stringify(data));
-
+                    if (!afterSessionUpdated) {
+                        submitFields(response.session.id);
+                    } else {
+                        afterSessionUpdated();
+                    }
                 } else if ("fields_in_error" == response.status) {
 
                     console.log("Session update failed with field errors.");
 
                     if (response.errors.cardNumber) {
-                        handleError("Card number missing or invalid.");
+                        handleError("Card number missing or invalid.",'cardNumber');
                     }
                     if (response.errors.expiryYear) {
-                        handleError("Expiry year missing or invalid.");
+                        handleError("Expiry year missing or invalid.",'expiryYear');
                     }
                     if (response.errors.expiryMonth) {
-                        handleError("Expiry month missing or invalid.");
+                        handleError("Expiry month missing or invalid.",'expiryMonth');
                     }
                     if (response.errors.securityCode) {
-                        handleError("Security code invalid.");
+                        handleError("Security code invalid.",'securityCode');
                     }
                 } else if ("request_timeout" == response.status) {
                     handleError("Session update failed with request timeout: " + response.errors.message);
                 } else if ("system_error" == response.status) {
                     handleError("Session update failed with system error: " + response.errors.message)
                 }
+                finalSubmit = false;
             } else {
                 handleError("Session update failed: " + response);
+                finalSubmit = false;
             }
         }
     }
-}, scope);
+});
 
-PaymentSession.setFocus('card.number', scope);
+function isMobileBrowser() {
+    return navigator.userAgent.indexOf('Mobile') >= 0 || navigator.userAgent.indexOf('Android') >= 0;
+}
 
-PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
-    borderColor: 'red',
-    borderWidth: '3px'
-}, scope);
+function pay(callback) {
+    if(isMobileBrowser()){
+        setTimeout(payClick,200,callback);
+    }else{
+        payClick(callback);
+    }
+}
 
-function pay() {
+function payClick(callback){
     $("#loading-bar-spinner").show();
+    finalSubmit = true;
+    expiryMonth = expiryYear = cardNumber = securityCode = false;
+
+    // UPDATE CALLBACK FUNCTION THAT WILL BE CALLED ONCE THE SESSION HAS BEEN UPDATED
+    if (callback)
+        afterSessionUpdated = callback;
+
     // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
-    PaymentSession.updateSessionFromForm('card', null, scope);
+    PaymentSession.updateSessionFromForm('card');
+}
+
+function submitFields(sessionId) {
+    var data = {
+        apiOperation: JavaSample.operation(),
+        sessionId: sessionId,
+        transactionId: $('#transaction-id').val(),
+        orderId: $('#order-id').val(),
+        orderAmount: $('#order-amount').val(),
+        orderCurrency: $('#order-currency').val(),
+        orderDescription: $('#order-description').val(),
+        secureIdResponseUrl: JavaSample.secureIdResponseUrl()
+    };
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', JavaSample.endpoint(), true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.documentElement.innerHTML = this.response;
+        }
+    };
+    xhr.send(JSON.stringify(data));
 }
 
 function handleError(message) {
@@ -106,4 +144,10 @@ function handleError(message) {
     console.log(message);
     $errorAlert.append("<p>" + message + "</p>");
     $errorAlert.show();
+}
+
+function clearErrorMessages(){
+    var $errorAlert = $('#error-alert');
+    $errorAlert.html("");
+    $errorAlert.hide();
 }

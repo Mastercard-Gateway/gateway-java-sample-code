@@ -4,12 +4,6 @@
 
 package com.gateway.client;
 
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gateway.app.Config;
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
@@ -21,7 +15,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.ModelAndView;
+
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
 
 public class ApiResponseService {
 
@@ -72,7 +69,7 @@ public class ApiResponseService {
             secureIdEnrollmentResponse.setStatus(json3ds.get("summaryStatus").getAsString());
             secureIdEnrollmentResponse.setAcsUrl(jsonCustomized.get("acsUrl").getAsString());
             secureIdEnrollmentResponse.setPaReq(jsonCustomized.get("paReq").getAsString());
-            secureIdEnrollmentResponse.setMdValue(Utils.createUniqueId("md-"));        //This is just a required unique ID to be able to connect the request to the response from ACS
+            secureIdEnrollmentResponse.setMdValue(Utils.createUniqueId(Utils.Prefixes.MD));        //This is just a required unique ID to be able to connect the request to the response from ACS
 
             return secureIdEnrollmentResponse;
         } catch (Exception e) {
@@ -114,8 +111,6 @@ public class ApiResponseService {
 
     }
 
-    /* essentials_exclude_start */
-
     /**
      * Parses JSON response from AUTHORIZE transaction into TransactionResponse object
      *
@@ -124,10 +119,11 @@ public class ApiResponseService {
      */
     public static TransactionResponse parseAuthorizeResponse(String response) {
 
-        return parseMasterpassResponse(response);
+        return parseTransactionResponse(response);
 
     }
 
+    /* essentials_exclude_start */
     /**
      * Parses JSON response from Masterpass transaction into TransactionResponse object
      *
@@ -136,6 +132,18 @@ public class ApiResponseService {
      */
     public static TransactionResponse parseMasterpassResponse(String response) {
 
+        return parseTransactionResponse(response);
+
+    }
+    /* essentials_exclude_end */
+
+    /**
+     * Parses JSON response from a transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    private static TransactionResponse parseTransactionResponse(String response) {
         try {
 
             TransactionResponse resp = new TransactionResponse();
@@ -155,9 +163,7 @@ public class ApiResponseService {
             logger.error("Unable to parse wallet response", e);
             throw e;
         }
-
     }
-    /* essentials_exclude_end */
 
     /**
      * Parses JSON response from Browser Payment transaction into BrowserPaymentResponse object
@@ -263,24 +269,6 @@ public class ApiResponseService {
     }
 
     /**
-     * Retrieve a Gateway session using the RETRIEVE_SESSION API
-     * @param config        contains frequently used information like Merchant ID, API password, etc.
-     * @param sessionId     used to target a specific session
-     * @return parsed session or throw exception
-     */
-    public static HostedSession retrieveSession(Config config, String sessionId) throws Exception {
-        String url = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
-        RESTApiClient sessionConnection = new RESTApiClient();
-        try {
-            String sessionResponse = sessionConnection.getTransaction(url, config);
-            return parseSessionResponse(sessionResponse);
-        } catch (Exception e) {
-            logger.error("Unable to retrieve session", e);
-            throw e;
-        }
-    }
-
-    /**
      * Retrieve redirect URL from browser payment response
      *
      * @param response      response from API
@@ -296,40 +284,6 @@ public class ApiResponseService {
             logger.error("Unable to get browser payment redirect URL", e);
             throw e;
         }
-    }
-
-    /**
-     * Beautify the API request and response so they're readable in the view
-     *
-     * @param mav           The ModelAndView object from the controller
-     * @param apiResponse   The response from the API
-     * @param payload       The request payload (want to display this to the user, as it's helpful to see both request and response)
-     * @param config        contains frequently used information like Merchant ID, API password, etc.
-     * @param apiRequest    contains information about the API request (method, operation, etc)
-     * @param requestUrl    API request URL
-     * @return              Modified ModelAndView object or throw exception
-     * @throws Exception
-     */
-    public static ModelAndView formatApiResponse(ModelAndView mav, String apiResponse, String payload, Config config, ApiRequest apiRequest, String requestUrl) throws Exception {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            Object prettyResp = mapper.readValue(apiResponse, Object.class);
-            Object prettyPayload = mapper.readValue(payload, Object.class);
-
-            mav.setViewName("apiResponse");
-            mav.addObject("config", config);
-            mav.addObject("resp", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyResp));
-            mav.addObject("operation", apiRequest.getApiOperation());
-            mav.addObject("method", apiRequest.getApiMethod());
-            mav.addObject("request", mapper.writerWithDefaultPrettyPrinter().writeValueAsString(prettyPayload));
-            mav.addObject("requestUrl", requestUrl);
-            return mav;
-        }
-        catch (Exception e) {
-            logger.error("Unable to format API response");
-            throw e;
-        }
-
     }
 
 }

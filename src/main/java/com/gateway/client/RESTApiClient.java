@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.client;
@@ -11,8 +11,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 /**
  * Service client class for making API requests using REST protocol using JSON
@@ -21,6 +19,8 @@ public final class RESTApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(RESTApiClient.class);
     private static final String UTF8_ENCODING = "UTF-8";
+    private static final String TNSI_TOGGLES_ON = "Enable new 3DS API";
+    private static final String TNSI_TOGGLES_ON_HEADER = "TNSI_TOGGLES_ON";
 
     /**
      * Performs a PUT operation (required for the following API operations: AUTHORIZE, CAPTURE, PAY, REFUND, UPDATE_AUTHORIZATION, VERIFY, VOID, CHECK_3DS_ENROLLMENT, INITIATE_BROWSER_PAYMENT)
@@ -32,10 +32,18 @@ public final class RESTApiClient {
      * @throws Exception
      */
     public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
-            HttpPut httpPut = new HttpPut(requestUrl);
-            httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
+        HttpPut httpPut = new HttpPut(requestUrl);
+        httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
 
-            return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
+        return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
+    }
+
+    public String sendTransaction3DS(String data, String requestUrl, Config config) throws Exception {
+        HttpPut httpPut = new HttpPut(requestUrl);
+        httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
+        httpPut.setHeader(TNSI_TOGGLES_ON_HEADER, TNSI_TOGGLES_ON);
+
+        return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
     }
 
     /**

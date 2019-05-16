@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 MasterCard. All rights reserved.
+ * Copyright (c) 2019 MasterCard. All rights reserved.
  */
 
 package com.gateway.app;
@@ -27,7 +27,7 @@ public class Main {
 
     @RequestMapping("/")
     ModelAndView index() {
-        return new ModelAndView("redirect:/pay");
+        return new ModelAndView("redirect:/config");
     }
 
     private static void initWebhooksNotificationsFolder() {
