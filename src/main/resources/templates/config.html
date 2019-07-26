@@ -35,7 +35,7 @@
                                 <span th:text="${config.transactionMode}"></span>
                             </td>
                             <td th:if="${config.supportedPaymentOperations}" th:each="item, itemStatus : ${config.supportedPaymentOperations}">
-                                <span th:text="${!itemStatus.last} ? ${item} + ', ': ${item}"></span>
+                                <span th:text="${!itemStatus.last} ? ${item.supportedPaymentOperation} + ', ': ${item.supportedPaymentOperation}"></span>
                             </td>
                         </tr>
                     </table>

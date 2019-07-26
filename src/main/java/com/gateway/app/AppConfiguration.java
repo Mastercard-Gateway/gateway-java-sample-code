@@ -44,6 +44,9 @@ public class AppConfiguration {
     @Value("${gateway.threeds.api.version}")
     private String threeDSApiVersion;
 
+    @Value("${GATEWAY_SRCI_VERSION:1.0.0}")
+    private String srciVersion;
+
     @Bean
     public Config buildConfig() {
 
@@ -81,6 +84,7 @@ public class AppConfiguration {
         config.setApiVersion(Integer.parseInt(apiVersion));
         config.setApmVersion(apmVersion);
         config.setApiThreeDsVersion(threeDSApiVersion);
+        config.setSrciVersion(srciVersion);
 
         return config;
     }

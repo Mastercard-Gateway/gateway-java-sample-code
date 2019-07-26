@@ -29,6 +29,7 @@ public class ApiRequest {
 
     // Browser payments properties
     private String returnUrl;
+    private String interactionOperation;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
 
@@ -180,6 +181,15 @@ public class ApiRequest {
 
     public void setReturnUrl(String returnUrl) {
         this.returnUrl = returnUrl;
+    }
+
+    public String getInteractionOperation() {
+        return interactionOperation;
+    }
+
+    public ApiRequest setInteractionOperation(String interactionOperation) {
+        this.interactionOperation = interactionOperation;
+        return this;
     }
 
     public String getBrowserPaymentOperation() {
