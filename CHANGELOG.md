@@ -6,7 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.0] - 2019-07-26
 ### Added
-- **SRC** Standalone page.
 - Changes behind the scenes to create the sessions.
 
 ## [1.1.0] - 2019-01-11
