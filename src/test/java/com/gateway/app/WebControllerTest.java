@@ -33,7 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "gateway.merchant.id=testMerchant",
         "gateway.api.password=testP4ssword",
         "gateway.api.version=51",
-        "gateway.apm.api.version=1.1.0"
+        "gateway.apm.api.version=1.1.0",
+        "gateway.srci.version=1.0.0"
 })
 public class WebControllerTest {
     @Autowired

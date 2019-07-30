@@ -4,6 +4,10 @@
 
 package com.gateway.client;
 
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+
 import com.gateway.response.BrowserPaymentResponse;
 import com.gateway.response.SecureIdEnrollmentResponse;
 import com.gateway.response.TransactionResponse;
@@ -15,10 +19,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
 
 public class ApiResponseService {
 

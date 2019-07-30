@@ -18,6 +18,7 @@ public class Config {
     private String apiBaseURL;
     private int apiVersion;
     private String apmVersion;
+    private String srciVersion;
     private String gatewayHost;
     private String apiUsername;
     private String apiThreeDsVersion;
@@ -166,5 +167,13 @@ public class Config {
 
     public String getApiThreeDsVersion() {
         return apiThreeDsVersion;
+    }
+
+    public String getSrciVersion() {
+        return srciVersion;
+    }
+
+    public void setSrciVersion(String srciVersion) {
+        this.srciVersion = srciVersion;
     }
 }

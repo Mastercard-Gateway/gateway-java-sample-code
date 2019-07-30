@@ -321,13 +321,19 @@ public class ApiRequestService {
         /* essentials_exclude_end */
 
         JsonObject interaction = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
+        if (Utils.notNullOrEmpty(request.getApiOperation())) {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
             if (request.getApiOperation().equals(CREATE_CHECKOUT_SESSION.toString())) {
-                interaction.addProperty("returnUrl", request.getReturnUrl());
-            } else if (request.getApiOperation().equals(INITIATE_BROWSER_PAYMENT.toString())
+                if(Utils.notNullOrEmpty(request.getReturnUrl())){
+                    interaction.addProperty("returnUrl", request.getReturnUrl());
+                }
+                if(Utils.notNullOrEmpty(request.getInteractionOperation())) {
+                    interaction.addProperty("operation", request.getInteractionOperation());
+                }
+            } else if (Utils.notNullOrEmpty(request.getReturnUrl())
+                    && (request.getApiOperation().equals(INITIATE_BROWSER_PAYMENT.toString())
                     || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")
-                    || request.getApiOperation().equals(UPDATE_SESSION.toString())) {
+                    || request.getApiOperation().equals(UPDATE_SESSION.toString()))) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
             }
         }
