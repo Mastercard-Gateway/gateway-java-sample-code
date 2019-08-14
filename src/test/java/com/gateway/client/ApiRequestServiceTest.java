@@ -380,6 +380,20 @@ public class ApiRequestServiceTest {
     /* essentials_exclude_end */
 
     @Test
+    public void parseSecureRemoteCommerceRequest() throws Exception {
+        ApiRequest request = new ApiRequest();
+        request.setWalletProvider("SECURE_REMOTE_COMMERCE");
+        request.setCorrelationId("1234567890000");
+        request.setScheme("MASTERCARD");
+
+        String result = ApiRequestService.buildJSONPayload(request);
+
+        String data = "{\"order\":{\"walletProvider\":\"SECURE_REMOTE_COMMERCE\"},\"wallet\":{\"secureRemoteCommerce\":{\"srcCorrelationId\":\"1234567890000\", \"scheme\":\"MASTERCARD\"}}}";
+
+        assertEquals(prettifyJson(data), result);
+    }
+
+    @Test
     public void parseNVPRequest() throws Exception {
         ApiRequest request = new ApiRequest();
         request.setApiOperation("PAY");

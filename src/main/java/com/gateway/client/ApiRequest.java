@@ -53,6 +53,8 @@ public class ApiRequest {
     private String masterpassCheckoutUrl;
     /* essentials_exclude_end */
     private String walletProvider;
+    private String correlationId;
+    private String scheme;
 
     public String getSourceToken() {
         return sourceToken;
@@ -337,4 +339,19 @@ public class ApiRequest {
         return this;
     }
 
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
 }

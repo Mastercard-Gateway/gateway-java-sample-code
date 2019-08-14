@@ -266,6 +266,7 @@ public class ApiRequestService {
         /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
+            /* essentials_exclude_start */
             // Used for Masterpass operations
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
@@ -275,8 +276,15 @@ public class ApiRequestService {
                 if(Utils.notNullOrEmpty(request.getMasterpassCheckoutUrl())) masterpass.addProperty("checkoutUrl", request.getMasterpassCheckoutUrl());
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
+            /* essentials_exclude_end */
+            if(request.getWalletProvider().equals("SECURE_REMOTE_COMMERCE")) {
+                JsonObject secureRemoteCommerce = new JsonObject();
+                if(Utils.notNullOrEmpty(request.getCorrelationId())) secureRemoteCommerce.addProperty("srcCorrelationId", request.getCorrelationId());
+                if(Utils.notNullOrEmpty(request.getScheme())) secureRemoteCommerce.addProperty("scheme", request.getScheme());
+                if (!secureRemoteCommerce.entrySet().isEmpty()) wallet.add("secureRemoteCommerce", secureRemoteCommerce);
+            }
         }
-        /* essentials_exclude_end */
+
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))

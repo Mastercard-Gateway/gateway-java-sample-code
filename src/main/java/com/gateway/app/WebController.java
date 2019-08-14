@@ -257,7 +257,7 @@ public class WebController {
         mav.addObject("config", config);
         mav.addObject("baseUrl", getBaseUrl());
         mav.addObject("apmApiVersion", config.getApmVersion());
-        mav.setViewName("apmReceipt");
+        mav.setViewName("apm");
         return mav;
     }
 
@@ -276,9 +276,9 @@ public class WebController {
                     config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
                 }
             } else {
-                if (config.getTransactionMode() == null) {
+                 if (config.getTransactionMode() == null) {
                     config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
-                }
+                 }
             }
 
             mav.setViewName("config");
