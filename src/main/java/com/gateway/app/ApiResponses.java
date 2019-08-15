@@ -10,5 +10,5 @@ public enum ApiResponses {
     CARD_ENROLLED,
     AUTHENTICATION_FAILED,
     COMPLETED,
-    PROCEED_WITH_PAYMENT;
+    PROCEED;
 }
