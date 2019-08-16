@@ -116,8 +116,8 @@ function handleError(message, selectorField) {
             html: true,
             template: [
                 '<div class="tooltip hs-validation-tooltip" role="tooltip">',
-                    '<div class="arrow" style="border-color: #ff1a1a;"></div>',
-                    '<div class="tooltip-inner" style="background-color: #f00"></div>',
+                    '<div class="arrow"></div>',
+                    '<div class="tooltip-inner"></div>',
                 '</div>'
             ].join(''),
             animation: true
