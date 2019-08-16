@@ -349,4 +349,5 @@ input {
 
 .hs-validation-tooltip.tooltip .tooltip-inner {
     background-color: #ff1a1a;
+    font-weight: bold;
 }

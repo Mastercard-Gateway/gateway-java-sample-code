@@ -6,21 +6,30 @@ package com.gateway.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.gateway.app.Config;
+import com.gateway.model.SupportedPaymentOperation;
 import com.gateway.response.PaymentOptionsResponse;
 import com.gateway.response.TransactionResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.gateway.client.ApiAuthenticationChannel.PAYER_BROWSER;
+import static com.gateway.client.ApiOperation.AUTHORIZE;
+import static com.gateway.client.ApiOperation.CREATE_CHECKOUT_SESSION;
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiOperation.INITIATE_BROWSER_PAYMENT;
 import static com.gateway.client.ApiOperation.PAY;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 import static com.gateway.client.Utils.Prefixes.ORDER;
@@ -103,6 +112,8 @@ public class ApiRequestService {
                 break;
             case UPDATE_SESSION:
                 req.setApiMethod("PUT");
+                break;
+            default:
                 break;
         }
 
@@ -223,21 +234,19 @@ public class ApiRequestService {
 
         // Used for hosted checkout - CREATE_CHECKOUT_SESSION operation
         JsonObject order = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getApiOperation()) &&
-                (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")
-                        || request.getApiOperation().equals(UPDATE_SESSION.toString())
-                        || request.getApiOperation().equals(PAY.toString()))) {
-            // Need to add order ID in the request body only for CREATE_CHECKOUT_SESSION. Its presence in the body will cause an error for the other operations.
-            if (Utils.notNullOrEmpty(request.getOrderId())) {
-                if (request.getApiOperation().equals(PAY.toString()) &&
+        // Need to add order ID in the request body only for some operations. Its presence in the body will cause an error for the other operations.
+        if (Utils.notNullOrEmpty(request.getOrderId()) && Utils.notNullOrEmpty(request.getApiOperation()) &&
+                Arrays.asList(CREATE_CHECKOUT_SESSION.toString(), UPDATE_SESSION.toString(), PAY.toString())
+                        .contains(request.getApiOperation())) {
+            // Need to add order ID as reference in the request body only for PAY when having authenticated with 3DS2
+            if (request.getApiOperation().equals(PAY.toString()) &&
                         Utils.notNullOrEmpty(request.getAuthenticationTransactionId())) {
-                    //for PAY wth 3ds
-                    order.addProperty("reference", request.getOrderId());
+                order.addProperty("reference", request.getOrderId());
                 } else {
                     order.addProperty("id", request.getOrderId());
                 }
-            }
         }
+
         if (Utils.notNullOrEmpty(request.getOrderAmount())) order.addProperty("amount", request.getOrderAmount());
         if (Utils.notNullOrEmpty(request.getOrderCurrency())) order.addProperty("currency", request.getOrderCurrency());
 
@@ -249,7 +258,7 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getRedirectResponseUrl()))
             authentication.addProperty("redirectResponseUrl", request.getRedirectResponseUrl());
         // The transactionId you used for the Initiate Authentication operation.
-        if (request.getApiOperation().equals(PAY.toString()) &&
+        if (request.getApiOperation() != null && request.getApiOperation().equals(PAY.toString()) &&
                 Utils.notNullOrEmpty(request.getAuthenticationTransactionId()))
             authentication.addProperty("transactionId", request.getAuthenticationTransactionId());
 
@@ -257,6 +266,7 @@ public class ApiRequestService {
         /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
+            /* essentials_exclude_start */
             // Used for Masterpass operations
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
@@ -266,8 +276,15 @@ public class ApiRequestService {
                 if(Utils.notNullOrEmpty(request.getMasterpassCheckoutUrl())) masterpass.addProperty("checkoutUrl", request.getMasterpassCheckoutUrl());
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
+            /* essentials_exclude_end */
+            if(request.getWalletProvider().equals("SECURE_REMOTE_COMMERCE")) {
+                JsonObject secureRemoteCommerce = new JsonObject();
+                if(Utils.notNullOrEmpty(request.getCorrelationId())) secureRemoteCommerce.addProperty("srcCorrelationId", request.getCorrelationId());
+                if(Utils.notNullOrEmpty(request.getScheme())) secureRemoteCommerce.addProperty("scheme", request.getScheme());
+                if (!secureRemoteCommerce.entrySet().isEmpty()) wallet.add("secureRemoteCommerce", secureRemoteCommerce);
+            }
         }
-        /* essentials_exclude_end */
+
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))
@@ -277,7 +294,8 @@ public class ApiRequestService {
         if (Utils.notNullOrEmpty(request.getTargetTransactionId()))
             transaction.addProperty("targetTransactionId", request.getTargetTransactionId());
         //for PAY wth 3ds
-        if (request.getApiOperation().equals(PAY.toString()) && Utils.notNullOrEmpty(request.getOrderId()))
+        if (request.getApiOperation() != null && request.getApiOperation().equals(PAY.toString()) &&
+                Utils.notNullOrEmpty(request.getOrderId()))
             transaction.addProperty("reference", request.getOrderId());
 
         JsonObject expiry = new JsonObject();
@@ -311,13 +329,19 @@ public class ApiRequestService {
         /* essentials_exclude_end */
 
         JsonObject interaction = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
+        if (Utils.notNullOrEmpty(request.getApiOperation())) {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
-            if (request.getApiOperation().equals("CREATE_CHECKOUT_SESSION")) {
-                interaction.addProperty("returnUrl", request.getReturnUrl());
-            } else if (request.getApiOperation().equals("INITIATE_BROWSER_PAYMENT")
+            if (request.getApiOperation().equals(CREATE_CHECKOUT_SESSION.toString())) {
+                if(Utils.notNullOrEmpty(request.getReturnUrl())){
+                    interaction.addProperty("returnUrl", request.getReturnUrl());
+                }
+                if(Utils.notNullOrEmpty(request.getInteractionOperation())) {
+                    interaction.addProperty("operation", request.getInteractionOperation());
+                }
+            } else if (Utils.notNullOrEmpty(request.getReturnUrl())
+                    && (request.getApiOperation().equals(INITIATE_BROWSER_PAYMENT.toString())
                     || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")
-                    || request.getApiOperation().equals(UPDATE_SESSION.toString())) {
+                    || request.getApiOperation().equals(UPDATE_SESSION.toString()))) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
             }
         }
@@ -380,7 +404,7 @@ public class ApiRequestService {
     public static ApiRequest createBrowserPaymentsRequest(HttpServletRequest request, String operation, String source, Config config) throws Exception {
         try {
             ApiRequest req = new ApiRequest();
-            req.setApiOperation("INITIATE_BROWSER_PAYMENT");
+            req.setApiOperation(INITIATE_BROWSER_PAYMENT.toString());
             req.setTransactionId(Utils.createUniqueId(TRANS));
             req.setOrderId(Utils.createUniqueId(ORDER));
             req.setOrderAmount("50.00");
@@ -528,15 +552,7 @@ public class ApiRequestService {
                     "/transaction/1";// + Utils.createUniqueId(Utils.Prefixes.TRANS);
 
             // Perform API operation
-            //Thread.sleep(30000);
-            String apiResponse;
-            try {
-                apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
-            } catch (Exception e) {
-                logger.debug("Retrying", e);
-                apiResponse = connection.sendTransaction(paymentData, paymentRequestUrl, config);
-                throw e;
-            }
+            String apiResponse = connection.sendTransaction3DS(paymentData, paymentRequestUrl, config);
             return ApiResponseService.parseAuthorizeResponse(apiResponse);
         } catch (Exception e) {
             logger.debug("Unhandled exception caught", e);
@@ -557,7 +573,23 @@ public class ApiRequestService {
 
         try {
             String paymentOptionsInquiryResponse = connection.getTransaction(paymentOptionsInquiryUrl, config);
-            return new Gson().fromJson(paymentOptionsInquiryResponse, PaymentOptionsResponse.class);
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(new TypeToken<List<SupportedPaymentOperation>>() {
+                    }.getType(),
+                    (JsonDeserializer<List<SupportedPaymentOperation>>)(json, typeOfT, context) -> {
+                        List<Map<String, SupportedPaymentOperation>> items = new Gson()
+                                .fromJson(json, new TypeToken<List<Map<String, SupportedPaymentOperation>>>() {
+                                }.getType());
+                        List<SupportedPaymentOperation> supportedPaymentOperations = new ArrayList<>();
+                        for (Map<String, SupportedPaymentOperation> pair : items) {
+                            supportedPaymentOperations.add(pair.get("supportedPaymentOperation"));
+                        }
+                        return supportedPaymentOperations;
+                    });
+            Gson gson = gsonBuilder.create();
+
+            return gson.fromJson(paymentOptionsInquiryResponse, PaymentOptionsResponse.class);
         } catch (Exception e) {
             logger.debug("Unable to retrieve Payment Options", e);
             throw e;
@@ -575,18 +607,31 @@ public class ApiRequestService {
      * @see https://secure.uat.tnspayments.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
      */
     public static ApiOperation getApiOperationFromPaymentOptionsInquiry(Config config) throws Exception {
-
-        if (config.getTransactionMode() == null) {
-            config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
+        if (config.getTransactionMode() == null && config.getSupportedPaymentOperations() == null) {
+            PaymentOptionsResponse paymentOptionsInquiry =
+                    ApiRequestService.retrievePaymentOptionsInquiry(config);
+            config.setTransactionMode(paymentOptionsInquiry.getTransactionMode());
+            config.setSupportedPaymentOperations(paymentOptionsInquiry.getSupportedPaymentOperations());
         }
-        switch (config.getTransactionMode()) {
-            case AUTHORIZE_CAPTURE:
-                return ApiOperation.AUTHORIZE;
-            case PURCHASE:
+        if (config.getTransactionMode() != null) {
+            switch (config.getTransactionMode()) {
+                case AUTHORIZE_CAPTURE:
+                    return AUTHORIZE;
+                case PURCHASE:
+                    return PAY;
+                default:
+                    throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+            }
+        } else {
+            if (config.getSupportedPaymentOperations().contains(SupportedPaymentOperation.AUTHORIZE)) {
+                return AUTHORIZE;
+            }
+            if (config.getSupportedPaymentOperations().contains(SupportedPaymentOperation.PURCHASE)) {
                 return PAY;
-            default:
-                throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+            }
         }
+        throw new IllegalArgumentException("Unsupported Payment Options Transaction Mode");
+
     }
 
     /**

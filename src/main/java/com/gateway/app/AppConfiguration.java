@@ -44,6 +44,9 @@ public class AppConfiguration {
     @Value("${gateway.threeds.api.version}")
     private String threeDSApiVersion;
 
+    @Value("${GATEWAY_SRCI_VERSION:1.0.0}")
+    private String srciVersion;
+
     @Bean
     public Config buildConfig() {
 
@@ -61,7 +64,8 @@ public class AppConfiguration {
             config.setAuthenticationType(Config.AuthenticationType.CERTIFICATE);
             config.setKeyStore(keystore);
             config.setKeyStorePassword(keystorePassword);
-            config.setGatewayHost(gatewayHost.trim());
+            if (gatewayHost != null)
+                config.setGatewayHost(gatewayHost.trim());
         }
         else if (apiPassword != null) {
             config.setAuthenticationType(Config.AuthenticationType.PASSWORD);
@@ -79,10 +83,9 @@ public class AppConfiguration {
         config.setCurrency(currency);
         config.setApiVersion(Integer.parseInt(apiVersion));
         config.setApmVersion(apmVersion);
+        config.setApiThreeDsVersion(threeDSApiVersion);
+        config.setSrciVersion(srciVersion);
 
-        if (threeDSApiVersion != null) {
-            config.setApiThreeDsVersion(threeDSApiVersion);
-        }
         return config;
     }
 }

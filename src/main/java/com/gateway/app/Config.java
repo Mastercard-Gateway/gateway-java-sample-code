@@ -4,11 +4,10 @@
 
 package com.gateway.app;
 
+import java.util.List;
+
 import com.gateway.model.SupportedPaymentOperation;
 import com.gateway.model.TransactionMode;
-
-import java.util.List;
-import java.util.Map;
 
 public class Config {
 
@@ -19,6 +18,7 @@ public class Config {
     private String apiBaseURL;
     private int apiVersion;
     private String apmVersion;
+    private String srciVersion;
     private String gatewayHost;
     private String apiUsername;
     private String apiThreeDsVersion;
@@ -28,12 +28,12 @@ public class Config {
     private String webhooksNotificationSecret;
     private AuthenticationType authenticationType;
     private TransactionMode transactionMode;
-    private List<Map<String, SupportedPaymentOperation>> supportedPaymentOperations;
+    private List<SupportedPaymentOperation> supportedPaymentOperations;
 
 
-    public List<Map<String, SupportedPaymentOperation>> getSupportedPaymentOperations() { return supportedPaymentOperations; }
+    public List<SupportedPaymentOperation> getSupportedPaymentOperations() { return supportedPaymentOperations; }
 
-    public Config setSupportedPaymentOperations(List<Map<String, SupportedPaymentOperation>> supportedPaymentOperations) {
+    public Config setSupportedPaymentOperations(List<SupportedPaymentOperation> supportedPaymentOperations) {
         this.supportedPaymentOperations = supportedPaymentOperations;
         return this;
     }
@@ -50,7 +50,7 @@ public class Config {
     public static String WEBHOOKS_NOTIFICATION_FOLDER = "webhooks-notifications";
 
     public Config() {
-        httpProxyHost = System.getProperty("http.proxyHost") != null ? System.getProperty("http.proxyHost") : null;
+        httpProxyHost = System.getProperty("http.proxyHost");
         httpProxyPort = System.getProperty("http.proxyPort") != null ?
                 Integer.valueOf(System.getProperty("http.proxyPort")) : null;
     }
@@ -97,7 +97,9 @@ public class Config {
         this.apiVersion = apiVersion;
     }
 
-    public String getApmVersion() { return apmVersion; }
+    public String getApmVersion() {
+        return apmVersion;
+    }
 
     public void setApmVersion(String apmVersion) {
         this.apmVersion = apmVersion;
@@ -165,5 +167,13 @@ public class Config {
 
     public String getApiThreeDsVersion() {
         return apiThreeDsVersion;
+    }
+
+    public String getSrciVersion() {
+        return srciVersion;
+    }
+
+    public void setSrciVersion(String srciVersion) {
+        this.srciVersion = srciVersion;
     }
 }

@@ -140,7 +140,7 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var merchantId = /*[[${config.merchantId}]]*/ null;
-    var sessionId = /*[[${hostedSession.id}]]*/ null;
+    var sessionId = /*[[${checkoutSession.id}]]*/ null;
     var currency = /*[[${config.currency}]]*/ null;
     var apiVersion = /*[[${config.apiVersion}]]*/ null;
     var supportedPaymentOperations = /*[[${config.supportedPaymentOperations}]]*/ null;
@@ -254,10 +254,11 @@
         hppdebug: true
     };
 
-    if (apiVersion >= 52) {
-        configObject.interaction.operation = supportedPaymentOperations.length
-            ? supportedPaymentOperations[0].supportedPaymentOperation
-            : 'PURCHASE';
+    // Starting from API version 52 onwards the property "interaction.operation" is required.
+    // In the below condition we are checking the supported payment operation(s) (AKA transaction mode(s))
+    // and inserting it to the configObject for making checkout.js works
+    if (apiVersion >= 52 && supportedPaymentOperations.length) {
+        configObject.interaction.operation = supportedPaymentOperations[0];
     }
 
     function orderFormSubmitHandler() {

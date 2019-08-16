@@ -24,6 +24,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import static com.gateway.client.ApiOperation.CREATE_SESSION;
+import static com.gateway.client.ApiOperation.CREATE_CHECKOUT_SESSION;
 import static com.gateway.client.ApiOperation.UPDATE_SESSION;
 import static com.gateway.client.Utils.Prefixes.APM;
 import static com.gateway.client.Utils.Prefixes.ORDER;
@@ -166,6 +168,40 @@ public class WebController {
     /* essentials_exclude_end */
 
     /**
+     *  Display page for alternate payments methods using srci.js
+     *
+     * @return ModelAndView for src.html
+     */
+    @GetMapping("/src")
+    public ModelAndView showSRC(HttpServletRequest httpServletRequest) {
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation("CREATE_SESSION");
+        req.setOrderId(Utils.createUniqueId(ORDER));
+
+        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+
+        try {
+            RESTApiClient connection = new RESTApiClient();
+            String resp = connection.postTransaction(requestUrl, config);
+
+            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
+
+            mav.setViewName("src");
+            mav.addObject("config", config);
+            mav.addObject("hostedSession", hostedSession);
+            mav.addObject("request", req);
+            mav.addObject("baseUrl", getBaseUrl());
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+    /**
      * Display page for alternate payments methods using apm.js
      *
      * @return ModelAndView for apm.html
@@ -175,7 +211,7 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
+        req.setApiOperation(CREATE_SESSION.toString());
         req.setOrderId(Utils.createUniqueId(ORDER));
         req.setTransactionId(Utils.createUniqueId(TRANS));
 
@@ -188,13 +224,10 @@ public class WebController {
             HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
 
             String correlationId = Utils.createUniqueId(APM);
-            req.setApiOperation("UPDATE_SESSION");
+            req.setApiOperation(UPDATE_SESSION.toString());
             req.setOrderAmount("50.00");
             req.setOrderCurrency(config.getCurrency());
             req.setBrowserPaymentOperation("PAY");
-            // NOTE: Uncomment the below for local testing
-            // req.setReturnUrl("https://localhost/sample/apmReceipt?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
-            // NOTE: Comment out the below for local testing
             req.setReturnUrl(ApiRequestService.getCurrentContext(httpServletRequest) + "?merchantId=" + config.getMerchantId() + "&sessionId=" + hostedSession.getId() + "&orderId=" + req.getOrderId() + "&transactionId=" + req.getTransactionId() + "&correlationId=" + correlationId);
             ApiRequestService.updateSession(ApiProtocol.REST, req, config, hostedSession.getId());
 
@@ -224,7 +257,7 @@ public class WebController {
         mav.addObject("config", config);
         mav.addObject("baseUrl", getBaseUrl());
         mav.addObject("apmApiVersion", config.getApmVersion());
-        mav.setViewName("apmReceipt");
+        mav.setViewName("apm");
         return mav;
     }
 
@@ -255,18 +288,6 @@ public class WebController {
         } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
-        return mav;
-    }
-
-    /**
-     * APM with Hosted Checkout receipt page
-     *
-     * @return ModelAndView for apmHostedCheckoutReceipt.html
-     */
-    @GetMapping("/apmHostedCheckoutReceipt")
-    public ModelAndView showAPMwithHCOReceipt() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("apmHostedCheckoutReceipt");
         return mav;
     }
 
@@ -454,26 +475,34 @@ public class WebController {
         ModelAndView mav = new ModelAndView();
 
         ApiRequest req = new ApiRequest();
-        req.setApiOperation("CREATE_SESSION");
-
-        String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
-
-        String data = ApiRequestService.buildJSONPayload(req);
+        req.setApiOperation(CREATE_CHECKOUT_SESSION.toString());
+        req.setOrderId(Utils.createUniqueId(ORDER));
+        req.setOrderCurrency(config.getCurrency());
 
         try {
+
+            if (config.getApiVersion() >= 52) {
+                if (config.getSupportedPaymentOperations() == null) {
+                    config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
+                }
+
+                req.setInteractionOperation(config.getSupportedPaymentOperations().get(0).name());
+            }
+
+            String requestUrl = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config);
+            String data = ApiRequestService.buildJSONPayload(req);
+
             RESTApiClient connection = new RESTApiClient();
             String resp = connection.postTransaction(data, requestUrl, config);
 
-            HostedSession hostedSession = ApiResponseService.parseSessionResponse(resp);
-
-            if (config.getSupportedPaymentOperations() == null) {
-                config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
-            }
+            // Note that the type of the below variable is just a naming convention. We are not using Hosted Session here anymore.
+            // The purpose of this variable is to make Session Id available in hostedCheckout view
+            HostedSession checkoutSession = ApiResponseService.parseSessionResponse(resp);
 
             mav.setViewName("hostedCheckout");
             mav.addObject("config", config);
             mav.addObject("currencies", currencies);
-            mav.addObject("hostedSession", hostedSession);
+            mav.addObject("checkoutSession", checkoutSession);
             mav.addObject("baseUrl", getBaseUrl());
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);

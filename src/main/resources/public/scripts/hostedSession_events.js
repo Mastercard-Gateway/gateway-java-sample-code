@@ -68,13 +68,13 @@ PaymentSession.onFocus(['card.nameOnCard','card.number','card.expiryMonth','card
         $("label[for='card-holder-name']").css({fontWeight:"bold"});
     }
     console.log("Focus event executed for " + selector);
-    for(var sel in selectors){
-        if(selectors[sel] === selector){
+    for (var sel in selectors) {
+        if (selectors[sel] === selector) {
             setOnFocusField(sel);
             currentFocusField = sel;
             clearErrorMessageOnFocus(sel);
         }
-    };
+    }
 
 });
 

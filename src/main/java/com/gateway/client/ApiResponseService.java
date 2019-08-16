@@ -138,6 +138,18 @@ public class ApiResponseService {
     /* essentials_exclude_end */
 
     /**
+     * Parses JSON response from Secure Remote Commerce transaction into TransactionResponse object
+     *
+     * @param response response from API
+     * @return TransactionResponse
+     */
+    public static TransactionResponse parseSecureRemoteCommerceResponse(String response) {
+
+        return parseTransactionResponse(response);
+
+    }
+
+    /**
      * Parses JSON response from a transaction into TransactionResponse object
      *
      * @param response response from API

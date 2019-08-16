@@ -11,8 +11,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 /**
  * Service client class for making API requests using REST protocol using JSON
@@ -32,10 +30,17 @@ public final class RESTApiClient {
      * @throws Exception
      */
     public String sendTransaction(String data, String requestUrl, Config config) throws Exception {
-            HttpPut httpPut = new HttpPut(requestUrl);
-            httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
+        HttpPut httpPut = new HttpPut(requestUrl);
+        httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
 
-            return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
+        return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
+    }
+
+    public String sendTransaction3DS(String data, String requestUrl, Config config) throws Exception {
+        HttpPut httpPut = new HttpPut(requestUrl);
+        httpPut.setEntity(new StringEntity(data, UTF8_ENCODING));
+
+        return ApiService.executeHTTPMethod(httpPut, config, ApiProtocol.REST);
     }
 
     /**
