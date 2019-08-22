@@ -46,9 +46,10 @@
                                             min="1"
                                             max="999999999"
                                             maxlength="10"
-                                            class="form-control input-md"
+                                            class="form-control input-md readonly"
                                             required
                                             placeholder="e.g. 50.00"
+                                            readonly
                                     />
                                 </div>
                                 <div class="form-group col-md-9">
@@ -76,10 +77,55 @@
                                     <textarea
                                             id="order-description"
                                             class="form-control"
-                                            rows="4"
+                                            rows="3"
                                             required
                                             placeholder="e.g. Ordered goods"
                                     ></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <small>Note: Order Item data is only needed for Klarna Pay Later</small>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="control-label" for="order-item-name"
+                                    >Item Name</label
+                                    >
+                                    <input
+                                            id="order-item-name"
+                                            type="text"
+                                            maxlength="100"
+                                            class="form-control input-md"
+                                            placeholder="e.g. Some stuff"
+                                    />
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label class="control-label" for="order-item-quatity"
+                                    >Item Quantity</label
+                                    >
+                                    <input
+                                            id="order-item-quatity"
+                                            type="number"
+                                            min="1"
+                                            max="999999999"
+                                            maxlength="10"
+                                            class="form-control input-md"
+                                            placeholder="e.g. 1"
+                                    />
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label class="control-label" for="order-item-unitprice"
+                                    >Item Unit Price</label
+                                    >
+                                    <input
+                                            id="order-item-unitprice"
+                                            type="number"
+                                            min="1"
+                                            max="999999999"
+                                            maxlength="10"
+                                            class="form-control input-md"
+                                            placeholder="e.g. 50.00"
+                                    />
                                 </div>
                             </div>
                             <h6 class="panel-title">Advanced Settings</h6>
@@ -186,6 +232,9 @@
     var currencyInput = $('#order-currency');
     var amountInput = $('#order-amount');
     var descriptionInput = $('#order-description');
+    var itemNameInput = $('#order-item-name');
+    var itemQtyInput = $('#order-item-quatity');
+    var itemUnitPriceInput = $('#order-item-unitprice');
     var sessionIdInput = $('#order-session-id');
     var returnUrlInput = $('#order-return-url');
     var orderSubmit = $('#order-submit');
@@ -230,8 +279,16 @@
             fullpageButton.prop('disabled', false);
         });
 
+    // Sort currency <select> options
+    function sortSelectCurrencyOptions() {
+        currencyInput.html(currencyInput.find('option').sort(function (a, b) {
+            return a.text > b.text ? 1 : -1;
+        }));
+    }
+
     // Initializing form
     toggleTab();
+    sortSelectCurrencyOptions();
     var order = initializeOrderObj();
     setOrderFormValues(order);
     setReturnUrl(order.returnUrl);
@@ -261,6 +318,18 @@
         configObject.interaction.operation = supportedPaymentOperations[0];
     }
 
+    // order.item data is needed for Klarna APM to work
+    if (itemNameInput.val() !== '' && itemQtyInput.val() !== '' && itemUnitPriceInput.val() !== '') {
+        configObject.order.item = [{}];
+        configObject.order.item[0].name = order.itemName;
+        configObject.order.item[0].quantity = order.itemQuantity;
+        configObject.order.item[0].unitPrice = order.itemUnitPrice;
+    } else {
+        itemNameInput.val('');
+        itemQtyInput.val('');
+        itemUnitPriceInput.val('');
+    }
+
     function orderFormSubmitHandler() {
         order = getOrderFormValues();
         storeOrderFormValues(order);
@@ -278,6 +347,9 @@
             amount: stored.amount || '50',
             currency: stored.currency || currency,
             description: stored.description || 'Ordered goods',
+            itemName: stored.itemName || '',
+            itemQuantity: stored.itemQuantity || '',
+            itemUnitPrice: stored.itemUnitPrice || '',
             sessionId: stored.sessionId || sessionId,
             returnUrl: stored.returnUrl || '',
         };
@@ -288,10 +360,16 @@
      * @returns {{currency: *, amount: *, description: *, sessionId: *, returnUrl: *}}
      */
     function getOrderFormValues() {
+        if (itemQtyInput.val() !== '' && itemUnitPriceInput.val() !== '') {
+            amountInput.val(itemQtyInput.val() * itemUnitPriceInput.val());
+        }
         return {
             currency: currencyInput.val(),
             amount: amountInput.val(),
             description: descriptionInput.val(),
+            itemName: itemNameInput.val(),
+            itemQuantity: itemQtyInput.val(),
+            itemUnitPrice: itemUnitPriceInput.val(),
             sessionId: sessionIdInput.val(),
             returnUrl: returnUrlInput.val(),
         };
@@ -305,6 +383,9 @@
         currencyInput.val(order.currency);
         amountInput.val(order.amount);
         descriptionInput.val(order.description);
+        itemNameInput.val(order.itemName);
+        itemQtyInput.val(order.itemQuantity);
+        itemUnitPriceInput.val(order.itemUnitPrice);
         returnUrlInput.val(order.returnUrl);
         sessionIdInput.val(order.sessionId);
     }
@@ -318,6 +399,9 @@
             sessionStorage.setItem('amount', order.amount);
             sessionStorage.setItem('currency', order.currency);
             sessionStorage.setItem('description', order.description);
+            sessionStorage.setItem('itemName', order.itemName);
+            sessionStorage.setItem('itemQuantity', order.itemQuantity);
+            sessionStorage.setItem('itemUnitPrice', order.itemUnitPrice);
             sessionStorage.setItem('returnUrl', order.returnUrl);
             sessionStorage.setItem('sessionId', order.sessionId);
         }
@@ -332,6 +416,9 @@
             stored.amount = sessionStorage.getItem('amount');
             stored.currency = sessionStorage.getItem('currency');
             stored.description = sessionStorage.getItem('description');
+            stored.itemName = sessionStorage.getItem('itemName');
+            stored.itemQuantity = sessionStorage.getItem('itemQuantity');
+            stored.itemUnitPrice = sessionStorage.getItem('itemUnitPrice');
             stored.returnUrl = sessionStorage.getItem('returnUrl');
             stored.sessionId = sessionStorage.getItem('sessionId');
             // Removing sessionID to avoid caching issues with the SESSION
