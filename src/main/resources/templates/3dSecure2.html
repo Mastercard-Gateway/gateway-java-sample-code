@@ -251,7 +251,7 @@
                 } else {
                     console.log("After Initiate 3DS ", data);
                     switch (data.gatewayRecommendation) {
-                        case "PROCEED_WITH_AUTHENTICATION":
+                        case "PROCEED":
                             let retriesLeft = maxRetries;
 
                             let promiseAuthenticatePayer = new Promise((resolve, reject) => {
@@ -286,6 +286,7 @@
                                         // You can proceed with the payment as authentication is granted.
                                         case "PROCEED_WITH_AUTHENTICATION":
                                         case "PROCEED_WITH_PAYMENT":
+                                        case "PROCEED":
                                             //challenge flow for ThreeDS <1.2.0
                                             console.log("Redirecting to ACS", authResponse.htmlRedirectCode);
                                             redirectToACS(authResponse.htmlRedirectCode);

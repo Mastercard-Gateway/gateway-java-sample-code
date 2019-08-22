@@ -29,6 +29,7 @@ public class ApiRequest {
 
     // Browser payments properties
     private String returnUrl;
+    private String interactionOperation;
     private String browserPaymentOperation;
     private String browserPaymentConfirmation;
 
@@ -52,6 +53,8 @@ public class ApiRequest {
     private String masterpassCheckoutUrl;
     /* essentials_exclude_end */
     private String walletProvider;
+    private String correlationId;
+    private String scheme;
 
     public String getSourceToken() {
         return sourceToken;
@@ -180,6 +183,15 @@ public class ApiRequest {
 
     public void setReturnUrl(String returnUrl) {
         this.returnUrl = returnUrl;
+    }
+
+    public String getInteractionOperation() {
+        return interactionOperation;
+    }
+
+    public ApiRequest setInteractionOperation(String interactionOperation) {
+        this.interactionOperation = interactionOperation;
+        return this;
     }
 
     public String getBrowserPaymentOperation() {
@@ -327,4 +339,19 @@ public class ApiRequest {
         return this;
     }
 
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
 }

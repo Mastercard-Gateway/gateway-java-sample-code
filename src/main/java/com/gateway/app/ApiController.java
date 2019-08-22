@@ -597,7 +597,7 @@ public class ApiController {
             // When the result of the Authenticate Payer operation indicates that you can proceed with the payment, you
             // may initiate an Authorize or Pay operation.
             if (gatewayRecommendation != null &&
-                    gatewayRecommendation.equals(ApiResponses.PROCEED_WITH_PAYMENT.toString())) {
+                    gatewayRecommendation.equals(ApiResponses.PROCEED.toString())) {
                 // The gateway will use the authentication.transactionId (provided in the request) to lookup the
                 // authentication results that is stored when you asked to perform authentication. The gateway will
                 // pass the required information to the acquirer.
@@ -606,13 +606,55 @@ public class ApiController {
                 mav.addObject("config", config);
 
             } else {
-                throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED_WITH_PAYMENT.toString());
+                throw new Exception("Gateway Recommendation not " + ApiResponses.PROCEED.toString());
 
             }
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         }
         catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+    /**
+     * Pay via SRC
+     */
+    @PostMapping("/payWithSRC")
+    public ModelAndView payWithSRC(String correlationId, String networkScheme, String sessionId) {
+        ModelAndView mav = new ModelAndView();
+
+        try {
+            // Update session from wallet
+            ApiRequest req = new ApiRequest();
+            req.setApiOperation("UPDATE_SESSION_FROM_WALLET");
+            req.setWalletProvider("SECURE_REMOTE_COMMERCE");
+            req.setCorrelationId(correlationId);
+            req.setScheme(networkScheme);
+
+            String url = ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, config, sessionId);
+            String data = ApiRequestService.buildJSONPayload(req);
+
+            RESTApiClient connection = new RESTApiClient();
+            String response = connection.postTransaction(data, url, config);
+
+            // Make payment using updated session
+            ApiRequest apiReq = ApiRequestService.createApiRequest("PAY", config);
+            apiReq.setSessionId(sessionId);
+            String payload = ApiRequestService.buildJSONPayload(apiReq);
+            String reqUrl = ApiRequestService.getRequestUrl(ApiProtocol.REST, config, apiReq);
+
+            // Perform API operation
+            RESTApiClient apiConnection = new RESTApiClient();
+            String apiResponse = apiConnection.sendTransaction(payload, reqUrl, config);
+
+            TransactionResponse srcResponse = ApiResponseService.parseSecureRemoteCommerceResponse(apiResponse);
+            mav.setViewName("receipt");
+            mav.addObject("response", srcResponse);
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
             ExceptionService.constructGeneralErrorResponse(mav, e);
         }
         return mav;

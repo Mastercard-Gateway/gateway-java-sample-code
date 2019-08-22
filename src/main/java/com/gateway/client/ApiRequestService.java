@@ -266,6 +266,7 @@ public class ApiRequestService {
         /* essentials_exclude_start */
         if (Utils.notNullOrEmpty(request.getWalletProvider())) {
             order.addProperty("walletProvider", request.getWalletProvider());
+            /* essentials_exclude_start */
             // Used for Masterpass operations
             if(request.getWalletProvider().equals("MASTERPASS_ONLINE")) {
                 JsonObject masterpass = new JsonObject();
@@ -275,8 +276,15 @@ public class ApiRequestService {
                 if(Utils.notNullOrEmpty(request.getMasterpassCheckoutUrl())) masterpass.addProperty("checkoutUrl", request.getMasterpassCheckoutUrl());
                 if (!masterpass.entrySet().isEmpty()) wallet.add("masterpass", masterpass);
             }
+            /* essentials_exclude_end */
+            if(request.getWalletProvider().equals("SECURE_REMOTE_COMMERCE")) {
+                JsonObject secureRemoteCommerce = new JsonObject();
+                if(Utils.notNullOrEmpty(request.getCorrelationId())) secureRemoteCommerce.addProperty("srcCorrelationId", request.getCorrelationId());
+                if(Utils.notNullOrEmpty(request.getScheme())) secureRemoteCommerce.addProperty("scheme", request.getScheme());
+                if (!secureRemoteCommerce.entrySet().isEmpty()) wallet.add("secureRemoteCommerce", secureRemoteCommerce);
+            }
         }
-        /* essentials_exclude_end */
+
 
         JsonObject transaction = new JsonObject();
         if (Utils.notNullOrEmpty(request.getTransactionAmount()))
@@ -321,13 +329,19 @@ public class ApiRequestService {
         /* essentials_exclude_end */
 
         JsonObject interaction = new JsonObject();
-        if (Utils.notNullOrEmpty(request.getReturnUrl()) && Utils.notNullOrEmpty(request.getApiOperation())) {
+        if (Utils.notNullOrEmpty(request.getApiOperation())) {
             // Return URL needs to be added differently for browser payments and hosted checkout payments
             if (request.getApiOperation().equals(CREATE_CHECKOUT_SESSION.toString())) {
-                interaction.addProperty("returnUrl", request.getReturnUrl());
-            } else if (request.getApiOperation().equals(INITIATE_BROWSER_PAYMENT.toString())
+                if(Utils.notNullOrEmpty(request.getReturnUrl())){
+                    interaction.addProperty("returnUrl", request.getReturnUrl());
+                }
+                if(Utils.notNullOrEmpty(request.getInteractionOperation())) {
+                    interaction.addProperty("operation", request.getInteractionOperation());
+                }
+            } else if (Utils.notNullOrEmpty(request.getReturnUrl())
+                    && (request.getApiOperation().equals(INITIATE_BROWSER_PAYMENT.toString())
                     || request.getApiOperation().equals("CONFIRM_BROWSER_PAYMENT")
-                    || request.getApiOperation().equals(UPDATE_SESSION.toString())) {
+                    || request.getApiOperation().equals(UPDATE_SESSION.toString()))) {
                 browserPayment.addProperty("returnUrl", request.getReturnUrl());
             }
         }
