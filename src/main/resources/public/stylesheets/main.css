@@ -54,6 +54,9 @@ form#threedsChallengeRedirectForm {
 .form-control[readonly] {
     background-color: #ffffff;
 }
+.form-control.readonly {
+    background-color: #e9ecef;
+}
 form label {
     font-weight: 400;
 }
