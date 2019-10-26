@@ -565,7 +565,7 @@ public class ApiRequestService {
      * @param config
      * @return the API Operation corresponding to the available options for processing a payment
      * @throws Exception
-     * @see https://secure.uat.tnspayments.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
+     * @see https://mtf.gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
      */
     public static PaymentOptionsResponse retrievePaymentOptionsInquiry(Config config) throws Exception {
         String paymentOptionsInquiryUrl =
@@ -604,7 +604,7 @@ public class ApiRequestService {
      * @param config
      * @return the API Operation corresponding to the available options for processing a payment
      * @throws Exception
-     * @see https://secure.uat.tnspayments.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
+     * @see https://mtf.gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Gateway%3a%20%20Payment%20Options%20Inquiry.html?locale=en_US
      */
     public static ApiOperation getApiOperationFromPaymentOptionsInquiry(Config config) throws Exception {
         if (config.getTransactionMode() == null && config.getSupportedPaymentOperations() == null) {
