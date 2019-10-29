@@ -6,52 +6,109 @@
         <div class="contents col-12">
             <div class="col-md-12">
                 <h3>Secure Remote Checkout - Standalone Implementation</h3>
-                <button class="mt-4 btn btn-primary" onclick="launchSRCi()">Launch SRCi</button>
+                <button id="launchSRCi" class="mt-4 btn btn-primary" onclick="launchSRCi()">Launch SRCi</button>
+            </div>
+        </div>
+    </div> <!-- row -->
+    <div id="paymentInfo" class="row" style="display: none;">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <p style="font-weight: bold;">Successfully retrieved payment info. Click to complete payment.</p>
+                <p style="margin-bottom: 3px;">Correlation ID: <span id="correlationId"></span></p>
+                <p style="margin-bottom: 3px;">Scheme: <span id="scheme"></span></p>
+                <button class="mt-4 btn btn-primary" onclick="completePayment()">Complete payment</button>
+            </div>
+        </div>
+    </div> <!-- row -->
+    <div id="error" class="row" style="display: none;">
+        <div class="contents col-12">
+            <div class="col-md-12">
+                <p style="font-weight: bold;">An error has occurred</p>
+                <p id="errorMessage" style="margin-bottom: 3px;"></p>
             </div>
         </div>
     </div> <!-- row -->
 </div>
-<script type="text/javascript" th:href="@{${config.apiBaseURL} + '/static/srci/' + ${config.srciVersion} + '/srci.min.js'}"></script>
+<script type="text/javascript" th:src="@{${config.apiBaseURL} + '/static/srci/' + ${config.srciVersion} + '/srci.js'}"></script>
 <script th:inline="javascript">
 
-    /*<![CDATA[*/
-    var merchantId = /*[[${config.merchantId}]]*/ null;
-    var sessionId = /*[[${hostedSession.id}]]*/ null;
-    var orderId = /*[[${request.orderId}]]*/ null;
-    var currency = /*[[${config.currency}]]*/ null;
-    /*]]>*/
+  /*<![CDATA[*/
+  var merchantId = /*[[${config.merchantId}]]*/ null;
+  var sessionId = /*[[${hostedSession.id}]]*/ null;
+  var orderId = /*[[${request.orderId}]]*/ null;
+  var currency = /*[[${config.currency}]]*/ null;
+  /*]]>*/
 
-    var srciConfig = {
-        sessionId: sessionId
-    };
+  var _correlationId, _networkScheme, paymentOptionsInquiryResponse;
 
-    function errorCallback(error) {
-        console.error("Error checking out using SRCi", error);
+  var configureErrorCallback = function(error) {
+    console.error("Error configuring SRCi", error);
+    showError(error);
+  };
+
+  var launchSRCiErrorCallback = function(error) {
+    console.error("Error checking out using SRCi", error);
+    showError(error);
+  };
+
+  var cancelCallback = function() {
+    console.log("User cancelled the checkout operation");
+  };
+
+  var payloadCallback = function(correlationId, networkScheme) {
+    console.log("User successfully selected the card:\nCorrelation ID: " + correlationId + "\nScheme: " + networkScheme);
+
+    _correlationId = correlationId;
+    _networkScheme = networkScheme;
+
+    $("#launchSRCi").hide();
+    $("#correlationId").html(correlationId);
+    $("#scheme").html(networkScheme);
+    $("#paymentInfo").show();
+
+  };
+
+  var showError = function(error) {
+    $("#launchSRCi").hide();
+    $("#errorMessage").html(error.explanation);
+    $("#error").show();
+  };
+
+  SRCi.configure(merchantId, sessionId, null, function(response) {
+    if(response.result === "ERROR") {
+      configureErrorCallback(response);
     }
-
-
-    function cancelCallback() {
-        console.log("User cancelled the checkout operation");
+    else {
+      paymentOptionsInquiryResponse = response;
     }
+  });
 
+  /**
+   Function to launching SRCi interface
+   */
+  function launchSRCi() {
+    SRCi.launchUI(paymentOptionsInquiryResponse, payloadCallback, launchSRCiErrorCallback, cancelCallback);
+  }
 
-    function payloadCallback(correlationId, networkScheme) {
-        console.log("User successfully selected the card ... ");
+  /**
+   Complete the payment
+   */
+  function completePayment() {
+    // TODO
+    // Do the following steps from the server to complete the payment
+    // 1. Update session from wallet (https://na-gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Wallet%3a+Update+Session+From+Wallet.html?locale=en_US)
+    // by passing correlationId & networkScheme
+    // 2. Pay call using the session - https://na-gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a++Pay.html?locale=en_US
 
-
-        //Do the following steps from the server to complete the payment
-        // 1. Update session from wallet (https://na-gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Wallet%3a+Update+Session+From+Wallet.html?locale=en_US)
-        // by passing correlationId & networkScheme
-        // 2. Pay call using the session - https://na-gateway.mastercard.com/api/documentation/apiDocumentation/rest-json/version/latest/operation/Transaction%3a++Pay.html?locale=en_US
-    }
-
-
-    /**
-     Function to launching SRCi interface
-     */
-    function launchSRCi() {
-        SRCi.launchUI(srciConfig, payloadCallback, errorCallback, cancelCallback);
-    }
+    $.ajax({
+      method: "POST",
+      url: "/sample/payWithSRC",
+      data: { correlationId: _correlationId, networkScheme: _networkScheme, sessionId: sessionId }
+    })
+      .done(function() {
+        console.log("Called update session...");
+      });
+  }
 </script>
 </body>
 </html>
