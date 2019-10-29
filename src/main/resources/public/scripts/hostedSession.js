@@ -4,8 +4,8 @@
 
 /**
  *    The Hosted Session JavaScript client library enables you to collect sensitive payment details from the payer in
- *    payment form fields, hosted by the Mastercard Payment Gateway. For more information, see {@link https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentSession.html payment session}
- *    See https://secure.uat.tnspayments.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html Implementing a Hosted Session Integration
+ *    payment form fields, hosted by the Mastercard Payment Gateway. For more information, see {@link https://test-gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/pickAdditionalFunctionality/paymentSession.html payment session}
+ *    See https://test-gateway.mastercard.com/api/documentation/integrationGuidelines/hostedSession/integrationModelHostedSession.html Implementing a Hosted Session Integration
  */
 
 // APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE
