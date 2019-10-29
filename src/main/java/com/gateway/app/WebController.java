@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
 import static com.gateway.client.ApiOperation.CREATE_SESSION;
@@ -276,9 +277,9 @@ public class WebController {
                     config.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(config).getSupportedPaymentOperations());
                 }
             } else {
-                 if (config.getTransactionMode() == null) {
+                if (config.getTransactionMode() == null) {
                     config.setTransactionMode(ApiRequestService.retrievePaymentOptionsInquiry(config).getTransactionMode());
-                 }
+                }
             }
 
             mav.setViewName("config");
@@ -504,6 +505,81 @@ public class WebController {
             mav.addObject("currencies", currencies);
             mav.addObject("checkoutSession", checkoutSession);
             mav.addObject("baseUrl", getBaseUrl());
+        } catch (ApiException e) {
+            ExceptionService.constructApiErrorResponse(mav, e);
+        } catch (Exception e) {
+            ExceptionService.constructGeneralErrorResponse(mav, e);
+        }
+        return mav;
+    }
+
+    /**
+     * Display page for Hosted Checkout WCAG test pages
+     *
+     * @return ModelAndView for configureHostedCheckout.html
+     */
+    @GetMapping("/configureHostedCheckout")
+    public ModelAndView showConfigureHostedCheckout() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("configureHostedCheckout");
+        return mav;
+    }
+
+    /**
+     * Display page for Hosted Checkout WCAG test configuration
+     *
+     * @return ModelAndView for configureHostedCheckout.html
+     */
+    @GetMapping("/configureHostedCheckout/{testPage}")
+    public ModelAndView showHostedCheckoutTestPage(@PathVariable String testPage) {
+
+        ModelAndView mav = new ModelAndView();
+
+        ApiRequest req = new ApiRequest();
+        req.setApiOperation(CREATE_SESSION.toString());
+
+        Config testConfig = new Config();
+
+        testConfig.setGatewayHost(config.getGatewayHost());
+        testConfig.setApiVersion(config.getApiVersion());
+        testConfig.setCurrency(config.getCurrency());
+        testConfig.setAuthenticationType(config.getAuthenticationType());
+
+        switch (testPage) {
+            case "achPayment":
+            case "costcoCashCard":
+                testConfig.setMerchantId("TESTJWHEELER");
+                testConfig.setApiUsername("merchant.TESTJWHEELER");
+                testConfig.setApiPassword("92d8837912d1d71ef4708486581594b8");
+                break;
+            case "apms":
+                testConfig.setMerchantId("TESTPPRO");
+                testConfig.setApiUsername("merchant.TESTPPRO");
+                testConfig.setApiPassword("f3864fcc4068d1952ae9db709ba16c39");
+                break;
+            default:
+                testConfig = null;
+                break;
+        }
+
+        try {
+            if (testConfig != null) {
+                RESTApiClient connection = new RESTApiClient();
+                String data = ApiRequestService.buildJSONPayload(req);
+                String resp = connection.postTransaction(data, ApiRequestService.getSessionRequestUrl(ApiProtocol.REST, testConfig), testConfig);
+
+                mav.addObject("hostedSession", ApiResponseService.parseSessionResponse(resp));
+
+                if (testConfig.getSupportedPaymentOperations() == null) {
+                    testConfig.setSupportedPaymentOperations(ApiRequestService.retrievePaymentOptionsInquiry(testConfig).getSupportedPaymentOperations());
+                }
+            }
+
+            mav.setViewName("hcoconfigpages/" + testPage);
+            mav.addObject("config", testConfig != null ? testConfig : config);
+            mav.addObject("currencies", currencies);
+            mav.addObject("baseUrl", getBaseUrl());
+            mav.addObject("pageId", testPage);
         } catch (ApiException e) {
             ExceptionService.constructApiErrorResponse(mav, e);
         } catch (Exception e) {

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>HCO Configuration page</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+              integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="stylesheets/main.css"/>
+
+        <script th:src="@{webjars/jquery/jquery.min.js}"></script>
+        <script th:src="@{webjars/popper.js/1.11.1/dist/umd/popper.min.js}"></script>
+        <script th:src="@{webjars/jquery-ui/jquery-ui.min.js}"></script>
+        <script th:src="@{webjars/bootstrap/js/bootstrap.min.js}"></script>
+    </head>
+    <body>
+        <div class="col-12 col-md-9">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="container mt-5 ml-4">
+                        <div class="row">
+                            <div class="col">
+                                <h5>Payment Plans</h5>
+                                <ul class="my-4 list-group">
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/amexPaymentPlans">AMEX Payment Plans</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/banamexPaymentPlans">BANAMEX Payment Plans</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Wallets</h5>
+                                <ul class="my-4 list-group">
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/amexCheckout">American Express Checkout</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/visaCheckout">VISA Checkout</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/masterpass">Masterpass</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Alternative Payment Methods</h5>
+                                <ul class="my-4 list-group">
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/apms">Alternative Payment Methods</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/paypal">PayPal</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/achPayment">ACH Payment</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/costcoCashCard">Costco Cash Card</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/costcoPrivateLabel">Costco Private Label</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Others</h5>
+                                <ul class="my-4 list-group">
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/interactionOperationAuthorize">Interaction operation - AUTHORIZE</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/billingShippingEmailFields">Billing Shipping Email fields</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/authenticationCardEntryFields">Authentication/card entry fields</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/surchargeFields">Surcharge fields</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/lineItemsFields">Line items fields</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h5>Brandings</h5>
+                                <ul class="my-4 list-group">
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/accertifyBrandingCorporate">Accertify Branding(corporate theme)</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/amexBrandingCorporate">AMEX Branding(corporate theme)</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/banamexBranding">BANAMEX Branding</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/merchLinkBranding">MERCHLINK Branding</a>
+                                    </li>
+                                    <li class="list-group-item list-group-item-primary">
+                                        <a href="configureHostedCheckout/paymarkBranding">PAYMARK Branding</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
