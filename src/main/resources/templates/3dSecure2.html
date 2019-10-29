@@ -165,12 +165,38 @@
     var transactionId = /*[[${request.transactionId}]]*/ null;
     /*]]>*/
 
+    var eventHandler = function (eventName, status, data) {
+      if (!data) {
+        data = '';
+      }
+      console.warn("Event: " + eventName + ": ", data);
+    };
+
+    ThreeDS.onEvent("BEFORE_INITIATE_AUTHENTICATION", function (data) {
+      eventHandler("Before Initiate Authentication", "success", JSON.stringify(data, null, 2));
+    })
+
+    ThreeDS.onEvent("AFTER_INITIATE_AUTHENTICATION", function (data) {
+      eventHandler("After Initiate Authentication", "success", JSON.stringify(data, null, 2));
+    })
+
+    ThreeDS.onEvent("BEFORE_AUTHENTICATE_PAYER", function (data) {
+      eventHandler("Before Authenticate Payer", "success", JSON.stringify(data, null, 2));
+    })
+
+    ThreeDS.onEvent("AFTER_AUTHENTICATE_PAYER", function (data) {
+      eventHandler("After Authenticate Payer", "success", JSON.stringify(data, null, 2));
+    })
+
     ThreeDS.configure({
         merchantId: merchantId,
         hostedSessionId: sessionId,
         sessionId: sessionId,//since ThreeDS 1.2.0
         containerId: '3DSUI',
-        configuration: {userLanguage: "en-AU", wsVersion: /*[[${config.apiVersion}]]*/ null},
+        configuration: {
+            userLanguage: "en-AU",
+            wsVersion: /*[[${config.apiVersion}]]*/ null,
+        },
         callback: function (data) {
             if (ThreeDS.isConfigured())
                 console.log("Done with configure");
@@ -230,6 +256,14 @@
         console.error("error.status : ", error.status);
     }
 
+    var optionalParam = {
+      "device": {
+        "browserDetails": {
+          "3DSecureChallengeWindowSize": "FULL_SCREEN"
+        }
+      }
+    }
+
     /**
      * Use the ThreeDS Library to Initiate 3DS Authentication for the arguments passed.
      */
@@ -244,10 +278,6 @@
                 if (data.error) {
                     var error = data.error;
                     logError(error);
-                    if (error.code === 400) {
-                        console.warn("Retrying after 5000");
-                        window.setTimeout(initiateAuthentication(), 5000);
-                    }
                 } else {
                     console.log("After Initiate 3DS ", data);
                     switch (data.gatewayRecommendation) {
@@ -261,22 +291,22 @@
                                     // This method will call AUTHENTICATE_PAYER REST API and returns the raw response in `data.response` field.
                                     // @param orderId    (required) - Order Id of the transaction
                                     // @param transactionId (required) - Transaction Id of the transaction
-                                    // @param optionalParams (optional) - Any additional REST API `request` params such as billing and shipping details
                                     // @param callback function (required)
-                                    ThreeDS.authenticatePayer(orderId, transactionId, null, function (data) {
+                                    // @param optionalParams (optional) - Any additional REST API `request` params such as billing and shipping details
+                                    ThreeDS.authenticatePayer(orderId, transactionId, function (data) {
                                         // processAuthenticatePayerResponse(data, retriesLeft);
                                         if (data.error) {
                                             logError(data.error);
-                                            if (data.error.code === 429 && retriesLeft > 0) {
+                                            if ((data.error.code === 429 || data.error.cause === "SERVER_BUSY") && retriesLeft > 0) {
                                                 console.warn("Retrying after 5000");
                                                 window.setTimeout(authenticatePayer(retriesLeft - 1), 5000);
                                             } else {
                                                 reject(data);
                                             }
                                         } else resolve(data);
-                                    });
+                                    }, optionalParam);
                                 };
-                                authenticatePayer(maxRetries);
+                                window.setTimeout(authenticatePayer(maxRetries), 3000);
                             })
                                 .then(function (authResponse) {
                                     console.log("Received Authenticate Payer Response ", authResponse.htmlRedirectCode);
@@ -301,7 +331,7 @@
                     }
                 }
             }
-        });
+        }, optionalParam);
     }
 
     /**
