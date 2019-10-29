@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{hcoconfigpages/layout :: hcoTestPage (~{::#wcag-scenario})}">
+    <body>
+        <div id="wcag-scenario">
+            <div class="col-12 col-md-9">
+                <div class="row">
+                    <div class="contents col-12">
+                        <div class="col-md-12">
+                            <h3>Hosted Checkout WCAG Testing page</h3>
+                            <h5>Test name: <b>Billing Shipping Email fields</b></h5>
+                            <table class="table table-bordered">
+                                <tbody>
+                                <tr>
+                                    <th scope="row">Card number</th>
+                                    <td>5123450000000008</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Expiry month</th>
+                                    <td>05</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Expiry year</th>
+                                    <td>21</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Security code</th>
+                                    <td>100</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div th:replace="~{hcoconfigpages/WCAGDefectsTable :: wcagReports}"></div>
+                            <div class="mt-5">
+                                <input id="lightbox-with-session" type="button" class="btn btn-primary mr-2"
+                                       value="Pay with Lightbox" onclick="Checkout.showLightbox();"/>
+                                <input id="page-with-session" type="button" class="btn btn-primary"
+                                       value="Pay with Payment Page" onclick="Checkout.showPaymentPage();" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script th:src="@{${baseUrl} + '/checkout/version/' + ${config.apiVersion} + '/checkout.js'}"
+                    data-error="errorCallback"
+                    data-cancel="cancelCallback"
+                    data-beforeRedirect="Checkout.saveFormFields"
+                    data-afterRedirect="Checkout.restoreFormFields">
+            </script>
+
+            <script th:inline="javascript">
+
+                function errorCallback(error) {
+                    var message = JSON.stringify(error);
+                    console.log(message);
+                }
+
+                function cancelCallback() {
+                    console.log('Payment cancelled');
+                    // Reload the page to generate a new session ID - the old one is out of date as soon as the lightbox is invoked
+                    window.location.reload(true);
+                }
+
+                var configObject = {
+                    merchant: "TEST3DSV2",
+                    order: {
+                        currency: "EUR",
+                        description: "Goods",
+                        amount: "100"
+                    },
+                    interaction: {
+                        merchant: {
+                            name: 'Merchant Name'
+                        },
+                        displayControl: {
+                            billingAddress: 'MANDATORY',
+                            customerEmail: 'MANDATORY'
+                        },
+                        operation: "AUTHORIZE"
+                    },
+                    shipping: {
+                        address: {
+                            city: 'O\'Fallon',
+                            company: "Mastercard",
+                            country: "USA",
+                            postcodeZip: 63000,
+                            street: '123 Technology Dr'
+                        }
+                    },
+                    hppdebug: true
+                };
+
+                Checkout.configure(configObject);
+            </script>
+        </div>
+    </body>
+</html>

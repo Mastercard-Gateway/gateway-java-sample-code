@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html  th:fragment="hcoTestPage (template)" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>WCAG test page</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+              integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="../stylesheets/main.css"/>
+        <script th:src="@{../webjars/jquery/jquery.min.js}"></script>
+        <script th:src="@{../webjars/bootstrap/js/bootstrap.min.js}"></script>
+        <script th:src="@{../scripts/wcagdefects.js}"></script>
+        <script th:src="@{../scripts/wcagscenarios.js}"></script>
+        <script th:src="@{../scripts/wcagreport.js}"></script>
+    </head>
+    <body>
+        <style type="text/css">
+            .status {
+                border-radius: 5px;
+                display: inline-block;
+                font-size: 15px;
+                font-weight: bold;
+                line-height: 1;
+                margin: 0;
+                padding: 4px 5px;
+                text-align: left;
+                text-decoration: none;
+                text-transform: uppercase;
+                cursor: pointer;
+            }
+
+            .status.status_success {
+                background-color: #00875a;
+                border-color: #00875a;
+                color: #fff;
+                border: 1px solid #dfe1e6;
+            }
+
+            .status.status_warning {
+                background-color: #ffab00;
+                border-color: #ffab00;
+                color: #253858;
+                border: 1px solid #dfe1e6;
+            }
+
+            .status.status_danger {
+                background-color: #de350b;
+                border-color: #de350b;
+                color: #fff;
+                border: 1px solid #dfe1e6;
+            }
+        </style>
+
+        <div th:replace="${template}"></div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var pageId = /*[[${pageId}]]*/ null;
+            /*]]>*/
+
+            var screenReaders = WCAG_REPORT.scenarios[pageId];
+            var wcagDefects = WCAG_REPORT.defects;
+            var statuses = WCAG_REPORT.statuses;
+
+            var template = "";
+            for (var screenReader in screenReaders) {
+                template += getTable(screenReader);
+            }
+            $('#hcowcagdefects').html(template);
+
+            function getTable(screenReader) {
+                return [
+                    '<h3 class="pt-3">Screenreader - <b>' + screenReader + '</b></h3>',
+                    '<table class="table table-bordered">',
+                        '<thead>',
+                            '<tr>',
+                                '<th style="width: 30px">#</th>',
+                                '<th>Description</th>',
+                                '<th>Status</th>',
+                                '<th>Browsers</th>',
+                            '</tr>',
+                        '</thead>',
+                        '<tbody>',
+                            getTableRows(screenReaders[screenReader]),
+                        '</tbody>',
+                    '</table>'
+                ].join("");
+            }
+
+            function getDefectStatus(status) {
+                if (Array.isArray(status)) {
+                    return status.map(function (value) {
+                        return '<span title="' + statuses[value].description + '" class="' + getStatusClass(statuses[value].color) + '">' + statuses[value].title + '</span><br/>';
+                    }).join('');
+                }
+            }
+
+            function getStatusClass(status) {
+                switch (status) {
+                    case 'SUCCESS':
+                        return 'status status_success';
+                        break;
+                    case 'WARNING':
+                        return 'status status_warning';
+                        break;
+                    case 'DANGER':
+                        return 'status status_danger';
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            function getTableRows(screenReader) {
+                var defects = [];
+                var browsers = [];
+                for (var browser in screenReader) {
+                    browsers.push(browser);
+                    defects = defects.concat(screenReader[browser]);
+                }
+                defects = defects.filter(function (item, index, self) {
+                    return self.indexOf(item) === index;
+                });
+                defects.sort(function (a, b) {
+                    return a - b;
+                });
+                return defects.map(function (item) {
+                    var wcagDefect = wcagDefects.filter(function (wcagDefect) {
+                        return wcagDefect.id === item;
+                    })[0];
+                    return '<tr class="' + (wcagDefect.fixed ? 'table-success':'table-danger') + '">' +
+                        '<th scope="row">' + wcagDefect.id + '</th>' +
+                        '<td>' + wcagDefect.description + '</td>' +
+                        '<td>' + getDefectStatus(wcagDefect.status) + '</td>' +
+                        '<td>' +
+                            browsers.filter(function (browser) {
+                                return !!~screenReader[browser].indexOf(wcagDefect.id);
+                            }).join(", ") +
+                        '</td>' +
+                    '</tr>';
+                }).join("");
+            }
+        </script>
+    </body>
+</html>
