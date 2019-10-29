@@ -48,10 +48,8 @@
     /*]]>*/
 
     APM.configure(merchantId, sessionId, {
-            configuration: {
                 wsVersion: apiVersion,
                 userLanguage: 'en-US'
-            }
         }, function (data) {
             if (data && data.result === "ERROR") {
                 var error = data.restApiResponse.error;
